@@ -1,37 +1,37 @@
-Album Name,Artist,avg_score,min_score,max_score,score_std,track_count,avg_uncertainty,Genres,Record Label,Release Date,confidence_score,weighted_score,NMF_Date
-Poison,CATHEDRALE,100.08211199442546,95.56332015991211,103.85155487060547,2.433422982274688,12,0.0,post-punk,Howlin' Banana,2025-02-14,56.40059167098469,56.446903321673496,2025-02-14
-Out Of The Blue,Morgan Saint,101.69194497002496,98.58452224731447,105.87648010253906,2.4611305968537063,9,8.472222222222236,"electronic, indie, pop, chill, experimental",4Love,2025-02-14,45.341647431679874,46.10880315472664,2025-02-14
-Mr. Luck & Ms. Doom,The Delines,102.0449631430886,97.61170959472656,107.67181015014648,3.520120047664419,11,18.181818181818198,"alt country,americana",Jealous Butcher Records,2025-02-14,25.50875858987255,26.030403301294886,2025-02-14
-Plus One,The War And Treaty,10.711632728576522,7.994724273681502,14.134641647338729,1.8757618754659193,18,1.1404210908949606e-13,"soul, country, blues, gospel, country soul",UMG Nashville,2025-02-14,66.33009868668401,7.1050365598199505,2025-02-14
-"American Man, American Music",Ron Pope,9.865086936950544,7.290609359741072,12.892562866210799,1.7996385710081764,10,1.1404210908949606e-13,"acoustic, singer-songwriter, indie, piano, piano rock",Brooklyn Basement Records,2025-02-14,64.75633579253726,6.388268823117422,2025-02-14
-Cryogeyser,Cryogeyser,10.212751908735656,6.1022033691404864,14.212583541869979,2.132864015016681,11,1.1404210908949606e-13,"shoegaze,dream pop",Cryogeyser,2025-02-14,60.41311010624473,6.169841055502083,2025-02-14
-Dark Country,Gary Louris,10.417963186899682,7.639331817626815,17.67484474182115,2.527871530194824,12,1.1404210908949606e-13,"alt country,americana",SHAM,2025-02-14,55.00692787317286,5.73060149607161,2025-02-14
-(AU),Thomas Erak & The Ouroboros,8.446869776798993,4.8842315673826775,12.176908493041857,1.9789231969118353,13,4.2178909937389945e-13,"post-hardcore,emocore,metalcore",Equal Vision Records,2025-02-14,63.48273668716896,5.362304098713361,2025-02-14
-Ghostholding,venturing,7.736180232121256,4.5614318847654864,11.75130081176744,2.0573910552634995,13,1.1404210908949606e-13,shoegaze,deadAir,2025-02-14,62.3179887342894,4.821031925517648,2025-02-14
-I Love What We Do,Geoffrey O'Connor,9.02304687499986,4.203311920165877,12.754676818847518,2.81395634137809,10,1.1404210908949606e-13,"indie pop, electronic, pop, australian",Dinosaur City Records,2025-02-14,50.01604033199262,4.512970764174529,2025-02-14
-Be Real With Me,Chatham Rabbits,7.491006427340902,3.9641036987303337,10.936185836791857,2.3493484818413477,9,4.2164790177897275e-13,"bluegrass,newgrass,americana",Independent,2025-02-14,56.200148655583824,4.209956747964926,2025-02-14
-"to you, after 2000 years",Customer Service,8.068799336751164,5.799730300903182,10.601427078246932,2.4116737712386374,3,1.1404210908949606e-13,midwest emo,Royal Mountain Records,2025-02-14,46.08623391082865,3.7186057361305327,2025-02-14
-Serene Demon,Art d'Ecco,6.669918251037463,3.7485427856443962,10.679023742675646,2.4999974724383187,10,4.239097961544757e-13,"art rock, glam rock, post-punk, Canadian, indie pop",Paper Bag Records,2025-02-14,54.57856168951805,3.640345447282905,2025-02-14
-GNOSIS,RAVEN,7.29949712753282,3.9247913360594318,13.65816879272447,2.9559251916966773,8,1.1404210908949606e-13,idm,Incienso (EU),2025-02-14,46.887296485545,3.4225368601401542,2025-02-14
-Avalanche,Thala,5.221455383300646,2.8569717407225212,9.049936294555529,1.8494886286450625,10,4.2398085042805174e-13,"latin, pop, female vocalists, latin pop, spanish",Fire Records,2025-02-14,64.0319034698882,3.343397270758351,2025-02-14
-Food From the Gods,"Black Milk,Fat Ray",5.506641214543988,1.2520217895506462,8.324361801147326,2.2172053031650663,11,4.229667121597395e-13,"alternative hip hop,underground hip hop",Fat Beats Records,2025-02-13,59.1772295245638,3.2586777106249234,2025-02-14
-It Will Be Like Now,Vulture Feather,7.631481409072737,3.1807231903074786,11.772642135619979,3.409962874400983,8,1.1404210908949606e-13,"post-punk, indie, vocal, rock, punk",felte,2025-02-14,40.43574428176318,3.0858463074829494,2025-02-14
-A Million Knives,The Velveteers,6.086822069608113,0.07125473022447437,11.446573257446154,3.1587523298756413,13,4.223903278426195e-13,"indie rock, rock, Stoner Rock, Garage Rock, alternative",Easy Eye Sound,2025-02-14,45.96978812154049,2.798099208734015,2025-02-14
-Hopeless Romantik,Das Beat,5.08594942092882,2.849393844604357,8.051488876342638,2.173904920141194,4,4.25837143325225e-13,"neue deutsche welle,cold wave,darkwave",Arbutus Records,2025-02-14,52.199322982769004,2.6548311649709047,2025-02-14
-New Dawn,Marshall Allen,5.330141612461497,1.7332439422606036,10.336111068725447,2.874735834364855,7,1.1404210908949606e-13,free jazz,Mexican Summer,2025-02-14,47.290299768857366,2.5206399466376497,2025-02-14
-Anything At All,"Denison Witmer,Sufjan Stevens",4.160033416747912,0.9559307098387322,8.578042984008654,2.131975839637378,10,4.203215553388872e-13,"singer-songwriter,chamber pop,baroque pop",Asthmatic Kitty,2025-02-14,59.92673537021728,2.4929722169671296,2025-02-14
-La La La,Marinero,9.482563177744412,1.3146419525145134,17.572666168212756,4.533075723657504,12,4.217515225946044e-13,"indie rock, indie pop, psychedelic pop, psychedelic, Psychedelic Rock",Hardly Art,2025-02-14,25.418537652370212,2.4103288917447565,2025-02-14
-Like A Ribbon,John Glacier,4.062473470514333,-2.401157379150529,6.473823547363143,2.314884496928465,11,1.1404210908949606e-13,experimental hip hop,Young,2025-02-14,57.74590423351559,2.345912039795184,2025-02-14
-You'll Know It Was Me,Church Tongue,3.2405207951862223,1.5401115417479083,5.755184173583846,1.622716094968007,6,1.1404210908949606e-13,"metalcore,melodic hardcore",Pure Noise Records,2025-02-14,63.480132508047134,2.0570868947350367,2025-02-14
-Out of Body,Last Days of Heaven,8.727758407592635,3.5211296081541583,13.307977676391463,4.619522464642528,5,1.1404210908949606e-13,Unknown,NEW MORALITY ZINE,2025-02-14,21.795715960489463,1.902277432236629,2025-02-14
-Gaiko,Gaiko,3.7597507900660503,-2.617343902588029,7.50642776489244,3.0454730040150046,9,1.1404210908949606e-13,Unknown,Nous'klaer Audio,2025-02-14,46.18507190195128,1.7364436057261867,2025-02-14
-Better Wonder,"Kestrels,Weird Nightmare",9.601084947585921,0.5004310607908771,16.973640441894393,5.424623447072132,12,1.1404210908949606e-13,"shoegaze,dream pop",Darla,2025-02-14,12.263038563119595,1.1773847496003322,2025-02-14
-Phonetics On and On,Horsegirl,95.30312035300516,85.93731689453125,102.78206634521484,5.613933497829114,11,45.681818181818194,"indie rock, post-punk, Crank wave, noise pop, shoegaze",Matador,2025-02-14,1.0,0.9530312035300516,2025-02-14
-Heartache in Room 14,The Altons,91.10000356038411,85.18243789672852,96.39768600463869,3.48721454752567,9,50.000000000000014,retro soul,Daptone Records,2025-02-14,1.0,0.9110000356038411,2025-02-14
-Light hit my face like a straight right,Mallrat,90.6975212097168,74.75232315063477,98.5205192565918,6.255689151149325,12,23.020833333333346,"pop, electronic, indie pop, australian",Nettwerk Music Group,2025-02-14,1.0,0.9069752120971679,2025-02-14
-My Apologies To The Chef,Winona Fighter,79.12255586896624,73.89525604248047,85.70652770996094,3.650809103942588,14,50.000000000000014,"pop punk, punk, female vocalists, USA",Rise Records,2025-02-14,1.0,0.7912255586896625,2025-02-14
-Oh! The Ocean,The Wombats,75.56764888763428,68.84667587280273,85.94780349731445,5.246238330889005,12,50.00000000000002,indie,The Wombats,2025-02-14,1.0,0.7556764888763428,2025-02-14
-Saint Motel & the Symphony in the Sky,Saint Motel,74.910413424174,68.66291809082031,79.14486694335938,3.1391434223223067,12,50.00000000000001,"indie, indie rock, indie pop, american",Elektra Entertainment (NEK),2025-02-14,1.0,0.7491041342417399,2025-02-14
-Divinations,Oracle Sisters,69.37577299638228,65.89812088012695,74.47937393188477,3.0840192500491805,11,50.00000000000001,"indie pop, dream pop, french, indie, france",Wizard Artists,2025-02-14,1.0,0.6937577299638228,2025-02-14
-The Breeze Grew a Fire,Mereba,64.47679857107309,56.37915802001954,74.02506256103516,4.856976155098565,13,50.000000000000014,alternative r&b,Secretly Canadian,2025-02-14,1.0,0.6447679857107309,2025-02-14
-Automatic,The Lumineers,58.568552780151364,50.92161560058594,67.30329132080078,5.602976085659947,10,50.00000000000002,"folk pop,indie folk",Dualtone Music Group,2025-02-14,1.0,0.5856855278015136,2025-02-14
+Artist,Album Name,avg_score,confidence_score,track_count,Genres,Label,Artist_Centrality,Mood_Score,Energy_Profile
+CATHEDRALE,Poison,95.823,57.5,12,"garage rock, indie rock, french rock, toulouse",Howlin' Banana,-1.903,,
+Morgan Saint,Out Of The Blue,93.814,28.675,9,"female vocalist, electronic, indie, pop, chill, experimental, indie pop, experimental pop, minimal, dream pop",4Love,0.522,,
+The Delines,Mr. Luck & Ms. Doom,92.466,41.85,11,"female vocalist, americana, country, alt-country, alternative country, folk, indie, usa, american, psychedelic rock",Jealous Butcher Records,0.248,,
+The Lumineers,Automatic,77.211,39.61,10,"folk, indie, folk rock, american, rock, indie folk, americana, alternative, indie rock, indie pop",Dualtone Music Group,0.25,,
+The Wombats,Oh! The Ocean,74.971,10.574,12,"indie, british, indie rock, britpop, rock, alternative, liverpool, indie pop, alternative rock, pop",The Wombats,0.421,,
+The Altons,Heartache in Room 14,74.052,27.073,9,"soul, usa, psychedelic, daptone, los angeles, chicano soul,  united states, penrose, souldies",Daptone Records,0.481,,
+Saint Motel,Saint Motel & the Symphony in the Sky,73.559,13.268,12,"indie, indie rock, indie pop, american, los angeles, hard-pop, rock, pop, alternative, power pop",Elektra Entertainment (NEK),1.194,,
+Father John Misty,"I Love You, Honeybear Demos, etc.",72.063,1.0,11,"folk, indie, indie folk, alt-country, folk rock, singer-songwriter, american, chamber pop, indie rock, usa",Sub Pop Records,-0.232,,
+Mallrat,Light hit my face like a straight right,70.252,24.83,12,"female vocalist, female vocalist, pop, electronic, indie pop, australian, australia, indie, rap, singer-songwriter",Nettwerk Music Group,-0.107,,
+Horsegirl,Phonetics On and On,69.699,43.904,11,"female vocalist, indie rock, post-punk, noise pop, crank wave, shoegaze, noise rock, indie, art punk, rock",Matador,-0.555,,
+Oracle Sisters,Divinations,69.361,32.676,11,"indie pop, dream pop, french, indie, france, indie rock, acoustic, synth pop, soft rock, folk rock",Wizard Artists,0.148,,
+Mereba,The Breeze Grew a Fire,67.905,29.643,13,"rnb, soul, pop, hip-hop, female, hip hop, folk, singer-songwriter, world, ethiopia",Secretly Canadian,-0.115,,
+Ron Pope,"American Man, American Music",65.504,1.0,10,"acoustic, singer-songwriter, indie, piano, piano rock, american, rock, male vocalists, love, pop",Brooklyn Basement Records,-1.436,,
+Winona Fighter,My Apologies To The Chef,61.314,2.604,14,"female vocalist, pop punk, punk, usa, nashville, punk rock, tennessee",Rise Records,-1.496,,
+"Black Milk,Fat Ray",Food From the Gods,60.842,3.341,11,"hip-hop, underground hip-hop, detroit, rap, hip hop, producer, detroit rap, underground rap, black milk, american",Fat Beats Records,-1.54,,
+John Glacier,Like A Ribbon,8.706,29.836,11,"experimental, electronic, british, hip-hop, experimental hip hop, abstract, experimental rap, hip hop, uk, idm",Young,-2.091,,
+venturing,Ghostholding,7.868,50.935,13,"alternative rock, shoegaze, slowcore, noise pop, rock, emo, lo-fi, dream pop, post-hardcore, united states",deadAir,-2.091,,
+"Denison Witmer,Sufjan Stevens",Anything At All,7.288,6.796,10,"singer-songwriter, indie, folk, acoustic, mellow, indie rock, alternative, american, christian, indie folk",Asthmatic Kitty,-2.091,,
+Customer Service,"to you, after 2000 years",7.181,28.25,3,"ambient, electronic, experimental, american, drone, tennessee, vaporwave, eagleville",Royal Mountain Records,-2.091,,
+"Last Days of Heaven,Jasper Byrne",Out of Body,6.935,,1,"synthwave,vaporwave",NEW MORALITY ZINE,-2.091,,
+The War And Treaty,Plus One,6.895,25.037,18,"female vocalist, soul, country, blues, gospel, country soul, americana, rnb, usa, american",UMG Nashville,-2.091,,
+RAVEN,GNOSIS,6.729,71.914,8,"heavy metal, nwobhm, speed metal, hard rock, metal, british, new wave of british heavy metal, black metal, rac, rock",Incienso (EU),-2.091,,
+Church Tongue,You'll Know It Was Me,6.709,53.01,6,"metalcore, hardcore, melodic hardcore, metallic hardcore, american, hardcore punk, new hampshire, clawhammer, 00s metalcore, gorg",Pure Noise Records,-2.091,,
+Marinero,La La La,6.703,77.961,12,"indie rock, indie pop, psychedelic pop, psychedelic, psychedelic rock, san francisco, disco polo",Hardly Art,-2.091,,
+Gary Louris,Dark Country,6.65,62.23,12,"singer-songwriter, americana, alt-country, folk, rock, country rock, jayhawks, country, acoustic, songwriter",SHAM,-2.091,,
+Cryogeyser,Cryogeyser,6.633,70.718,11,"shoegaze, electronic, dream pop, indie, indie pop, indie rock, ethereal, us, lo-fi indie, cocteau twins worship",Cryogeyser,-2.091,,
+Geoffrey O'Connor,I Love What We Do,6.62,66.94,10,"indie pop, electronic, pop, australian, australia, seen em live, electropop, indie, synth pop, synthpop",Dinosaur City Records,-2.091,,
+"Kestrels,Weird Nightmare",Better Wonder,6.554,75.649,12,"indie rock, shoegaze, indie, canadian, canada, rock, under 2000 listeners, halifax, birp",Darla,-2.091,,
+The Velveteers,A Million Knives,6.536,50.335,13,"indie rock, rock, stoner rock, garage rock, alternative, indie pop, usa, blues, american, colorado",Easy Eye Sound,-2.091,,
+Marshall Allen,New Dawn,6.506,75.029,7,"free jazz, jazz, avant-garde, saxophone, improv, avant-garde jazz, sax, under 2000 listeners, avant-jazz, try",Mexican Summer,-2.091,,
+Thala,Avalanche,6.465,28.011,10,"female vocalist, female vocalist, latin, pop, latin pop, spanish, mexican, thalia, mexico, dance",Fire Records,-2.091,,
+Art d'Ecco,Serene Demon,6.343,66.232,10,"art rock, glam rock, post-punk, canadian, indie pop, indie rock, canada, synth pop, synthpop, glam",Paper Bag Records,-2.091,,
+Das Beat,Hopeless Romantik,6.231,50.927,4,"new wave, coldwave, electronic, synth pop, new rave, synthpop, spotify, upcoming album 2023",Arbutus Records,-2.091,,
+Vulture Feather,It Will Be Like Now,6.107,71.176,8,"post-punk, indie, vocal, rock, punk, experimental, indie rock, post punk, guitar, bass",felte,-2.091,,
+Thomas Erak & The Ouroboros,(AU),6.094,75.828,13,"post-hardcore, math rock, progressive rock, american, sasscore, swancore",Equal Vision Records,-2.091,,
+Chatham Rabbits,Be Real With Me,6.057,60.318,9,"Americana, Folk, Dual-Gender",Independent,-2.091,,
