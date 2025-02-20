@@ -1,329 +1,349 @@
 import streamlit as st
-from datetime import datetime
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import networkx as nx
-import numpy as np
-from typing import Tuple, List
+from datetime import datetime
+import glob
+import os
 
-def load_data() -> Tuple[pd.DataFrame, pd.DataFrame]:
-    """Load and prepare all necessary datasets"""
-    try:
-        with st.spinner('Loading prediction data...'):
-            # Get the most recent prediction file
-            prediction_files = os.listdir('predictions')
-            latest_prediction = sorted(
-                [f for f in prediction_files if f.endswith('_Album_Recommendations.csv')],
-                reverse=True
-            )[0]
-            
-            predictions = pd.read_csv(f'predictions/{latest_prediction}')
-            track_predictions = pd.read_csv('predictions/nmf_predictions_with_uncertainty.csv')
-            feature_importance = pd.read_csv('data/feature_importance.csv')  # You'll need to save this during model training
-            
-            return predictions, track_predictions, feature_importance
-    except Exception as e:
-        st.error(f"Error loading data: {e}")
-        return None, None, None
+st.set_page_config(
+    page_title="New Music Friday Regression Model",
+    page_icon="🎵",
+    layout="wide",
+    initial_sidebar_state="expanded"
+)
 
-def create_network_visualization(G: nx.Graph) -> go.Figure:
-    """Create an interactive network visualization using plotly"""
-    pos = nx.spring_layout(G)
+# Custom CSS
+st.markdown("""
+    <style>
+    .prediction-card {
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        background-color: #ffffff;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
+@st.cache_data
+def load_predictions():
+    # Get the most recent predictions file
+    prediction_files = glob.glob('predictions/*_Album_Recommendations.csv')
+    if not prediction_files:
+        st.error("No prediction files found!")
+        return None
+
+    latest_file = max(prediction_files)
+    predictions_df = pd.read_csv(latest_file)
     
-    edge_trace = go.Scatter(
-        x=[], y=[], mode='lines',
-        line=dict(width=0.5, color='#888'),
-        hoverinfo='none'
-    )
+    # Extract date from filename
+    date_str = os.path.basename(latest_file).split('_')[0]
+    analysis_date = datetime.strptime(date_str, '%m-%d-%y').strftime('%Y-%m-%d')
     
-    node_trace = go.Scatter(
-        x=[], y=[], mode='markers+text',
-        hoverinfo='text',
-        marker=dict(
-            showscale=True,
-            colorscale='YlGnBu',
-            size=10,
-        )
-    )
-    
-    # Add edges to visualization
-    for edge in G.edges():
-        x0, y0 = pos[edge[0]]
-        x1, y1 = pos[edge[1]]
-        edge_trace['x'] += (x0, x1, None)
-        edge_trace['y'] += (y0, y1, None)
-    
-    # Add nodes to visualization
-    node_trace['x'] = [pos[node][0] for node in G.nodes()]
-    node_trace['y'] = [pos[node][1] for node in G.nodes()]
-    node_trace['text'] = list(G.nodes())
-    
-    fig = go.Figure(data=[edge_trace, node_trace],
-                   layout=go.Layout(
-                       showlegend=False,
-                       hovermode='closest',
-                       margin=dict(b=0,l=0,r=0,t=0),
-                   ))
-    return fig
+    return predictions_df, analysis_date
+
+def load_training_data():
+    df = pd.read_csv('data/df_cleaned_pre_standardized.csv')
+    # Filter out NMF data since we only want training data
+    return df[df['playlist_origin'] != 'df_nmf'].copy()
 
 def main():
-    st.set_page_config(layout="wide", page_title="Music Recommendation Analysis")
+    # Sidebar with project context
+    st.sidebar.title("About This Project")
+    st.sidebar.write("""
+    ### Tech Stack
+    - 🤖 Machine Learning: RandomForest & XGBoost
+    - 📊 Data Processing: Pandas & NumPy
+    - 🎨 Visualization: Plotly & Streamlit
+    - 🎵 Data Source: Spotify API
     
-    st.title("New Music Friday Prediction App")
-    st.write("Predicting which new albums you'll enjoy based on your music taste!")
+    ### Key Features
+    - Weekly New Music Predictions
+    - Advanced Artist Similarity Analysis
+    - Genre-based Learning
+    - Automated Label Analysis
+    """)
     
-    # Sidebar for navigation
-    page = st.sidebar.selectbox(
-        "Choose a page", 
-        ["Album Predictions", "Track Predictions", "Model Insights", "Artist Network", "About"]
+    # Main navigation
+    page = st.sidebar.radio(
+        "Navigate",
+        ["Weekly Predictions", "Technical Overview", "Music Analytics", "Explore Mike's Taste"]
     )
     
-    # Load data with spinner
-    with st.spinner('Loading data...'):
-        album_predictions, track_predictions, feature_importance = load_data()
-    
-    if not all([album_predictions is not None, track_predictions is not None, feature_importance is not None]):
-        st.error("Failed to load necessary data. Please check your data files.")
+    # Load prediction data
+    predictions_data = load_predictions()
+    if predictions_data is None:
+        st.error("Could not load prediction data. Please check the predictions folder.")
         return
     
-    if page == "Album Predictions":
-        st.header("Album Recommendations")
+    df, analysis_date = predictions_data
+    
+    if page == "Weekly Predictions":
+        st.title("🎵 New Music Friday Regression Model")
+        st.subheader("Personalized New Music Friday Recommendations")
         
-        col1, col2 = st.columns([2, 1])
-        
+        # Key metrics
+        col1, col2, col3 = st.columns(3)
         with col1:
-            # Filter controls
-            st.subheader("Filter Options")
-            
-            # Genre filter
-            genres = album_predictions['Genres'].str.split(', ').explode().unique()
-            selected_genres = st.multiselect("Filter by Genre", genres)
-            
-            # Confidence threshold
-            confidence_threshold = st.slider(
-                "Minimum Confidence Score", 
-                min_value=0, 
-                max_value=100, 
-                value=50,
-                help="Higher values indicate more reliable predictions"
-            )
-            
-            # Search box
-            search_term = st.text_input("Search by Artist or Album Name")
-        
+            st.metric("New Releases", len(df))
         with col2:
-            # Sorting options
-            sort_by = st.selectbox(
-                "Sort by",
-                ['weighted_score', 'avg_score', 'confidence_score', 'track_count']
-            )
-            sort_ascending = st.checkbox("Sort Ascending")
+            st.metric("Genres Analyzed", df['Genres'].nunique())
+        with col3:
+            st.metric("Analysis Date", analysis_date)
+            
+        # Top predictions with interactive elements
+        st.subheader("🏆 Top Album Predictions")
         
-        # Apply filters
-        filtered_predictions = album_predictions.copy()
+        # Create a set of all unique genres
+        all_genres = set()
+        for genres in df['Genres'].str.split(','):
+            if isinstance(genres, list):
+                all_genres.update([g.strip() for g in genres])
         
-        if selected_genres:
-            filtered_predictions = filtered_predictions[
-                filtered_predictions['Genres'].str.contains('|'.join(selected_genres), na=False)
+        # Genre filter
+        genres = st.multiselect(
+            "Filter by Genre",
+            options=sorted(list(all_genres)),
+            default=[]
+        )
+        
+        # Filter data based on selected genres
+        if genres:
+            filtered_data = df[
+                df['Genres'].apply(lambda x: any(genre in x for genre in genres))
             ]
+        else:
+            filtered_data = df
         
-        filtered_predictions = filtered_predictions[
-            filtered_predictions['confidence_score'] >= confidence_threshold
-        ]
+        # Artist search
+        artist_search = st.text_input(
+            "Search by Artist",
+            placeholder="Enter artist name..."
+        ).strip().lower()
         
-        if search_term:
-            search_mask = (
-                filtered_predictions['Album Name'].str.contains(search_term, case=False, na=False) |
-                filtered_predictions['Artist'].str.contains(search_term, case=False, na=False)
-            )
-            filtered_predictions = filtered_predictions[search_mask]
+        # Modify filtering logic to include both genre and artist filters
+        if genres or artist_search:
+            filtered_data = df.copy()
+            if genres:
+                filtered_data = filtered_data[
+                    filtered_data['Genres'].apply(lambda x: any(genre in x for genre in genres))
+                ]
+            if artist_search:
+                filtered_data = filtered_data[
+                    filtered_data['Artist'].str.lower().str.contains(artist_search, na=False)
+                ]
+        else:
+            filtered_data = df
+
+        # Sort by average score
+        top_albums = filtered_data.sort_values('avg_score', ascending=False)
         
-        # Sort results
-        filtered_predictions = filtered_predictions.sort_values(
-            sort_by, 
-            ascending=sort_ascending
-        )
+        # Display predictions in an engaging format
+        for idx, row in top_albums.head(10).iterrows():
+            with st.container():
+                col1, col2, col3 = st.columns([3, 1, 1])
+                with col1:
+                    st.markdown(f"### {row['Artist']} - {row['Album Name']}")
+                    st.markdown(f"**Genre:** {row['Genres']}")
+                    st.markdown(f"**Label:** {row['Label']}")
+                with col2:
+                    st.metric("Score", f"{row['avg_score']:.1f}")
+                with col3:
+                    st.metric("Confidence", f"{row['confidence_score']:.1f}")
+                st.markdown("---")
         
-        # Display results
-        st.subheader("Filtered Results")
-        st.dataframe(
-            filtered_predictions[['Album Name', 'Artist', 'avg_score', 
-                                'confidence_score', 'Genres', 'track_count']]
-        )
+    elif page == "Technical Overview":
+        st.title("🔬 Model Architecture")
         
-        # Download button
-        csv = filtered_predictions.to_csv(index=False)
-        st.download_button(
-            label="Download filtered results as CSV",
-            data=csv,
-            file_name="filtered_predictions.csv",
-            mime="text/csv"
-        )
-        
-        # Visualizations
-        st.subheader("Prediction Visualization")
-        
-        viz_type = st.radio(
-            "Choose visualization",
-            ["Score vs Confidence", "Genre Distribution", "Score Distribution"]
-        )
-        
-        if viz_type == "Score vs Confidence":
-            fig = px.scatter(
-                filtered_predictions,
-                x='confidence_score',
-                y='avg_score',
-                hover_data=['Album Name', 'Artist', 'Genres'],
-                title='Album Predictions: Score vs Confidence',
-                color='track_count'
-            )
-            st.plotly_chart(fig)
-            
-        elif viz_type == "Genre Distribution":
-            genre_counts = (
-                filtered_predictions['Genres']
-                .str.split(', ')
-                .explode()
-                .value_counts()
-                .head(15)
-            )
-            fig = px.bar(
-                x=genre_counts.index,
-                y=genre_counts.values,
-                title="Genre Distribution in Predictions"
-            )
-            st.plotly_chart(fig)
-            
-        else:  # Score Distribution
-            fig = px.histogram(
-                filtered_predictions,
-                x='avg_score',
-                title="Distribution of Prediction Scores"
-            )
-            st.plotly_chart(fig)
-        
-    elif page == "Track Predictions":
-        st.header("Track-Level Predictions")
-        
-        # Add confidence interval visualization
-        fig = go.Figure([
-            go.Scatter(
-                name='Upper Bound',
-                x=track_predictions.index,
-                y=track_predictions['prediction_upper'],
-                mode='lines',
-                marker=dict(color="#444"),
-                line=dict(width=0),
-                showlegend=False
-            ),
-            go.Scatter(
-                name='Prediction',
-                x=track_predictions.index,
-                y=track_predictions['predicted_score'],
-                mode='lines',
-                marker=dict(color="#ff0000"),
-                line=dict(width=2),
-                fillcolor='rgba(68, 68, 68, 0.3)',
-                fill='tonexty'
-            ),
-            go.Scatter(
-                name='Lower Bound',
-                x=track_predictions.index,
-                y=track_predictions['prediction_lower'],
-                marker=dict(color="#444"),
-                line=dict(width=0),
-                mode='lines',
-                fillcolor='rgba(68, 68, 68, 0.3)',
-                fill='tonexty',
-                showlegend=False
-            )
-        ])
-        
-        fig.update_layout(
-            title='Track Predictions with Confidence Intervals',
-            yaxis_title='Predicted Score',
-            hovermode='x'
-        )
-        st.plotly_chart(fig)
-        
-    elif page == "Model Insights":
-        st.header("Model Performance Insights")
+        st.write("""
+        ### Prediction Pipeline
+        This model combines multiple ML techniques to predict music preferences:
+        1. Artist Similarity Network Analysis
+        2. Genre Encoding & Classification
+        3. Audio Feature Analysis
+        4. Ensemble Prediction
+        """)
         
         # Feature importance visualization
-        st.subheader("Feature Importance")
-        fig = px.bar(
-            feature_importance.head(15),
-            x='importance',
-            y='feature',
+        st.subheader("🎯 Feature Impact Analysis")
+        features = ['Artist Network Centrality', 'Label Analysis', 'Genre Encoding', 
+                   'Popularity Metrics', 'Mood Profile', 'Energy Signature']
+        importance = [0.365, 0.317, 0.160, 0.056, 0.039, 0.038]
+        
+        fig = go.Figure(go.Bar(
+            x=importance,
+            y=features,
             orientation='h',
-            title="Top 15 Most Important Features"
+            marker_color='#1DB954'  # Spotify green
+        ))
+        fig.update_layout(
+            title="Feature Importance in Prediction Model",
+            xaxis_title="Relative Importance",
+            yaxis_title="Feature"
         )
-        st.plotly_chart(fig)
+        st.plotly_chart(fig, use_container_width=True)
+    
+    elif page == "Explore Mike's Taste":
+        st.title("🎧 Mike's Music Taste Analysis")
         
-        # Add feature effect plots
-        st.subheader("Feature Effects on Predictions")
-        feature_to_analyze = st.selectbox(
-            "Select feature to analyze",
-            feature_importance['feature'].tolist()
+        # Load training data
+        training_df = load_training_data()
+        
+        # Create tabs for different analyses
+        tab1, tab2, tab3 = st.tabs(["Overview", "Audio Features", "Timeline Analysis"])
+        
+        with tab1:
+            st.subheader("Music Collection Overview")
+            
+            # Display collection metrics
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                loved = len(training_df[training_df['playlist_origin'] == 'df_liked'])
+                st.metric("Loved Songs (100%)", loved)
+            with col2:
+                liked_albums = training_df[training_df['playlist_origin'] == 'df_fav_albums']['Album Name'].nunique()
+                st.metric("Liked Albums (50%)", liked_albums)
+            with col3:
+                disliked_albums = training_df[training_df['playlist_origin'] == 'df_not_liked']['Album Name'].nunique()
+                st.metric("Disliked Albums (0%)", disliked_albums)
+            
+            # Top genres pie chart
+            st.subheader("Favorite Genres in Loved Songs")
+            loved_genres = training_df[training_df['playlist_origin'] == 'df_liked']['Genres'].str.split('|', expand=True).stack()
+            top_genres = loved_genres.value_counts().head(10)
+            
+            fig = px.pie(
+                values=top_genres.values,
+                names=top_genres.index,
+                title="Top 10 Genres in Loved Songs"
+            )
+            st.plotly_chart(fig)
+            
+        with tab2:
+            st.subheader("Audio Features Analysis")
+            
+            # Feature distribution by preference level
+            feature_cols = ['Danceability', 'Energy', 'Valence', 'Tempo', 'mood_score', 'energy_profile']
+            
+            selected_feature = st.selectbox(
+                "Select Audio Feature to Analyze",
+                feature_cols
+            )
+            
+            fig = go.Figure()
+            for origin, name, color in [
+                ('df_liked', 'Loved Songs', '#1DB954'),
+                ('df_fav_albums', 'Liked Albums', '#1ED760'),
+                ('df_not_liked', 'Disliked Albums', '#FF6B6B')
+            ]:
+                data = training_df[training_df['playlist_origin'] == origin][selected_feature]
+                fig.add_trace(go.Violin(
+                    y=data,
+                    name=name,
+                    box_visible=True,
+                    line_color=color,
+                    meanline_visible=True
+                ))
+                
+            fig.update_layout(
+                title=f"{selected_feature} Distribution by Preference Level",
+                yaxis_title=selected_feature
+            )
+            st.plotly_chart(fig)
+            
+            # Correlation matrix for audio features
+            st.subheader("Feature Correlations")
+            corr_matrix = training_df[feature_cols].corr()
+            fig = px.imshow(
+                corr_matrix,
+                labels=dict(color="Correlation"),
+                color_continuous_scale="RdBu"
+            )
+            st.plotly_chart(fig)
+            
+        with tab3:
+            st.subheader("Musical Journey Timeline")
+            
+            # Convert dates and handle invalid formats
+            training_df['Release Date'] = pd.to_datetime(training_df['Release Date'], errors='coerce')
+            
+            # Drop rows with invalid dates
+            training_df = training_df.dropna(subset=['Release Date'])
+            
+            # Create timeline
+            timeline_data = training_df.groupby([
+                pd.Grouper(key='Release Date', freq='Y'),
+                'playlist_origin'
+            ]).size().reset_index(name='count')
+            
+            fig = px.line(
+                timeline_data,
+                x='Release Date',
+                y='count',
+                color='playlist_origin',
+                title="Music Preferences Over Time",
+                labels={
+                    'playlist_origin': 'Preference Level',
+                    'count': 'Number of Songs',
+                    'Release Date': 'Year'
+                }
+            )
+            st.plotly_chart(fig)
+            
+            # Artist network centrality analysis
+            st.subheader("Top Artists by Centrality")
+            top_artists = training_df[training_df['playlist_origin'] == 'df_liked'].nlargest(10, 'Artist Centrality')
+            
+            fig = px.bar(
+                top_artists,
+                x='Artist Name(s)',
+                y='Artist Centrality',
+                title="Most Central Artists in Mike's Music Network",
+                labels={
+                    'Artist Name(s)': 'Artist',
+                    'Artist Centrality': 'Network Centrality Score'
+                }
+            )
+            st.plotly_chart(fig)
+    
+    else:  # Music Analytics
+        st.title("📊 Music Analytics Dashboard")
+        
+        # Distribution of predictions
+        st.subheader("Prediction Distribution")
+        fig = px.histogram(
+            df,
+            x='avg_score',
+            nbins=30,
+            title="Distribution of Prediction Scores"
         )
+        st.plotly_chart(fig, use_container_width=True)
         
-        # Create partial dependence plot
-        # Note: You'll need to implement the actual partial dependence calculation
+        # Genre analysis
+        st.subheader("Genre Performance Analysis")
         
-    elif page == "Artist Network":
-        st.header("Artist Similarity Network")
+        # Explode genres and calculate average scores
+        genre_data = df.assign(
+            Genres=df['Genres'].str.split(',')
+        ).explode('Genres')
+        genre_data['Genres'] = genre_data['Genres'].str.strip()
         
-        # Create and display network visualization
-        # Note: You'll need to load your network data here
-        st.write("Artist network visualization shows how artists in your music library are connected based on similarity.")
+        genre_scores = genre_data.groupby('Genres').agg({
+            'avg_score': 'mean',
+            'Album Name': 'count'
+        }).reset_index()
         
-    else:  # About page
-        st.header("About This Project")
+        genre_scores = genre_scores[genre_scores['Album Name'] > 1].sort_values('avg_score', ascending=False)
         
-        st.subheader("Methodology")
-        st.write("""
-        This project uses machine learning to predict your music preferences based on:
-        1. Your historical listening data
-        2. Audio features from Spotify
-        3. Artist similarity data from Last.fm
-        4. Genre information and record labels
-        """)
-        
-        st.subheader("Features Used")
-        st.write("""
-        The model considers various features including:
-        - Audio features (tempo, energy, danceability, etc.)
-        - Artist network centrality
-        - Genre similarity
-        - Label performance
-        """)
-        
-        st.subheader("Data Sources")
-        st.write("""
-        - Spotify API: Audio features and track metadata
-        - Last.fm API: Artist similarity and genre information
-        - Personal listening history
-        - Record label information
-        """)
-        
-        # Add model performance metrics
-        st.subheader("Model Performance")
-        col1, col2 = st.columns(2)
-        
-        with col1:
-            st.metric(
-                label="R-squared Score", 
-                value="0.82",  # Replace with actual metrics
-                help="Percentage of variance explained by the model"
-            )
-        
-        with col2:
-            st.metric(
-                label="Mean Absolute Error", 
-                value="12.3",  # Replace with actual metrics
-                help="Average prediction error in score points"
-            )
+        fig = px.bar(
+            genre_scores,
+            x='Genres',
+            y='avg_score',
+            title="Average Prediction Score by Genre",
+            color='Album Name',
+            labels={'avg_score': 'Average Score', 'Album Name': 'Number of Albums'}
+        )
+        st.plotly_chart(fig, use_container_width=True)
 
 if __name__ == "__main__":
     main()
