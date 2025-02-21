@@ -1,5 +1,5 @@
 # Specify Python version
-python>=3.11,<3.12
+python>=3.12,<3.13
 
 # Core Data Handling
 pandas==2.2.2
