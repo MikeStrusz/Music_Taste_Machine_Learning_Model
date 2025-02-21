@@ -16,4 +16,4 @@ tqdm==4.66.2
 nbconvert==7.16.4
 nbformat==5.10.4
 streamlit==1.26.0
-pillow>=8,<10  # Resolves the conflict with streamlit
+pillow>=8,<10
