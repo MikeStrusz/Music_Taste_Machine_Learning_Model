@@ -31,3 +31,6 @@ nbformat==5.10.4
 
 # Streamlit
 streamlit==1.26.0
+
+# Pre-built Pillow to avoid zlib issue
+pillow==10.3.0  # Use a pre-built version
