@@ -282,20 +282,20 @@ def main():
         
         filtered_data = filtered_data.sort_values('avg_score', ascending=False)
         display_album_predictions(filtered_data, album_covers_df, similar_artists_df)
-    
-    elif page == "Notebook":
-        st.title("📓 Jupyter Notebook")
-        st.subheader("Embedded notebook content below:")
+# Comment this block to test without the notebook embedding    
+   # elif page == "Notebook":
+       # st.title("📓 Jupyter Notebook")
+      #  st.subheader("Embedded notebook content below:")
         
-        try:
-            with open('graphics/Music_Taste_Machine_Learning_Data_Prep.html', 'r', encoding='utf-8') as f:
-                html_content = f.read()
+       # try:
+         #   with open('graphics/Music_Taste_Machine_Learning_Data_Prep.html', 'r', encoding='utf-8') as f:
+         #       html_content = f.read()
             
-            st.markdown('<div class="notebook-content">', unsafe_allow_html=True)
-            components.html(html_content, height=800, scrolling=True)
-            st.markdown('</div>', unsafe_allow_html=True)
-        except Exception as e:
-            st.error(f"Error loading notebook content: {e}")
+         #   st.markdown('<div class="notebook-content">', unsafe_allow_html=True)
+          #  components.html(html_content, height=800, scrolling=True)
+          #  st.markdown('</div>', unsafe_allow_html=True)
+       # except Exception as e:
+           # st.error(f"Error loading notebook content: {e}")
 
 if __name__ == "__main__":
     main()
