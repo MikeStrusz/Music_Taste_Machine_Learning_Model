@@ -1,9 +1,6 @@
 
 [     UTC     ] Logs for nmf-preds.streamlit.app/
 ────────────────────────────────────────────────────────────────────────────────────────
-[17:32:50] 🖥 Provisioning machine...
-[17:32:50] 🎛 Preparing system...
-[17:32:50] ⛓ Spinning up manager process...
 [17:32:48] 🚀 Starting up repository: 'music_taste_machine_learning_model', branch: 'main', main module: 'app.py'
 [17:32:48] 🐙 Cloning repository...
 [17:32:57] 🐙 Cloning into '/mount/src/music_taste_machine_learning_model'...
@@ -86,3 +83,74 @@ Successfully installed markdown-it-py-3.0.0 mdurl-0.1.2 pygments-2.19.1 rich-13.
 
 [17:33:08] ❗️ installer returned a non-zero exit code
 [17:33:08] ❗️ Error during processing dependencies! Please fix the error and push an update, or try restarting the app.
+[17:34:39] ❗️ Streamlit server consistently failed status checks
+[17:34:39] ❗️ Please fix the errors, push an update to the git repo, or reboot the app.
+[17:34:51] 🐙 Pulling code changes from Github...
+[17:34:56] 📦 Processing dependencies...
+
+──────────────────────────────────────── uv ───────────────────────────────────────────
+
+Using uv pip install.
+error: Couldn't parse requirement in `requirements.txt` at position 0
+  Caused by: Expected one of `@`, `(`, `<`, `=`, `>`, `~`, `!`, `;`, found `"`
+echo "streamlit==1.31.1
+     ^
+Checking if Streamlit is installed
+Installing rich for an improved exception logging
+Using uv pip install.
+Using Python 3.12.9 environment at /home/adminuser/venv
+Audited 1 package in 1ms
+
+────────────────────────────────────────────────────────────────────────────────────────
+
+
+──────────────────────────────────────── pip ───────────────────────────────────────────
+
+Using standard pip install.
+ERROR: Invalid requirement: 'echo "streamlit==1.31.1' (from line 1 of /mount/src/music_taste_machine_learning_model/requirements.txt)
+
+[notice] A new release of pip is available: 24.0 -> 25.0.1
+[notice] To update, run: pip install --upgrade pip
+Checking if Streamlit is installed
+Installing rich for an improved exception logging
+Using standard pip install.
+Collecting rich>=10.14.0
+  Downloading rich-13.9.4-py3-none-any.whl.metadata (18 kB)
+Collecting markdown-it-py>=2.2.0 (from rich>=10.14.0)
+  Downloading markdown_it_py-3.0.0-py3-none-any.whl.metadata (6.9 kB)
+Collecting pygments<3.0.0,>=2.13.0 (from rich>=10.14.0)
+  Downloading pygments-2.19.1-py3-none-any.whl.metadata (2.5 kB)
+Collecting mdurl~=0.1 (from markdown-it-py>=2.2.0->rich>=10.14.0)
+  Downloading mdurl-0.1.2-py3-none-any.whl.metadata (1.6 kB)
+Downloading rich-13.9.4-py3-none-any.whl (242 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 242.4/242.4 kB 15.6 MB/s eta 0:00:00[2025-02-22 17:34:59.910348] 
+Downloading markdown_it_py-3.0.0-py3-none-any.whl (87 kB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 87.5/87.5 kB 111.0 MB/s eta 0:00:00[2025-02-22 17:34:59.924211] 
+Downloading pygments-2.19.1-py3-none-any.whl (1.2 MB)
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ 1.2/1.2 MB 83.5 MB/s eta 0:00:00[2025-02-22 17:34:59.951021] 
+Downloading mdurl-0.1.2-py3-none-any.whl (10.0 kB)
+Installing collected packages: pygments, mdurl, markdown-it-py, rich
+  Attempting uninstall: pygments
+    Found existing installation: Pygments 2.19.1
+    Uninstalling Pygments-2.19.1:
+      Successfully uninstalled Pygments-2.19.1
+  Attempting uninstall: mdurl
+    Found existing installation: mdurl 0.1.2
+    Uninstalling mdurl-0.1.2:
+      Successfully uninstalled mdurl-0.1.2
+  Attempting uninstall: markdown-it-py
+    Found existing installation: markdown-it-py 3.0.0
+    Uninstalling markdown-it-py-3.0.0:
+      Successfully uninstalled markdown-it-py-3.0.0
+  Attempting uninstall: rich
+    Found existing installation: rich 13.9.4
+    Uninstalling rich-13.9.4:
+      Successfully uninstalled rich-13.9.4
+Successfully installed markdown-it-py-3.0.0 mdurl-0.1.2 pygments-2.19.1 rich-13.9.4
+
+[notice] A new release of pip is available: 24.0 -> 25.0.1
+[notice] To update, run: pip install --upgrade pip
+
+────────────────────────────────────────────────────────────────────────────────────────
+
+[17:35:02] ❗️ installer returned a non-zero exit code

@@ -1,4 +1,4 @@
-echo "streamlit==1.31.1
+streamlit==1.31.1
 pandas==2.1.4
 numpy==1.26.4
 plotly==5.24.1
@@ -15,4 +15,4 @@ networkx==3.2.1
 lightgbm==4.5.0
 scipy==1.12.0
 tqdm==4.66.2
-beautifulsoup4==4.12.3" > requirements.txt
+beautifulsoup4==4.12.3
