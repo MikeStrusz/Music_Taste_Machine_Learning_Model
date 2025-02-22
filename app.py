@@ -225,7 +225,8 @@ def main():
         with col2:
             st.metric("Genres Analyzed", df['Genres'].nunique())
         with col3:
-            st.metric("Analysis Date", analysis_date)
+            formatted_date = datetime.strptime(analysis_date, '%Y-%m-%d').strftime('%B %d, %Y')
+            st.metric("Analysis Date", formatted_date)
         
         st.subheader("🏆 Top Album Predictions")
         
@@ -240,21 +241,10 @@ def main():
             default=[]
         )
         
-        artist_search = st.text_input(
-            "Search by Artist",
-            placeholder="Enter artist name..."
-        ).strip().lower()
-        
-        if genres or artist_search:
-            filtered_data = df.copy()
-            if genres:
-                filtered_data = filtered_data[
-                    filtered_data['Genres'].apply(lambda x: any(genre in x for genre in genres))
-                ]
-            if artist_search:
-                filtered_data = filtered_data[
-                    filtered_data['Artist'].str.lower().str.contains(artist_search, na=False)
-                ]
+        if genres:
+            filtered_data = df[
+                df['Genres'].apply(lambda x: any(genre in x for genre in genres))
+            ]
         else:
             filtered_data = df
         
