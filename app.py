@@ -41,6 +41,39 @@ st.markdown("""
         padding-left: 2rem;
         padding-right: 2rem;
     }
+    .spotify-button {
+        background-color: #f8f9fa;
+        color: #1e1e1e;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        display: inline-block;
+        margin-top: 10px;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+    .spotify-button:hover {
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        transform: translateY(-1px);
+        text-decoration: none;
+        color: #1e1e1e;
+    }
+    .album-container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    .metric-container {
+        background-color: #f8f9fa;
+        padding: 10px;
+        border-radius: 8px;
+        text-align: center;
+    }
     </style>
 """, unsafe_allow_html=True)
 
@@ -71,60 +104,7 @@ def load_training_data():
     df = pd.read_csv('data/df_cleaned_pre_standardized.csv')
     return df[df['playlist_origin'] != 'df_nmf'].copy()
 
-# [Previous code remains the same until the display_album_predictions function's CSS]
-
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
-    # Enhanced CSS for better visual hierarchy and layout
-    st.markdown("""
-        <style>
-        .large-text {
-            font-size: 1.2rem !important;
-            line-height: 1.6 !important;
-            margin: 8px 0 !important;
-            text-align: left !important;
-        }
-        .album-title {
-            font-size: 1.4rem !important;
-            margin-bottom: 16px !important;
-            font-weight: 600 !important;
-            text-align: left !important;
-        }
-        .spotify-button {
-            background-color: #f8f9fa;
-            color: #1e1e1e;
-            padding: 8px 16px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 0.9rem;
-            display: inline-block;
-            margin-top: 10px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        .spotify-button:hover {
-            background-color: #ffffff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-            transform: translateY(-1px);
-            text-decoration: none;
-            color: #1e1e1e;
-        }
-        .album-container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .metric-container {
-            background-color: #f8f9fa;
-            padding: 10px;
-            border-radius: 8px;
-            text-align: center;
-        }
-        </style>
-    """, unsafe_allow_html=True)
-
     try:
         album_links_df = pd.read_csv('data/nmf_album_links.csv')
     except Exception as e:
@@ -173,9 +153,9 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     )
             
             with cols[1]:
-                st.markdown(f'<div class="album-title">{row["Artist"]} - {row["Album Name"]}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="large-text"><strong>Genre:</strong> {row["Genres"]}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="large-text"><strong>Label:</strong> {row["Label"]}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="album-title" style="font-size: 1.8rem; font-weight: 600; margin-bottom: 16px;">{row["Artist"]} - {row["Album Name"]}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Genre:</strong> {row["Genres"]}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Label:</strong> {row["Label"]}</div>', unsafe_allow_html=True)
                 
                 similar_artists = similar_artists_df[
                     similar_artists_df['Artist'] == row['Artist']
@@ -183,7 +163,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 
                 if not similar_artists.empty:
                     similar_list = similar_artists.iloc[0]['Similar Artists']
-                    st.markdown(f'<div class="large-text"><strong>Similar Artists:</strong> {similar_list}</div>', unsafe_allow_html=True)
+                    st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Similar Artists:</strong> {similar_list}</div>', unsafe_allow_html=True)
                 
                 if 'Spotify URL' in row and pd.notna(row['Spotify URL']):
                     spotify_url = row['Spotify URL']
