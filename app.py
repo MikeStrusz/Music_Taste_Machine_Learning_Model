@@ -185,6 +185,24 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
             
             st.markdown('</div>', unsafe_allow_html=True)
 
+def about_me_page():
+    st.title("# About Me")
+    st.markdown("## Hi, I'm Mike Strusz! 👋")
+    st.write("""
+    I'm a Data Analyst based in Milwaukee, passionate about solving real-world problems through data-driven insights. With a strong background in data analysis, visualization, and machine learning, I’m always expanding my skills to stay at the forefront of the field.  
+
+    Before transitioning into data analytics, I spent over a decade as a teacher, where I developed a passion for making learning engaging and accessible. This experience has shaped my approach to data: breaking down complex concepts into understandable and actionable insights.  
+
+    This project is, if I’m being honest, something I initially wanted for my own use. As an avid listener of contemporary music, I love evaluating and experiencing today’s best music, often attending concerts to immerse myself in the artistry. But beyond my personal interest, this project became a fascinating exploration of how machine learning can use past behavior to predict future preferences. It’s not about tracking listeners; it’s about understanding patterns and applying them to create better, more personalized experiences. This approach has broad applications, from music to e-commerce to customer segmentation, and it’s a powerful tool for any business looking to anticipate and meet customer needs.  
+    """)
+    
+    st.markdown("## Let’s Connect!")
+    st.write("📧 Reach me at **mike.strusz@gmail.com**")
+    st.write("🔗 Connect with me on [LinkedIn](https://www.linkedin.com/in/mike-strusz/)")
+    
+    st.image("graphics/mike.jpeg", width=400)
+    st.caption("Me on the Milwaukee Riverwalk, wearing one of my 50+ bowties.")
+
 def main():
     st.sidebar.title("About This Project")
     st.sidebar.write("""
@@ -203,7 +221,7 @@ def main():
     
     page = st.sidebar.radio(
         "Navigate",
-        ["Weekly Predictions", "Notebook"]
+        ["Weekly Predictions", "Notebook", "About Me"]  # Added "About Me"
     )
     
     predictions_data = load_predictions()
@@ -264,6 +282,9 @@ def main():
             st.markdown('</div>', unsafe_allow_html=True)
         except Exception as e:
             st.error(f"Error loading notebook content: {e}")
+    
+    elif page == "About Me":
+        about_me_page()
 
 if __name__ == "__main__":
     main()
