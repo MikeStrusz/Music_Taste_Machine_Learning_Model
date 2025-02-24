@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 import streamlit.components.v1 as components
 import glob
-import os
+import os  # For feedback functionality
 
 st.set_page_config(
     page_title="New Music Friday Regression Model",
@@ -104,6 +104,25 @@ def load_training_data():
     df = pd.read_csv('data/df_cleaned_pre_standardized.csv')
     return df[df['playlist_origin'] != 'df_nmf'].copy()
 
+# Add feedback functions
+def save_feedback(album_name, artist, feedback):
+    feedback_file = 'feedback/feedback.csv'
+    if not os.path.exists('feedback'):
+        os.makedirs('feedback')
+    
+    if not os.path.exists(feedback_file):
+        with open(feedback_file, 'w') as f:
+            f.write('Album Name,Artist,Feedback\n')
+    
+    with open(feedback_file, 'a') as f:
+        f.write(f'{album_name},{artist},{feedback}\n')
+
+def load_feedback():
+    feedback_file = 'feedback/feedback.csv'
+    if os.path.exists(feedback_file):
+        return pd.read_csv(feedback_file)
+    return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
+
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
     try:
         album_links_df = pd.read_csv('data/nmf_album_links.csv')
@@ -136,7 +155,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
     for idx, row in filtered_albums.iterrows():
         with st.container():
             st.markdown('<div class="album-container">', unsafe_allow_html=True)
-            cols = st.columns([2, 4, 1, 1])
+            cols = st.columns([2, 4, 1, 1])  # Removed confidence score column
             
             with cols[0]:
                 if 'Album Art' in row and pd.notna(row['Album Art']):
@@ -178,10 +197,32 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 st.metric("Predicted Score", f"{row['avg_score']:.1f}")
                 st.markdown('</div>', unsafe_allow_html=True)
             
+            # Feedback buttons
             with cols[3]:
-                st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                st.metric("Confidence", f"{row['confidence_score']:.1f}")
-                st.markdown('</div>', unsafe_allow_html=True)
+                feedback_df = load_feedback()
+                existing_feedback = feedback_df[
+                    (feedback_df['Album Name'] == row['Album Name']) & 
+                    (feedback_df['Artist'] == row['Artist'])
+                ]
+                
+                if not existing_feedback.empty:
+                    feedback = existing_feedback.iloc[0]['Feedback']
+                    if feedback == 'like':
+                        st.markdown('👍 Mike liked it')
+                    elif feedback == 'mid':
+                        st.markdown('😐 Mike thought it was mid')
+                    elif feedback == 'dislike':
+                        st.markdown('👎 Mike didn\'t like it')
+                else:
+                    if st.button('👍', key=f"like_{idx}"):
+                        save_feedback(row['Album Name'], row['Artist'], 'like')
+                        st.experimental_rerun()
+                    if st.button('😐', key=f"mid_{idx}"):
+                        save_feedback(row['Album Name'], row['Artist'], 'mid')
+                        st.experimental_rerun()
+                    if st.button('👎', key=f"dislike_{idx}"):
+                        save_feedback(row['Album Name'], row['Artist'], 'dislike')
+                        st.experimental_rerun()
             
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -210,7 +251,7 @@ def main():
     - 🤖 Machine Learning: RandomForest & XGBoost
     - 📊 Data Processing: Pandas & NumPy
     - 🎨 Visualization: Plotly & Streamlit
-    - 🎵 Data Source: Spotify API
+    - 🎵 Data Source: Spotify & Lastfm APIs
     
     ### Key Features
     - Weekly New Music Predictions
@@ -221,7 +262,7 @@ def main():
     
     page = st.sidebar.radio(
         "Navigate",
-        ["Weekly Predictions", "Notebook", "About Me"]  # Added "About Me"
+        ["Weekly Predictions", "Notebook", "About Me"]
     )
     
     predictions_data = load_predictions()
