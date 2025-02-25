@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 from datetime import datetime
 import streamlit.components.v1 as components
 import glob
-import os  # For feedback functionality
+import os  
 
 st.set_page_config(
     page_title="New Music Friday Regression Model",
@@ -259,6 +259,11 @@ def main():
     - Genre-based Learning
     - Automated Label Analysis
     """)
+    
+    # Add the "Clear Cache and Refresh Data" button
+    if st.sidebar.button("Clear Cache and Refresh Data"):
+        st.cache_data.clear()
+        st.experimental_rerun()
     
     page = st.sidebar.radio(
         "Navigate",
