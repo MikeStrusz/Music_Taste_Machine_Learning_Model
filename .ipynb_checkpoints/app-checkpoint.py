@@ -5,7 +5,13 @@ import plotly.graph_objects as go
 from datetime import datetime
 import streamlit.components.v1 as components
 import glob
-import os  
+import os
+import requests
+from PIL import Image
+from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from time import sleep
+from typing import Dict
 
 st.set_page_config(
     page_title="New Music Friday Regression Model",
@@ -94,11 +100,19 @@ def load_predictions():
 
 @st.cache_data
 def load_album_covers():
-    return pd.read_csv('data/nmf_album_covers.csv')
+    try:
+        return pd.read_csv('data/nmf_album_covers.csv')
+    except Exception as e:
+        st.error(f"Error loading album covers data: {e}")
+        return pd.DataFrame(columns=['Artist', 'Album Name', 'Album Art'])
 
 @st.cache_data
 def load_similar_artists():
-    return pd.read_csv('data/nmf_similar_artists.csv')
+    try:
+        return pd.read_csv('data/nmf_similar_artists.csv')
+    except Exception as e:
+        st.error(f"Error loading similar artists data: {e}")
+        return pd.DataFrame(columns=['Artist', 'Similar Artists'])
 
 def load_training_data():
     df = pd.read_csv('data/df_cleaned_pre_standardized.csv')
@@ -148,9 +162,8 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
         st.error(f"Error merging data: {e}")
         merged_data = filtered_data
     
-    filtered_albums = merged_data[
-        (merged_data['Album Art'].notna()) | (merged_data['avg_score'] >= 40)
-    ]
+    # Removed the filtering condition to show all albums
+    filtered_albums = merged_data
     
     for idx, row in filtered_albums.iterrows():
         with st.container():
@@ -230,20 +243,119 @@ def about_me_page():
     st.title("# About Me")
     st.markdown("## Hi, I'm Mike Strusz! 👋")
     st.write("""
-    I'm a Data Analyst based in Milwaukee, passionate about solving real-world problems through data-driven insights. With a strong background in data analysis, visualization, and machine learning, I’m always expanding my skills to stay at the forefront of the field.  
+    I'm a Data Analyst based in Milwaukee, passionate about solving real-world problems through data-driven insights. With a strong background in data analysis, visualization, and machine learning, I'm always expanding my skills to stay at the forefront of the field.  
 
     Before transitioning into data analytics, I spent over a decade as a teacher, where I developed a passion for making learning engaging and accessible. This experience has shaped my approach to data: breaking down complex concepts into understandable and actionable insights.  
 
-    This project is, if I’m being honest, something I initially wanted for my own use. As an avid listener of contemporary music, I love evaluating and experiencing today’s best music, often attending concerts to immerse myself in the artistry. But beyond my personal interest, this project became a fascinating exploration of how machine learning can use past behavior to predict future preferences. It’s not about tracking listeners; it’s about understanding patterns and applying them to create better, more personalized experiences. This approach has broad applications, from music to e-commerce to customer segmentation, and it’s a powerful tool for any business looking to anticipate and meet customer needs.  
+    This project is, if I'm being honest, something I initially wanted for my own use. As an avid listener of contemporary music, I love evaluating and experiencing today's best music, often attending concerts to immerse myself in the artistry. But beyond my personal interest, this project became a fascinating exploration of how machine learning can use past behavior to predict future preferences. It's not about tracking listeners; it's about understanding patterns and applying them to create better, more personalized experiences. This approach has broad applications, from music to e-commerce to customer segmentation, and it's a powerful tool for any business looking to anticipate and meet customer needs.  
     """)
     
-    st.markdown("## Let’s Connect!")
+    st.markdown("## Let's Connect!")
     st.write("📧 Reach me at **mike.strusz@gmail.com**")
     st.write("🔗 Connect with me on [LinkedIn](https://www.linkedin.com/in/mike-strusz/)")
     
     st.image("graphics/mike.jpeg", width=400)
     st.caption("Me on the Milwaukee Riverwalk, wearing one of my 50+ bowties.")
 
+def manage_album_covers():
+    st.title("🖼️ Album Cover Manager")
+    st.subheader("Manage Missing Album Artwork")
+    
+    # Load the current album covers data and predictions data
+    album_covers_df = load_album_covers()
+    predictions_data = load_predictions()
+    
+    if predictions_data is None:
+        st.error("Could not load prediction data. Please check the predictions folder.")
+        return
+    
+    df, _ = predictions_data
+    all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
+    
+    # Identify albums missing artwork
+    merged_df = all_albums_df.merge(
+        album_covers_df,
+        left_on=['Artist', 'Album Name'],
+        right_on=['Artist', 'Album Name'],
+        how='left'
+    )
+    
+    missing_artwork = merged_df[merged_df['Album Art'].isna()].copy()
+    
+    # Show statistics
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Total Albums", len(all_albums_df))
+    with col2:
+        st.metric("Missing Artwork", len(missing_artwork))
+    
+    if len(missing_artwork) == 0:
+        st.success("All albums have artwork! 🎉")
+        return
+        
+    # Album selection
+    st.subheader("Select an album to update")
+    
+    selected_album_idx = st.selectbox(
+        "Albums missing artwork:",
+        options=range(len(missing_artwork)),
+        format_func=lambda x: f"{missing_artwork.iloc[x]['Artist']} - {missing_artwork.iloc[x]['Album Name']}"
+    )
+    
+    if selected_album_idx is not None:
+        selected_album = missing_artwork.iloc[selected_album_idx]
+        artist = selected_album['Artist']
+        album = selected_album['Album Name']
+        
+        st.write(f"**Selected:** {artist} - {album}")
+        
+        # Direct URL input
+        st.subheader("Enter Album Cover Image URL")
+        direct_url = st.text_input("Image URL:", 
+                                  value=st.session_state.get(f"{artist}_{album}_url", ""))
+        
+        # Helper text
+        st.caption("Tip: Search for the album cover on Google Images, right-click on an image and select 'Copy image address'")
+        
+        # Preview the URL image if provided
+        if direct_url:
+            try:
+                st.image(direct_url, caption=f"{artist} - {album}", width=300)
+            except Exception as e:
+                st.error(f"Failed to load image from URL: {e}")
+        
+        # Save the direct URL
+        if direct_url and st.button("Save URL"):
+            # Create a new row for the dataframe
+            new_row = {
+                'Artist': artist,
+                'Album Name': album,
+                'Album Art': direct_url
+            }
+            
+            # Check if this artist/album already exists
+            existing = album_covers_df[(album_covers_df['Artist'] == artist) & 
+                                     (album_covers_df['Album Name'] == album)]
+            
+            if not existing.empty:
+                # Update existing entry
+                album_covers_df.loc[(album_covers_df['Artist'] == artist) & 
+                                  (album_covers_df['Album Name'] == album), 'Album Art'] = direct_url
+            else:
+                # Add new entry
+                album_covers_df = pd.concat([album_covers_df, pd.DataFrame([new_row])], ignore_index=True)
+            
+            # Save the updated dataframe
+            try:
+                album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
+                st.success(f"Saved album art URL for {artist} - {album}")
+                
+                # Clear cache to reflect the update
+                st.cache_data.clear()
+                st.experimental_rerun()
+            except Exception as e:
+                st.error(f"Failed to save: {e}")
+                
 def main():
     st.sidebar.title("About This Project")
     st.sidebar.write("""
@@ -267,7 +379,7 @@ def main():
     
     page = st.sidebar.radio(
         "Navigate",
-        ["Weekly Predictions", "Notebook", "About Me"]
+        ["Weekly Predictions", "Album Cover Manager", "Notebook", "About Me"]
     )
     
     predictions_data = load_predictions()
@@ -314,6 +426,9 @@ def main():
         
         filtered_data = filtered_data.sort_values('avg_score', ascending=False)
         display_album_predictions(filtered_data, album_covers_df, similar_artists_df)
+    
+    elif page == "Album Cover Manager":
+        manage_album_covers()
     
     elif page == "Notebook":
         st.title("📓 Jupyter Notebook")
