@@ -395,21 +395,23 @@ def main():
         st.title("🎵 New Music Friday Regression Model")
         st.subheader("Personalized New Music Friday Recommendations")
         
+        # Fixed the genre counting logic
+        all_genres = set()
+        for genres_str in df['Genres']:
+            if isinstance(genres_str, str):
+                genres_list = [g.strip() for g in genres_str.split(',')]
+                all_genres.update(genres_list)
+        
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("New Releases", len(df))
         with col2:
-            st.metric("Genres Analyzed", df['Genres'].nunique())
+            st.metric("Genres Analyzed", len(all_genres))
         with col3:
             formatted_date = datetime.strptime(analysis_date, '%Y-%m-%d').strftime('%B %d, %Y')
             st.metric("Analysis Date", formatted_date)
         
         st.subheader("🏆 Top Album Predictions")
-        
-        all_genres = set()
-        for genres in df['Genres'].str.split(','):
-            if isinstance(genres, list):
-                all_genres.update([g.strip() for g in genres])
         
         genres = st.multiselect(
             "Filter by Genre",
