@@ -1,8 +1,7 @@
 ,feature,importance
-2,Artist Centrality,0.46621231011669484
-3,Label_Category_encoded,0.1885064700275918
-1,Genres_encoded,0.18070077508909893
-0,Popularity,0.06518941542016488
-5,energy_profile,0.045764135854916906
-4,mood_score,0.04531453191229085
-6,Featured_Centrality_Score,0.008312361579241792
+1,Artist Centrality,0.48229690799905406
+3,Record Label Frequency Encoded,0.2933644486539084
+2,Genre Frequency Encoded,0.08417928973496368
+0,Popularity,0.06455813345440391
+5,energy_profile,0.0387512913907636
+4,mood_score,0.03684992876690624
