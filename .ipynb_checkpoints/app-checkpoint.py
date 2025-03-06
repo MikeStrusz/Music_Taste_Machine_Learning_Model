@@ -14,6 +14,13 @@ from time import sleep
 from typing import Dict
 import networkx as nx
 
+# Check if App is Running Locally or on Streamlit's Servers
+def is_running_on_streamlit():
+    return os.getenv("STREAMLIT_SERVER_RUNNING", "False").lower() == "true"
+
+# Use this flag to control feedback buttons
+IS_LOCAL = not is_running_on_streamlit()
+
 st.set_page_config(
     page_title="New Music Friday Regression Model",
     page_icon="🎵",
@@ -147,20 +154,59 @@ def save_feedback(album_name, artist, feedback):
     if not os.path.exists('feedback'):
         os.makedirs('feedback')
     
-    if not os.path.exists(feedback_file):
-        with open(feedback_file, 'w') as f:
-            f.write('Album Name,Artist,Feedback\n')
+    # Create a dataframe with the new feedback
+    new_feedback = pd.DataFrame({
+        'Album Name': [album_name],
+        'Artist': [artist],
+        'Feedback': [feedback]
+    })
+
+    # Load existing feedback if file exists
+    if os.path.exists(feedback_file):
+        try:
+            # Use proper quoting and escape characters when reading
+            existing_feedback = pd.read_csv(feedback_file, quoting=1)  # QUOTE_ALL
+            # Combine with new feedback
+            combined_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
+        except Exception as e:
+            st.warning(f"Error reading existing feedback: {e}. Creating new file.")
+            # If reading fails, start fresh with just the new feedback
+            combined_feedback = new_feedback
+    else:
+        combined_feedback = new_feedback
     
-    with open(feedback_file, 'a') as f:
-        f.write(f'{album_name},{artist},{feedback}\n')
+    # Save with proper quoting to handle commas in fields
+    combined_feedback.to_csv(feedback_file, index=False, quoting=1)  # QUOTE_ALL
     
     # Clear cache after saving feedback
     st.cache_data.clear()
-    
+
 def load_feedback():
     feedback_file = 'feedback/feedback.csv'
     if os.path.exists(feedback_file):
-        return pd.read_csv(feedback_file)
+        try:
+            # Use quoting=1 (QUOTE_ALL) to properly handle commas in fields
+            return pd.read_csv(feedback_file, quoting=1)
+        except Exception as e:
+            st.warning(f"Error loading feedback data: {e}")
+            # Try to recover the file
+            try:
+                # Attempt to read with different options
+                df = pd.read_csv(feedback_file, quoting=1, error_bad_lines=False) 
+                st.info("Partially recovered feedback data")
+                return df
+            except:
+                # If all recovery attempts fail, provide an empty DataFrame as fallback
+                st.error("Could not recover feedback data. Starting with fresh feedback file.")
+                # Backup the problematic file
+                if os.path.exists(feedback_file):
+                    backup_file = feedback_file + ".backup." + datetime.now().strftime("%Y%m%d%H%M%S")
+                    try:
+                        os.rename(feedback_file, backup_file)
+                        st.info(f"Backed up problematic feedback file to {backup_file}")
+                    except:
+                        pass
+                return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
     return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
 
 if 'feedback_updated' not in st.session_state:
@@ -205,7 +251,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
     for idx, row in filtered_albums.iterrows():
         with st.container():
             st.markdown('<div class="album-container">', unsafe_allow_html=True)
-            cols = st.columns([2, 4, 1, 1])  # Removed confidence score column
+            cols = st.columns([2, 4, 1, 1])  # Define cols here
             
             with cols[0]:
                 if 'Album Art' in row and pd.notna(row['Album Art']):
@@ -247,7 +293,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 st.metric("Predicted Score", f"{row['avg_score']:.1f}")
                 st.markdown('</div>', unsafe_allow_html=True)
             
-            # Feedback buttons
+            # Feedback section
             with cols[3]:
                 feedback_df = load_feedback()
                 existing_feedback = feedback_df[
@@ -264,6 +310,10 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     elif feedback == 'dislike':
                         st.markdown('👎 Mike didn\'t like it')
                 else:
+                    st.markdown('😶 Mike hasn\'t listened/rated this album.')
+                
+                # Only show feedback buttons if running locally
+                if not is_running_on_streamlit():
                     if st.button('👍', key=f"like_{idx}"):
                         save_feedback(row['Album Name'], row['Artist'], 'like')
                         st.experimental_rerun()
@@ -397,21 +447,82 @@ def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")
     st.write("""
     ### How It Works
-    Enter an artist's name to see how closely they're connected to Lucy Dacus!
+    Select an artist to see how closely they're connected to Lucy Dacus!
     The **Dacus number** is the number of connections between the artist and Lucy Dacus.
     """)
     
-    # Artist input
-    artist_input = st.text_input("Enter an artist's name:", "Phoebe Bridgers")
+    # Get all artists from the graph
+    all_artists = sorted(list(G.nodes()))
+    
+    # Create a search box with autocomplete
+    search_term = st.text_input("Search for an artist:", "")
+    
+    # Filter artists based on search term (case-insensitive)
+    if search_term:
+        filtered_artists = [artist for artist in all_artists 
+                          if search_term.lower() in artist.lower()]
+        
+        # Display "no results" message if needed
+        if not filtered_artists:
+            st.warning(f"No artists found matching '{search_term}'")
+            return
+            
+        # Limit the number of suggestions to prevent overwhelming the UI
+        if len(filtered_artists) > 10:
+            st.info(f"Found {len(filtered_artists)} matches. Showing top 10.")
+            filtered_artists = filtered_artists[:10]
+            
+        # Let user select from filtered results
+        selected_artist = st.selectbox(
+            "Select an artist:", 
+            options=filtered_artists
+        )
+    else:
+        # If no search term, show popular artists or a subset
+        popular_artists = ["Phoebe Bridgers", "Boygenius", "Julien Baker", 
+                          "Japanese Breakfast", "Mitski", "Big Thief", 
+                          "The National", "Snail Mail", "Soccer Mommy"]
+        # Ensure these artists are in the graph
+        popular_artists = [a for a in popular_artists if a in G.nodes()]
+        
+        st.write("Or select from popular artists:")
+        selected_artist = st.selectbox(
+            "Popular artists:", 
+            options=popular_artists + ["Select an artist..."],
+            index=len(popular_artists)  # Default to "Select an artist..."
+        )
+        
+        if selected_artist == "Select an artist...":
+            st.info("Please search for an artist or select one from the list")
+            return
     
     # Calculate Dacus number and path
-    dacus_number, path = calculate_dacus_number(artist_input, G)
+    dacus_number, path = calculate_dacus_number(selected_artist, G)
     
     if dacus_number is not None:
         st.success(f"**Dacus Number:** {dacus_number}")
         st.write(f"**Path to Lucy Dacus:** {' → '.join(path)}")
+        
+        # Visualize the path
+        st.subheader("Network Path Visualization")
+        with st.spinner("Generating network visualization..."):
+            # Create a subgraph with the path and some neighbors for context
+            path_nodes = set(path)
+            context_nodes = set()
+            
+            # Add some context nodes (neighbors of path nodes)
+            for node in path:
+                neighbors = list(G.neighbors(node))[:3]  # Limit to 3 neighbors
+                context_nodes.update(neighbors)
+            
+            all_viz_nodes = path_nodes.union(context_nodes)
+            subgraph = G.subgraph(all_viz_nodes)
+            
+            # Create and display the visualization
+            fig = visualize_artist_network(subgraph, path)
+            st.plotly_chart(fig, use_container_width=True)
     else:
-        st.error("No path found. This artist might not be connected to Lucy Dacus.")
+        st.error("No path found. This artist might not be connected to Lucy Dacus in our network.")
         
 def calculate_dacus_number(artist_name, G):
     """
@@ -552,10 +663,19 @@ def main():
         st.cache_data.clear()
         st.experimental_rerun()
     
-    page = st.sidebar.radio(
-        "Navigate",
-        ["Weekly Predictions", "Album Cover Manager", "Notebook", "6 Degrees of Lucy Dacus", "About Me"]
-    )
+    # Navigation
+    page_options = [
+        "Weekly Predictions",
+        "The Machine Learning Model",
+        "6 Degrees of Lucy Dacus",
+        "About Me"
+    ]
+
+    # Add Album Cover Manager only if running locally
+    if not is_running_on_streamlit():
+        page_options.append("Album Cover Manager")
+
+    page = st.sidebar.radio("Navigate", page_options)
     
     # Load datasets
     predictions_data = load_predictions()
@@ -615,8 +735,8 @@ def main():
     elif page == "Album Cover Manager":
         manage_album_covers()
     
-    elif page == "Notebook":
-        st.title("📓 Jupyter Notebook")
+    elif page == "The Machine Learning Model":
+        st.title("📓 The Machine Learning Model in my Jupyter Notebook")
         st.subheader("Embedded notebook content below:")
         
         try:
