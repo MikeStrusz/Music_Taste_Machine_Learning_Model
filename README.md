@@ -80,7 +80,6 @@ The model uses the following features to make predictions:
 | Genres_encoded             | Target-encoded genres.                                                      | Float      |
 | Featured_Artist(s)         | Name(s) of featured artists.                                                | String     |
 | Artist Centrality          | PageRank score representing the artist's centrality in my music taste.      | Float      |
-| Featured_Centrality_Score  | PageRank score for featured artists.                                        | Float      |
 | mood_score                 | Combined score for valence, danceability, and liveness.                     | Float      |
 | energy_profile             | Combined score for energy, loudness, and tempo.                             | Float      |
 

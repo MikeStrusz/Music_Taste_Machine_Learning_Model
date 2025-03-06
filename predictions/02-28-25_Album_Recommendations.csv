@@ -1,51 +1,59 @@
-Artist,Album Name,avg_score,confidence_score,track_count,Genres,Label,Artist_Centrality,Mood_Score,Energy_Profile
-Deep Sea Diver,Billboard Heart,103.76,34.12,10,"female vocalist, indie, indie rock, folk, ambient, seattle, rock, indie pop, pop, alternative",Sub Pop Records,3561.32,100.0,100.0
-The Chills,Spring Board: The Early Unrecorded Songs,99.41,85.11,20,"new zealand, indie pop, indie, flying nun, kiwi, post-punk, pop, college rock, indie rock, dunedin sound",Fire Records,6636.22,100.0,100.0
-corook,committed to a bit,93.8,29.97,13,"female vocalist, singer-songwriter, indie pop, indie, pop, usa, queer, alternative pop, non-binary artist",Atlantic Records,100.0,100.0,100.0
-Hachiku,The Joys Of Being Pure At Heart,93.25,25.15,10,"indie pop, indie, indie rock, dream pop, australia, milk records",Marathon Artists,100.0,100.0,100.0
-Michi,Dirty Talk,87.51,26.11,10,"female vocalist, j-pop, japanese, electronic, pop, jpop, trip-hop, dance, electronica, british",Stones Throw Records,100.0,100.0,100.0
-Miya Folick,Erotica Veronica,80.05,26.97,11,"female vocalist, singer-songwriter, indie pop, indie, pop, usa, folk, alternative, indie rock, american",Nettwerk Music Group,7818.74,100.0,100.0
-Hana Vu,Movies,78.18,24.58,5,"female vocalist, dream pop, indie, shoegaze, lo-fi, indie pop, american, pop, indie rock, asian",Ghostly International,4010.08,100.0,100.0
-Edith Frost,In Space,77.42,31.16,12,"female vocalist, folk, singer-songwriter, indie, alt-country, indie folk, country, soft, lo-fi, folk-delica",Drag City,100.0,100.0,100.0
-Paris Texas,They Left Me With A Gun,75.1,1.0,6,"rap, hip-hop, electronic, rap rock, rock, alternative hip-hop, hip hop, trip hop, california, experimental hip-hop",Paris Texas LLC,798.69,100.0,100.0
-Matilda Mann,Roxwell,74.75,1.0,14,"female vocalist, folk, acoustic, indie pop, british, singer-songwriter, folk pop, indie, indie rock, uk",7476,1840.75,100.0,100.0
-Doves,Constellations For The Lonely,73.53,1.0,10,"indie, indie rock, britpop, alternative, rock, british, alternative rock, manchester, indie pop, doves",EMI North,100.0,100.0,100.0
-The Lathums,Matter Does Not Define,73.12,1.0,12,"indie rock, british, uk, indie, rock, alternative, pop, alternative rock, pop rock, acoustic",Modern Sky UK,789.26,100.0,100.0
-Andy Bell,pinball wanderer,71.31,37.1,8,"female vocalist, synthpop, electronic, pop, british, gay, male vocalists, 80s, dance, synth pop",Sonic Cathedral,5923.22,100.0,100.0
-Polly Paulusma,Wildfires,70.5,1.0,38,"female vocalist, folk, singer-songwriter, acoustic, british, indie, female, chill, england, british folk",One Little Independent,100.0,100.0,100.0
-Ichiko Aoba,Luminescent Creatures,70.32,1.0,11,"female vocalist, folk, singer-songwriter, japanese, chamber folk, contemporary folk, ambient, japan, acoustic, indie folk",Psychic Hotline,100.0,100.0,100.0
-Cheekface,Middle Spoon,68.59,52.19,12,"indie rock, post-punk, power pop, indie, rock, indie pop, usa, post punk, quirky, 3",Cheekface,3229.74,100.0,100.0
-The Devil Makes Three,Spirits,67.15,1.0,13,"bluegrass, folk, americana, country, acoustic, alt-country, santa cruz, american, california, usa","New West Records, LLC",1066.98,100.0,100.0
-"Venamoris,Dave Lombardo",To Cross or To Burn,66.35,1.0,10,laut - metalsplitter,Ipecac Recordings,100.0,100.0,100.0
-Joshua Burnside,Teeth of Time,62.65,1.0,10,"folk, indie, experimental folk, electronic, alternative, emo, experimental, singer-songwriter, uk, singersongwriter",Nettwerk Music Group,100.0,100.0,100.0
-Antony Szmierek,Service Station At The End Of The Universe,62.34,1.0,12,"spoken word, electronic, hip-hop, indie, british, uk, indie hip-hop, cringy",Mushroom Music/Virgin Music Group,956.72,100.0,100.0
-"bdrmm,Working Men's Club",Microtonic,62.23,1.0,10,"dream pop, shoegaze, post-punk, indie rock, indie pop, crank wave, indie, hull, united kingdom, uk",Rock Action Records,100.0,100.0,100.0
-Hope Tala,Hope Handwritten,61.67,1.0,16,"female vocalist, rnb, soul, bossa nova, british, london, neo-soul, indie, pop, alternative",PMR Records,2103.0,100.0,100.0
-Kip Moore,Solitary Tracks,61.56,1.0,23,"country, kip moore, usa, contemporary country, country-rock, quirky, thoughtful, narrative, organic, rainy day",Kip Moore,100.0,100.0,100.0
-BANKS,Off With Her Head,60.79,1.0,12,"female vocalist, electronic, downtempo, pop, indie, alternative rnb, american, indie pop, rnb, alternative","Her Name Is Banks, Inc",100.0,100.0,100.0
-Rebecca Black,SALVATION,59.73,1.0,7,"female vocalist, pop, fun fun fun fun, friday, queen of pop, legend, electropop, hyperpop, better than radiohead, brutal death metal",Rebecca Black,759.63,100.0,100.0
-Kasey Tyndall,Kasey Tyndall,57.64,1.0,11,"female vocalist, country, indie, singer-songwriter",MNRK Music,100.0,100.0,100.0
-Fridayy,"Some Days I’m Good, Some Days I’m Not",56.89,1.0,21,"hip-hop, singer-songwriter, rnb",FRIDAYY PS/ Def Jam,100.0,100.0,100.0
-Echolalia,Echolalia,55.03,1.0,13,"experimental, theremin, needs merging or splitting, electronica, lesser known yet streamable artists, under 2000 listeners, frauen und technik, united states",Full Time Hobby,100.0,100.0,100.0
-Everything Is Recorded,Richard Russell Is Temporary,53.68,1.0,14,"rnb, soul, electronic, british, alternative rnb, hip-hop, trip-hop, hip hop, experimental, uk",XL Recordings,100.0,100.0,100.0
-Charles Wesley Godwin,Lonely Mountain Town,53.55,40.21,7,"country, americana, folk, american, singer-songwriter, alternative country, west virginia, heartland rock, best2019",Big Loud Records,836.34,100.0,100.0
-Panda Bear,Sinister Grift,52.53,33.66,10,"experimental, psychedelic, freak folk, indie, folk, electronic, new weird america, indie rock, psychedelic pop, ambient",Domino Recording Co,875.94,100.0,100.0
-Yves Jarvis,All Cylinders,52.4,1.0,10,"experimental, neo-soul, soul, rnb, psychedelic folk, neo-psychedelia, canadian, alternative rnb, electronic, indie",In Real Life Music,100.0,100.0,100.0
-Tori Amos,The Music of Tori and the Muses,51.84,1.0,9,"female vocalist, singer-songwriter, alternative, piano, rock, indie, pop, tori amos, female, alternative rock",Faerie Workshop Rekords,2593.83,100.0,100.0
-"Bedrooms,Fried Monk",Monkrooms,51.05,1.97,11,"indie, hip hop, rock, folk, rap, indie pop, indie rock, german, irish, indie folk",Day Off Recording Company,7301.55,100.0,100.0
-Architects,"The Sky, The Earth & All Between",47.59,65.96,12,"metalcore, mathcore, hardcore, metal, tech metal, post-hardcore, progressive metalcore, british, progressive metal, technical metalcore",Epitaph,100.0,100.0,100.0
-David Grubbs,Whistle from Above,39.4,69.5,8,"experimental, post-rock, singer-songwriter, post rock, indie, folk, new weird america, indie rock, american, ambient",Drag City,100.0,100.0,100.0
-Yo La Tengo,Old Joy,37.88,55.09,6,"female vocalist, indie, indie rock, alternative, indie pop, rock, post-rock, dream pop, noise pop, shoegaze",Mississippi Records,5742.36,100.0,100.0
-DARKSIDE,Nothing,37.87,34.5,9,"electronic, minimal, experimental, ambient, death metal, darkcore, downtempo, psychedelic, house, microhouse",Matador,100.0,100.0,100.0
-Billy Hart Quartet,Just,37.29,48.6,10,"jazz, contemporary jazz, percussion, playlist",ECM Records,100.0,100.0,100.0
-"Boldy James,Chuck Strangers",Token of Appreciation,36.43,74.95,11,"rap, hip-hop, gangsta rap, hip hop, detroit, jazz rap, boom bap, conscious hip hop, drumless, the alchemist",1301 LLC,2949.61,100.0,100.0
-Redferrin,"Some City, Somewhere",36.41,1.0,7,"country, modern country pop",Round Here Records/Warner Music Nashville,100.0,100.0,100.0
-Year of the Cobra,Year Of The Cobra,35.15,70.71,8,"female vocalist, doom metal, stoner, stoner metal, stoner rock, doom, female fronted metal, sludge, stoner doom metal, united states",Prophecy Productions,100.0,100.0,100.0
-Mdou Moctar,Tears of Injustice,35.03,49.02,8,"psychedelic rock, niger, tuareg, world, desert blues, tishoumaren, african, folk, rock, blues rock",Matador,100.0,100.0,100.0
-"REASON,D'Anna Stewart",I Love You Again,34.83,75.18,10,"hip-hop, hardcore, rap, aussie hip-hop, hip hop, rock, australian, underground hip-hop, hardcore punk, metal",Do More Records,100.0,100.0,100.0
-Marie Davidson,City Of Clowns,34.83,76.75,10,"female vocalist, minimal synth, electronic, techno, ambient, canada, dark ambient, minimal, canadian, synthpop",Marie Davidson,100.0,100.0,100.0
-IDK,BRAVADO INTiMO...,33.81,62.44,20,"rap, hip-hop, trap, rnb, hip hop, hardcore hip hop, hardcore, boom bap, rock, country",.idk.,3505.01,100.0,100.0
-"Max Cooper,Felix Gerbelot",On Being,33.26,65.79,13,"minimal, minimal techno, techno, electronic, tech house, idm, neotrance, ambient, electro, minimal house",Mesh,100.0,100.0,100.0
-Cloakroom,Last Leg of the Human Table,33.12,83.01,10,"shoegaze, post-hardcore, emo, slowcore, indie, indie rock, post-rock, american, alternative rock, sludge",Closed Casket Activities,100.0,100.0,100.0
-The Men,Buyer Beware,32.76,77.24,12,"noise rock, post-punk, noise, noise punk, psychedelic rock, punk, rock, post-hardcore, indie rock, garage rock",Fuzz Club,100.0,100.0,100.0
-The Residents,Doctor Dark,32.72,82.59,16,"experimental, avant-garde, electronic, post-punk, avantgarde, psychedelic, noise, experimental rock, alternative, art rock",CRYPTIC CORP,100.0,100.0,100.0
+Artist,Album Name,avg_score,confidence_score,Track_Count,Genres,Label,Artist_Centrality,Mood_Score,Energy_Profile
+The Chills,Spring Board: The Early Unrecorded Songs,100.16,88.5,20,"new zealand, indie pop, indie, flying nun, kiwi, post-punk, pop, college rock, indie rock, dunedin sound",Fire Records,6636.25,100.0,100.0
+Kristin Daelyn,Beyond the Break,90.11,75.08,8,indie folk,Orindal Records,100.0,100.0,100.0
+Hachiku,The Joys Of Being Pure At Heart,86.41,31.42,10,"indie pop, indie, indie rock, dream pop, australia, milk records",Marathon Artists,100.0,100.0,100.0
+The Lathums,Matter Does Not Define,82.75,1.0,12,"indie rock, british, uk, indie, rock, alternative, pop, alternative rock, pop rock, acoustic",Modern Sky UK,789.27,100.0,100.0
+Deep Sea Diver,Billboard Heart,82.36,39.99,10,"female vocalist, indie, indie rock, folk, ambient, seattle, rock, indie pop, pop, alternative",Sub Pop Records,3561.33,100.0,100.0
+"LISA,Doja Cat,RAYE",Alter Ego,81.62,1.0,15,"female vocalist, j-pop, hip-hop, japanese, k-pop, blackpink, kpop, rap, hip hop, pop",Lloud Co./RCA Records,100.0,100.0,100.0
+Hana Vu,Movies,80.41,31.79,5,"female vocalist, dream pop, indie, shoegaze, lo-fi, indie pop, american, pop, indie rock, asian",Ghostly International,4010.09,100.0,100.0
+Doves,Constellations For The Lonely,79.94,1.0,10,"indie, indie rock, britpop, alternative, rock, british, alternative rock, manchester, indie pop, doves",EMI North,100.0,100.0,100.0
+Fridayy,"Some Days I’m Good, Some Days I’m Not",76.25,1.0,21,"hip-hop, singer-songwriter, rnb",FRIDAYY PS/ Def Jam,100.0,100.0,100.0
+Matilda Mann,Roxwell,75.47,1.0,14,"female vocalist, folk, acoustic, indie pop, british, singer-songwriter, folk pop, indie, indie rock, uk",7476,1840.76,100.0,100.0
+corook,committed to a bit,75.02,36.77,13,"female vocalist, singer-songwriter, indie pop, indie, pop, usa, queer, alternative pop, non-binary artist",Atlantic Records,100.0,100.0,100.0
+Michi,Dirty Talk,73.63,35.48,10,"female vocalist, j-pop, japanese, electronic, pop, jpop, trip-hop, dance, electronica, british",Stones Throw Records,100.0,100.0,100.0
+"you, infinite","you, infinite",72.4,1.0,9,"female vocalist, japanese, electronic, krautrock, j-pop, j-core, progressive electronic, berlin school, hardcore, jpop",Pelagic Records,100.0,100.0,100.0
+Miya Folick,Erotica Veronica,71.59,42.6,11,"female vocalist, singer-songwriter, indie pop, indie, pop, usa, folk, alternative, indie rock, american",Nettwerk Music Group,7818.75,100.0,100.0
+Polly Paulusma,Wildfires,70.6,1.0,38,"female vocalist, folk, singer-songwriter, acoustic, british, indie, female, chill, england, british folk",One Little Independent,100.0,100.0,100.0
+Cheekface,Middle Spoon,69.8,59.2,12,"indie rock, post-punk, power pop, indie, rock, indie pop, usa, post punk, quirky, 3",Cheekface,3229.75,100.0,100.0
+Antony Szmierek,Service Station At The End Of The Universe,69.14,1.0,12,"spoken word, electronic, hip-hop, indie, british, uk, indie hip-hop, cringy",Mushroom Music/Virgin Music Group,956.72,100.0,100.0
+Ichiko Aoba,Luminescent Creatures,68.17,1.0,11,"female vocalist, folk, singer-songwriter, japanese, chamber folk, contemporary folk, ambient, japan, acoustic, indie folk",Psychic Hotline,100.0,100.0,100.0
+Andy Bell,pinball wanderer,68.08,62.14,8,"female vocalist, synthpop, electronic, pop, british, gay, male vocalists, 80s, dance, synth pop",Sonic Cathedral,5923.32,100.0,100.0
+Edith Frost,In Space,65.16,25.07,12,"female vocalist, folk, singer-songwriter, indie, alt-country, indie folk, country, soft, lo-fi, folk-delica",Drag City,100.0,100.0,100.0
+Rebecca Black,SALVATION,65.01,1.0,7,"female vocalist, pop, fun fun fun fun, friday, queen of pop, legend, electropop, hyperpop, better than radiohead, brutal death metal",Rebecca Black,759.63,100.0,100.0
+The Devil Makes Three,Spirits,64.48,1.0,13,"bluegrass, folk, americana, country, acoustic, alt-country, santa cruz, american, california, usa","New West Records, LLC",1066.98,100.0,100.0
+Hope Tala,Hope Handwritten,64.44,1.0,16,"female vocalist, rnb, soul, bossa nova, british, london, neo-soul, indie, pop, alternative",PMR Records,2103.0,100.0,100.0
+Runaway Brother,Want You Need,63.76,1.0,9,"indie, alternative, pop, emo, pop punk, punk pop, rock, punk, melodic, male vocalists",Mr Saturn Records,1180.28,100.0,100.0
+Joshua Burnside,Teeth of Time,63.05,1.0,10,"folk, indie, experimental folk, electronic, alternative, emo, experimental, singer-songwriter, uk, singersongwriter",Nettwerk Music Group,100.0,100.0,100.0
+JD Clayton,Blue Sky Sundays,62.59,1.0,9,"country, folk",Rounder,100.0,100.0,100.0
+"Venamoris,Dave Lombardo",To Cross or To Burn,62.11,1.0,10,laut - metalsplitter,Ipecac Recordings,100.0,100.0,100.0
+Everything Is Recorded,Richard Russell Is Temporary,56.8,1.0,14,"rnb, soul, electronic, british, alternative rnb, hip-hop, trip-hop, hip hop, experimental, uk",XL Recordings,100.0,100.0,100.0
+"bdrmm,Working Men's Club",Microtonic,55.95,1.0,10,"dream pop, shoegaze, post-punk, indie rock, indie pop, crank wave, indie, hull, united kingdom, uk",Rock Action Records,100.0,100.0,100.0
+Kasey Tyndall,Kasey Tyndall,54.25,1.0,11,"female vocalist, country, indie, singer-songwriter",MNRK Music,100.0,100.0,100.0
+Charles Wesley Godwin,Lonely Mountain Town,53.36,81.04,7,"country, americana, folk, american, singer-songwriter, alternative country, west virginia, heartland rock, best2019",Big Loud Records,836.34,100.0,100.0
+Echolalia,Echolalia,52.1,1.0,13,"experimental, theremin, needs merging or splitting, electronica, lesser known yet streamable artists, under 2000 listeners, frauen und technik, united states",Full Time Hobby,100.0,100.0,100.0
+Yves Jarvis,All Cylinders,49.42,8.73,10,"experimental, neo-soul, soul, rnb, psychedelic folk, neo-psychedelia, canadian, alternative rnb, electronic, indie",In Real Life Music,100.0,100.0,100.0
+Architects,"The Sky, The Earth & All Between",48.35,79.12,12,"metalcore, mathcore, hardcore, metal, tech metal, post-hardcore, progressive metalcore, british, progressive metal, technical metalcore",Epitaph,100.0,100.0,100.0
+Paris Texas,They Left Me With A Gun,47.79,1.0,6,"rap, hip-hop, electronic, rap rock, rock, alternative hip-hop, hip hop, trip hop, california, experimental hip-hop",Paris Texas LLC,798.69,100.0,100.0
+Tori Amos,The Music of Tori and the Muses,47.62,1.0,9,"female vocalist, singer-songwriter, alternative, piano, rock, indie, pop, tori amos, female, alternative rock",Faerie Workshop Rekords,2593.83,100.0,100.0
+"Bedrooms,Fried Monk",Monkrooms,47.06,1.0,11,"indie, hip hop, rock, folk, rap, indie pop, indie rock, german, irish, indie folk",Day Off Recording Company,7301.82,100.0,100.0
+Panda Bear,Sinister Grift,44.51,45.94,10,"experimental, psychedelic, freak folk, indie, folk, electronic, new weird america, indie rock, psychedelic pop, ambient",Domino Recording Co,875.94,100.0,100.0
+"Boldy James,Chuck Strangers",Token of Appreciation,37.42,82.4,11,"rap, hip-hop, gangsta rap, hip hop, detroit, jazz rap, boom bap, conscious hip hop, drumless, the alchemist",1301 LLC,2949.61,100.0,100.0
+BANKS,Off With Her Head,36.55,49.61,12,"female vocalist, electronic, downtempo, pop, indie, alternative rnb, american, indie pop, rnb, alternative","Her Name Is Banks, Inc",100.0,100.0,100.0
+Kip Moore,Solitary Tracks,36.55,14.72,23,"country, kip moore, usa, contemporary country, country-rock, quirky, thoughtful, narrative, organic, rainy day",Kip Moore,100.0,100.0,100.0
+David Grubbs,Whistle from Above,35.89,81.32,8,"experimental, post-rock, singer-songwriter, post rock, indie, folk, new weird america, indie rock, american, ambient",Drag City,100.0,100.0,100.0
+DARKSIDE,Nothing,35.52,69.06,9,"electronic, minimal, experimental, ambient, death metal, darkcore, downtempo, psychedelic, house, microhouse",Matador,100.0,100.0,100.0
+Yo La Tengo,Old Joy,34.98,77.5,6,"female vocalist, indie, indie rock, alternative, indie pop, rock, post-rock, dream pop, noise pop, shoegaze",Mississippi Records,5742.38,100.0,100.0
+Redferrin,"Some City, Somewhere",33.64,32.63,7,"country, modern country pop",Round Here Records/Warner Music Nashville,100.0,100.0,100.0
+Billy Hart Quartet,Just,33.48,82.1,10,"jazz, contemporary jazz, percussion, playlist",ECM Records,100.0,100.0,100.0
+IDK,BRAVADO INTiMO...,33.16,78.72,20,"rap, hip-hop, trap, rnb, hip hop, hardcore hip hop, hardcore, boom bap, rock, country",.idk.,3505.02,100.0,100.0
+Cloakroom,Last Leg of the Human Table,32.77,84.42,10,"shoegaze, post-hardcore, emo, slowcore, indie, indie rock, post-rock, american, alternative rock, sludge",Closed Casket Activities,100.0,100.0,100.0
+"REASON,D'Anna Stewart",I Love You Again,32.61,80.64,10,"hip-hop, hardcore, rap, aussie hip-hop, hip hop, rock, australian, underground hip-hop, hardcore punk, metal",Do More Records,100.0,100.0,100.0
+Mdou Moctar,Tears of Injustice,32.56,83.08,8,"psychedelic rock, niger, tuareg, world, desert blues, tishoumaren, african, folk, rock, blues rock",Matador,100.0,100.0,100.0
+The Residents,Doctor Dark,32.52,84.76,16,"experimental, avant-garde, electronic, post-punk, avantgarde, psychedelic, noise, experimental rock, alternative, art rock",CRYPTIC CORP,100.0,100.0,100.0
+"Max Cooper,Felix Gerbelot",On Being,32.35,88.35,13,"minimal, minimal techno, techno, electronic, tech house, idm, neotrance, ambient, electro, minimal house",Mesh,100.0,100.0,100.0
+The Casper Fight Scene,S/T,32.29,85.36,10,"emo, indie, usa, punk rock, midwest emo",PNWK Records,100.0,100.0,100.0
+Big Black Delta,ADONAI,32.23,81.68,10,"electronic, industrial, indie, ambient, noise, experimental, synthpop, usa, electro, american",Big Black Delta,100.0,100.0,100.0
+The Men,Buyer Beware,32.21,87.99,12,"noise rock, post-punk, noise, noise punk, psychedelic rock, punk, rock, post-hardcore, indie rock, garage rock",Fuzz Club,100.0,100.0,100.0
+Marie Davidson,City Of Clowns,32.17,85.04,10,"female vocalist, minimal synth, electronic, techno, ambient, canada, dark ambient, minimal, canadian, synthpop",Marie Davidson,100.0,100.0,100.0
+Year of the Cobra,Year Of The Cobra,31.9,81.95,8,"female vocalist, doom metal, stoner, stoner metal, stoner rock, doom, female fronted metal, sludge, stoner doom metal, united states",Prophecy Productions,100.0,100.0,100.0
+"Shygirl,Club Shy",Club Shy Room 2,31.66,81.38,6,"female vocalist, electronic, grime, experimental, uk bass, deconstructed club, hyperpop, hip-hop, british, uk",Because Music Ltd.,100.0,100.0,100.0

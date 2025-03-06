@@ -12,6 +12,7 @@ from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 from typing import Dict
+import networkx as nx
 
 st.set_page_config(
     page_title="New Music Friday Regression Model",
@@ -85,6 +86,9 @@ st.markdown("""
 
 @st.cache_data
 def load_predictions():
+    """
+    Load the predictions data and ensure required columns are present.
+    """
     prediction_files = glob.glob('predictions/*_Album_Recommendations.csv')
     if not prediction_files:
         st.error("No prediction files found!")
@@ -92,6 +96,14 @@ def load_predictions():
     
     latest_file = max(prediction_files)
     predictions_df = pd.read_csv(latest_file)
+    
+    # Ensure 'playlist_origin' column exists (silently add if missing)
+    if 'playlist_origin' not in predictions_df.columns:
+        predictions_df['playlist_origin'] = 'unknown'  # Default value
+    
+    # Ensure 'Artist Name(s)' column exists (silently add if missing)
+    if 'Artist Name(s)' not in predictions_df.columns:
+        predictions_df['Artist Name(s)'] = 'Unknown Artist'  # Default value
     
     date_str = os.path.basename(latest_file).split('_')[0]
     analysis_date = datetime.strptime(date_str, '%m-%d-%y').strftime('%Y-%m-%d')
@@ -114,6 +126,17 @@ def load_similar_artists():
         st.error(f"Error loading similar artists data: {e}")
         return pd.DataFrame(columns=['Artist', 'Similar Artists'])
 
+@st.cache_data
+def load_liked_similar():
+    """
+    Load the dataset of similar artists for liked artists.
+    """
+    try:
+        return pd.read_csv('data/liked_artists_only_similar.csv')
+    except Exception as e:
+        st.error(f"Error loading liked similar artists data: {e}")
+        return pd.DataFrame(columns=['Artist', 'Similar Artists'])
+
 def load_training_data():
     df = pd.read_csv('data/df_cleaned_pre_standardized.csv')
     return df[df['playlist_origin'] != 'df_nmf'].copy()
@@ -130,12 +153,26 @@ def save_feedback(album_name, artist, feedback):
     
     with open(feedback_file, 'a') as f:
         f.write(f'{album_name},{artist},{feedback}\n')
-
+    
+    # Clear cache after saving feedback
+    st.cache_data.clear()
+    
 def load_feedback():
     feedback_file = 'feedback/feedback.csv'
     if os.path.exists(feedback_file):
         return pd.read_csv(feedback_file)
     return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
+
+if 'feedback_updated' not in st.session_state:
+    st.session_state.feedback_updated = False
+
+# Then in save_feedback:
+st.session_state.feedback_updated = True
+
+# And check at the beginning of your app:
+if st.session_state.feedback_updated:
+    st.cache_data.clear()
+    st.session_state.feedback_updated = False
 
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
     try:
@@ -355,7 +392,145 @@ def manage_album_covers():
                 st.experimental_rerun()
             except Exception as e:
                 st.error(f"Failed to save: {e}")
-                
+
+def dacus_game_page(G):
+    st.title("🎵 6 Degrees of Lucy Dacus")
+    st.write("""
+    ### How It Works
+    Enter an artist's name to see how closely they're connected to Lucy Dacus!
+    The **Dacus number** is the number of connections between the artist and Lucy Dacus.
+    """)
+    
+    # Artist input
+    artist_input = st.text_input("Enter an artist's name:", "Phoebe Bridgers")
+    
+    # Calculate Dacus number and path
+    dacus_number, path = calculate_dacus_number(artist_input, G)
+    
+    if dacus_number is not None:
+        st.success(f"**Dacus Number:** {dacus_number}")
+        st.write(f"**Path to Lucy Dacus:** {' → '.join(path)}")
+    else:
+        st.error("No path found. This artist might not be connected to Lucy Dacus.")
+        
+def calculate_dacus_number(artist_name, G):
+    """
+    Calculate the Dacus number and path for a given artist.
+    """
+    try:
+        if artist_name not in G:
+            return None, None
+        
+        if artist_name == "Lucy Dacus":
+            return 0, ["Lucy Dacus"]
+        
+        path = nx.shortest_path(G, source=artist_name, target="Lucy Dacus")
+        dacus_number = len(path) - 1
+        return dacus_number, path
+    except nx.NetworkXNoPath:
+        return None, None
+
+def visualize_artist_network(G, path):
+    """
+    Visualize the artist network and highlight the path to Lucy Dacus.
+    """
+    pos = nx.spring_layout(G, seed=42)
+    
+    edge_trace = []
+    for edge in G.edges():
+        x0, y0 = pos[edge[0]]
+        x1, y1 = pos[edge[1]]
+        edge_trace.append(go.Scatter(
+            x=[x0, x1, None], y=[y0, y1, None],
+            line=dict(width=0.5, color='#888'),
+            hoverinfo='none',
+            mode='lines'
+        ))
+    
+    node_trace = go.Scatter(
+        x=[], y=[], text=[], mode='markers+text', hoverinfo='text',
+        marker=dict(size=10, color='lightblue'),
+        textposition="top center"
+    )
+    
+    for node in G.nodes():
+        x, y = pos[node]
+        node_trace['x'] += (x,)
+        node_trace['y'] += (y,)
+        node_trace['text'] += (node,)
+    
+    # Highlight the path
+    path_edges = list(zip(path[:-1], path[1:]))
+    path_trace = []
+    for edge in path_edges:
+        x0, y0 = pos[edge[0]]
+        x1, y1 = pos[edge[1]]
+        path_trace.append(go.Scatter(
+            x=[x0, x1, None], y=[y0, y1, None],
+            line=dict(width=2, color='red'),
+            hoverinfo='none',
+            mode='lines'
+        ))
+    
+    fig = go.Figure(data=edge_trace + [node_trace] + path_trace)
+    fig.update_layout(showlegend=False, hovermode='closest')
+    return fig
+
+def build_graph(df, df_liked_similar, include_nmf=False):
+    """
+    Build a graph of artists and their connections.
+    Only includes liked artists and their similar artists by default.
+    Optionally includes NMF and not-liked artists (without adding edges).
+    """
+    G = nx.Graph()
+    
+    # Add nodes for liked artists
+    if 'playlist_origin' in df.columns and 'Artist Name(s)' in df.columns:
+        liked_artists = set(
+            df[df['playlist_origin'].isin(['df_liked', 'df_fav_albums'])]['Artist Name(s)']
+            .str.split(',').explode().str.strip()
+        )
+    else:
+        liked_artists = set()  # Fallback if columns are missing
+    
+    G.add_nodes_from(liked_artists, type='liked')
+    
+    # Add nodes for similar artists (from liked)
+    if 'Similar Artists' in df_liked_similar.columns:
+        similar_artists_liked = set(
+            df_liked_similar['Similar Artists']
+            .dropna()
+            .str.split(',').explode().str.strip()
+        )
+    else:
+        similar_artists_liked = set()  # Fallback if column is missing
+    
+    G.add_nodes_from(similar_artists_liked, type='similar_liked')
+    
+    # Add edges based on similarity (from liked)
+    if 'Artist' in df_liked_similar.columns and 'Similar Artists' in df_liked_similar.columns:
+        for _, row in df_liked_similar.iterrows():
+            artist = row['Artist']
+            if isinstance(row['Similar Artists'], str):
+                similar = row['Similar Artists'].split(', ')
+                for s in similar:
+                    G.add_edge(artist, s, weight=1.0)
+    
+    # Optionally include NMF and not-liked artists (without adding edges)
+    if include_nmf and 'playlist_origin' in df.columns and 'Artist Name(s)' in df.columns:
+        nmf_artists = set(
+            df[df['playlist_origin'] == 'df_nmf']['Artist Name(s)']
+            .str.split(',').explode().str.strip()
+        )
+        not_liked_artists = set(
+            df[df['playlist_origin'] == 'df_not_liked']['Artist Name(s)']
+            .str.split(',').explode().str.strip()
+        )
+        G.add_nodes_from(nmf_artists, type='nmf')
+        G.add_nodes_from(not_liked_artists, type='not_liked')
+    
+    return G
+
 def main():
     st.sidebar.title("About This Project")
     st.sidebar.write("""
@@ -379,37 +554,47 @@ def main():
     
     page = st.sidebar.radio(
         "Navigate",
-        ["Weekly Predictions", "Album Cover Manager", "Notebook", "About Me"]
+        ["Weekly Predictions", "Album Cover Manager", "Notebook", "6 Degrees of Lucy Dacus", "About Me"]
     )
     
+    # Load datasets
     predictions_data = load_predictions()
+    album_covers_df = load_album_covers()
+    similar_artists_df = load_similar_artists()
+    
     if predictions_data is None:
         st.error("Could not load prediction data. Please check the predictions folder.")
         return
     
     df, analysis_date = predictions_data
-    album_covers_df = load_album_covers()
-    similar_artists_df = load_similar_artists()
+    
+    # Load the liked similar artists dataset
+    df_liked_similar = load_liked_similar()
+    
+    # Load the artist network graph (G)
+    G = build_graph(df, df_liked_similar, include_nmf=True)
     
     if page == "Weekly Predictions":
         st.title("🎵 New Music Friday Regression Model")
         st.subheader("Personalized New Music Friday Recommendations")
         
+        # Fixed the genre counting logic
+        all_genres = set()
+        for genres_str in df['Genres']:
+            if isinstance(genres_str, str):
+                genres_list = [g.strip() for g in genres_str.split(',')]
+                all_genres.update(genres_list)
+        
         col1, col2, col3 = st.columns(3)
         with col1:
             st.metric("New Releases", len(df))
         with col2:
-            st.metric("Genres Analyzed", df['Genres'].nunique())
+            st.metric("Genres Analyzed", len(all_genres))
         with col3:
             formatted_date = datetime.strptime(analysis_date, '%Y-%m-%d').strftime('%B %d, %Y')
             st.metric("Analysis Date", formatted_date)
         
         st.subheader("🏆 Top Album Predictions")
-        
-        all_genres = set()
-        for genres in df['Genres'].str.split(','):
-            if isinstance(genres, list):
-                all_genres.update([g.strip() for g in genres])
         
         genres = st.multiselect(
             "Filter by Genre",
@@ -446,6 +631,9 @@ def main():
     
     elif page == "About Me":
         about_me_page()
+    
+    elif page == "6 Degrees of Lucy Dacus":
+        dacus_game_page(G)
 
 if __name__ == "__main__":
     main()
