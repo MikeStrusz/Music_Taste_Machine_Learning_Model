@@ -1,69 +1,72 @@
 Artist,Album Name,avg_score,confidence_score,Track_Count,Genres,Label,Artist_Centrality,Mood_Score,Energy_Profile,Genres_encoded,Record_Label_Frequency_Encoded
-Star 99,Gaman,103.66,82.61,10,indie pop,Lauren Records,1.0,23.71,76.71,85.31,1.0
-Hamilton Leithauser,This Side of the Island,101.93,81.72,9,"indie, indie rock, singer-songwriter, rock, indie pop, usa, alternative, alternative rock, new york, guitar",Glassnote Music LLC,49.46,54.9,47.33,79.17,3.05
-The Tubs,Cotton Crown,101.13,84.22,9,"jangle pop, indie rock, dream pop, indie, rock, british, indie pop, twee pop, power pop, uk",Trouble In Mind Records,8.75,62.5,67.77,81.28,1.68
-Neil Young,Oceanside Countryside,98.62,83.77,10,"classic rock, singer-songwriter, rock, folk, folk rock, canadian, country, alt-country, neil young, 70s",Reprise,65.46,39.99,64.5,83.47,3.05
-Frog Eyes,The Open Up,96.16,75.19,10,"indie, experimental, canadian, indie rock, freak folk, indie pop, rock, alternative, post-rock, folk",Paper Bag Records,10.52,41.37,71.94,66.37,1.0
-Vundabar,Surgery and Pleasure,95.33,36.8,11,"indie rock, surf rock, garage rock, indie, rock, boston, surf, usa, american, chill",Loma Vista Recordings,1.0,44.21,65.45,75.95,86.34
-"Croatian Amor,Lust For Youth",All Worlds,94.48,1.0,10,"female vocalist, synthpop, lo-fi, electronic, coldwave, swedish, minimal synth, new wave, post-punk, synth",Sacred Bones Records,1.0,25.88,60.79,67.95,2.37
-Bob Mould,Here We Go Crazy,89.91,33.34,11,"alternative, singer-songwriter, rock, indie, indie rock, alternative rock, punk, 90s, american, electronic",BMG Rights Management (US) LLC,1.0,31.75,80.48,77.84,51.52
-Benmont Tench,The Melancholy Season,89.16,33.97,13,"rock, singer-songwriter, hard rock, usa, soft rock, american, cafe largo, thrilling adventure hour",BMG Rights Management (US) LLC,1.0,42.73,39.47,76.18,51.52
-"Haroula Rose,Oliver Hill",Cycles,84.2,34.75,10,"female vocalist, folk, americana, psych folk, indie, singer-songwriter, usa, pop, indie folk, chicago",Ba Da Bing!,1.0,28.68,56.38,78.51,15.34
-Will Stratton,Points Of Origin,83.76,1.0,10,"singer-songwriter, folk, acoustic, indie folk, indie, chill, usa, guitar, american, mellow",Bella Union,1.0,29.35,80.49,82.27,13.97
-HOUSE Of ALL,HOUSE Of ALL SOULS,82.88,1.0,10,"indie rock, post-punk",Tiny Global Productions,1.0,40.04,39.88,67.52,4.84
-LAKE,Bucolic Gone,81.76,35.01,10,"rock, classic rock, indie pop, new york, indie, queensbridge, rap, hip-hop, hip hop, indie rock",Don Giovanni Records,1.0,49.89,43.45,83.64,10.56
-Pale Blue Eyes,New Place,81.48,1.0,12,"post-punk, indie rock, indie pop, crank wave, alternative, dark, shoegaze, art punk, electronic, indie",Having Fun,1.0,22.96,72.36,68.58,4.84
-Lady Gaga,MAYHEM,80.64,36.88,14,"female vocalist, pop, dance, electronic, lady gaga, electropop, american, gaga, singer-songwriter, sexy",Interscope Records,56.25,54.19,50.19,70.29,11.92
-Matt Embree,Orion,78.9,28.53,8,"indie, alternative, singer-songwriter, witnessed",Born Losers Records,1.0,63.04,50.07,80.87,9.19
-SASAMI,Blood On the Silver Screen,77.97,1.0,13,"female vocalist, shoegaze, indie rock, singer-songwriter, usa, american, noise pop, california, queer, los angeles",Domino Recording Co,1.0,45.79,50.27,68.99,59.03
-Arny Margret,"I Miss You, I Do",77.32,33.72,10,"female vocalist, icelandic, indie pop, acoustic, indie folk, folk pop, fgg, 4-25, upcoming album 2023, folk guitar girl",One Little Independent,1.0,35.31,64.48,79.43,8.51
-Combust,Belly of the Beast,74.09,1.0,12,"hardcore, hardcore punk, nyhc, crossover, crossover thrash, usa, thrash, heavy metal, metalcore, metal",Triple B Records,1.0,23.54,53.6,51.8,1.0
-"CA7RIEL,CA7RIEL & Paco Amoroso,Paco Amoroso",PAPOTA,73.4,1.0,9,"electropop, hip hop, rap, argentina, deep house, trap, pop rap",5020 Records,1.0,62.96,53.84,68.91,4.84
-Base Hollow,KRIPP KRONICLES I,72.68,1.0,5,uk,Base Hollow,1.0,31.51,46.44,85.63,4.84
-Fust,Big Ugly,72.09,37.17,11,"folk, indie rock, classic rock, metal, indie, alternative, rap, hip-hop, vocal, rock",Dear Life Records,1.0,41.58,68.29,76.57,7.14
-Michi,Dirty Talk,71.19,1.0,10,"female vocalist, j-pop, japanese, electronic, pop, jpop, trip-hop, dance, electronica, british",Stones Throw Records,1.0,38.62,28.2,73.1,17.39
-"Big Zuu,Capo Lee",Signed & Delivered,68.46,1.0,11,"grime, hip hop, rap, hip-hop, uk, london, english, ukhh, 7 stars, kilburn",Legacy Living Ltd,1.0,71.35,68.22,73.98,4.84
-Freak Slug,I Blow Out Big Candles (But With a Cherry on Top),68.27,1.0,12,"british, indie, uk, lo-fi, rare sads, pop, alternative, indie pop, synth pop, england",Future Classic,1.0,27.42,63.08,80.83,4.84
-Moreish Idols,All In The Game,67.48,1.0,11,"dream pop, indie rock, post-punk, punk rock, art punk, indie, jazz, alternative, alternative rock, london",Speedy Wunderground / [PIAS],7.68,52.73,48.17,69.23,7.14
-JENNIE,Ruby,67.38,1.0,14,"female vocalist, k-pop, korean, kpop, blackpink, pop, jennie, better than cardi b, finnish, yg entertainment",OA Entertainment/Columbia,1.0,53.27,44.37,74.3,4.84
-Lord Finesse,The SP 1200 Project: Sounds & Frequencies in Technicolor,65.34,1.0,17,"hip-hop, rap, underground hip-hop, hip hop, ditc, new york, east coast rap, underground rap, east coast, hiphop","Bossmen, LLC",1.0,46.42,40.57,80.92,4.84
-Fine China,I Felt Called,64.55,1.0,12,"indie, christian, rock, dream pop, electronic, indie rock, lo-fi, chamber pop, 90s, metal",Velvet Blue Music,1.0,47.34,64.27,71.7,4.84
-6ix,Homebody,64.29,1.0,16,"funk, electronic, jazz, 60s, piano, psychedelic, sax, cello, voice, improvisation",6ix Productions LLC,1.0,20.59,70.31,75.95,4.84
-Richy Mitch & The Coal Miners,Colorado's On Fire Again,63.88,1.0,14,"folk, acoustic, indie, indie folk, country, indie rock, usa, americana, brass, colorado",Band of Wolves,10.82,31.64,54.44,77.33,4.84
-Kris Delmhorst,Ghosts in the Garden,63.87,1.0,11,"female vocalist, folk, singer-songwriter, alt-country, americana, acoustic, folk rock, boston, indie, american",CEN,1.0,9.53,50.08,77.69,4.84
-Icewear Vezzo,UNDEFEATED - EP,63.73,1.0,9,"rap, detroit rap, hip-hop, detroit, hip hop, american, trap, michigan, united states",Iced Up Records,1.0,28.97,75.5,78.88,4.84
-Mohammad Mostafa Heydarian,Noor-e Vojood,63.08,1.0,6,tanbur,Centripetal Force,1.0,18.06,39.22,73.3,4.84
-Sylvie Lewis,Lives Wisely,62.98,1.0,11,"female vocalist, singer-songwriter, indie pop, melodic, jazz, greys anatomy, pop, folk, favorites, cabaret",Clover Music Group,1.0,34.9,45.29,76.44,4.84
-Melin Melyn,Mill On The Hill,62.01,1.0,12,"vocal, british, folk, indie pop, indie rock, psychedelic, bass, percussion, alternative country, lute",Blomonj,9.46,22.26,70.31,70.84,4.84
-Foreign Fields,"Small Sessions, Vol. 1",60.91,1.0,7,"folk, indie, indie folk, acoustic, experimental, indie pop, all, electronic, pop, ambient",Nettwerk Music Group,18.05,49.06,48.52,71.48,48.11
-Pyrex,Body,58.93,1.0,8,"hip-hop, hip hop, rap, italian, trap, vocal, pop, rock, punk, hardcore",Total Punk Records,1.0,13.13,78.36,66.3,4.84
-"JB Dunckel,Jonathan Fitoussi",Mirages 2,55.55,1.0,8,"electronic, french, chillout, soundtrack, ambient pop, space rock, france, air, français, art pop",Prototyp Recording,13.15,23.39,41.72,66.51,4.84
-Jeneba Kanneh-Mason,Fantasie,54.66,1.0,15,"classical, piano, romantic, instrumental, polish, composers, composer, classic, chopin, poland | composer, classical, american, instrumental, piano, organ, contemporary classical, modern classical, america, 20th century | classical, piano, impressionist, french, composers, impressionism, composer, instrumental, romantic, classic",Sony Classical,14.23,11.05,37.24,71.2,4.84
-Tobacco City,Horses,50.67,1.0,12,"soft rock, alternative country, indie, country, usa, americana, dream pop, alt-country, alt country, country rock",Scissor Tail Records,11.03,38.41,51.6,67.2,4.84
-Monde UFO,Flamingo Tower,49.57,1.0,11,"space rock, psychedelic rock, jazz, bossa nova, folk, ambient, lo-fi, avant-garde, drone, male vocalists",Fire Records,1.0,29.27,34.71,43.83,1.68
-Zombie Zombie,Funk Kraut,47.78,1.0,10,"electronic, psychedelic, krautrock, french, electro, experimental, screamo, france, electroclash, alternative",Born Bad Records,1.0,39.99,55.94,59.99,4.84
-HotWax,Hot Shock,46.45,77.87,10,"female vocalist, riot grrrl, crank wave, post-punk, queercore, garage rock, psychedelic rock, garage punk, heavy punk, indie rock",Marathon Artists,1.0,22.5,64.14,42.4,12.61
-Spiritbox,Tsunami Sea,44.33,51.52,11,"female vocalist, metalcore, progressive metalcore, djent, progressive metal, canadian, alternative metal, metal, female fronted metal, nu metal",Rise Records,1.0,13.29,56.49,50.22,10.56
-Harrison Gordon,Spring Break!,42.94,1.0,6,"emo, pop punk, coworker-core",Gordon Nation,1.0,24.46,68.77,66.02,4.84
-Jason Isbell,Foxes in the Snow,40.88,80.76,11,"alt-country, americana, singer-songwriter, southern rock, country, rock, folk, american, alternative country, roots rock",Southeastern Records,17.65,40.39,42.84,60.18,4.84
-Kedr Livanskiy,Myrtus Myth,37.91,1.0,11,"female vocalist, electronic, russian, techno, lo-fi, ambient, russia, house, outsider house, hypnagogic pop",2MR,1.0,51.81,71.61,59.19,4.84
-Raisa K,Affectionately,37.68,1.0,12,"female vocalist, electronic, experimental, indie rock, indie, alternative, indietronica, noise pop",15 love,1.0,41.16,82.04,58.65,4.84
-Annie DiRusso,Super Pedestrian,37.43,81.27,11,"female vocalist, indie pop, indie, indie rock, usa, pop rock, acoustic, american, folk rock, indie folk",Summer Soup Songs,34.36,39.99,41.24,82.43,4.84
-SKLOSS,The Pattern Speaks,37.04,78.38,8,"post-rock, post rock, texas, austin, post-metal, post metal, austin texas",Fuzz Club,1.0,17.91,58.09,51.82,4.84
-"Bianca Scout,Marina Zispin,Martyn Reid","Now You See Me, Now You Don't",36.45,80.14,10,"synthpop, darkwave",Scenic Route Records,1.0,46.72,58.62,56.77,4.84
-Clara Mann,Rift,36.32,83.72,10,"folk, bristol, indie folk, singer songwriter",The state51 Conspiracy,45.59,18.56,33.57,81.9,4.84
-TOKiMONSTA,Eternal Reverie,36.28,86.29,10,"female vocalist, electronic, instrumental hip-hop, hip-hop, hip hop, japanese, korean, experimental, beats, wonky",Young Art Records,1.0,46.3,55.1,55.68,4.84
-Michael Cera Palin,We Could Be Brave,35.72,84.84,10,"indie, math rock, emo, midwest emo, indie rock, emo pop, rock, usa, punk rock, pop punk",Brain Synthesizer,18.32,33.69,82.33,53.4,4.84
-Divorce,Drive to Goldenhammer,35.64,77.34,12,"female vocalist, noise rock, noise, aor, no wave, heavy metal, female fronted metal, punk, hard rock, punk rock",Gravity Records / Capitol Records UK,1.0,51.18,38.33,56.58,4.84
-"Freestyle Man,Jimi Tenor",Sinus Amoris (Songs from the Bay of Love),35.59,79.59,9,"electronic, acid jazz, jazz, finnish, electronica, experimental, funk, warp, idm, trip-hop",Studio Barnhus,1.0,48.22,56.07,54.53,4.84
-Downward,Downward,34.63,75.91,10,"shoegaze, dream pop, alternative rock, emo, space rock, post-rock, post-hardcore, indie, indie rock, black metal",NEW MORALITY ZINE,1.0,25.34,54.49,50.52,4.84
-Franc Moody,Chewing The Fat,34.35,76.95,10,"funk, disco, electronic, dance, british, house, 4, disco house, indie dance, funky house",Night Time Stories (NTS),53.55,46.97,52.47,73.66,4.84
-Lagartijeando,7 Caminos,33.91,73.48,8,"argentina, electronic, experimental, dance, cumbia, trippy, argentinian, best played loud, latinoamerica, digital cumbia",WONDERWHEEL RECORDINGS,1.0,57.78,40.84,64.12,4.84
-Nick Brobak,Voice at Dawn,33.78,72.69,15,"rare sads, ambient, lo-fi, slowcore, indie folk, bedroom, bedroom pop, lo-fi indie, bummer",View No Country,1.0,38.07,41.1,59.36,4.84
-Ingrown,Idaho,33.18,81.23,11,"hardcore, goregrind, pornogrind, grindcore, metalcore, hardcore punk, porngrind, powerviolence, metallic hardcore, metal",Closed Casket Activities,1.0,25.13,57.02,45.57,4.84
-Apollo Brown,Elevator Music,32.6,87.11,15,"instrumental hip-hop, hip-hop, instrumental, funky, hip hop, underground hip-hop, beats, detroit, producer, rap",Escapism,1.0,44.13,69.21,64.02,4.84
-TOKiMONSTA,Feel It,32.4,77.28,5,"female vocalist, electronic, instrumental hip-hop, hip-hop, hip hop, japanese, korean, experimental, beats, wonky",Young Art Records,1.0,47.08,57.84,55.68,4.84
-Kinski,Stumbledown Terrace,32.28,83.01,7,"post-rock, instrumental, experimental, indie, post rock, space rock, psychedelic, rock, indie rock, psychedelic rock",Comedy Minus One,1.0,9.87,63.39,38.97,4.84
-shinetiac,Infiltrating Roku City,32.21,86.96,10,"electronic, instrumental, ambient, experimental, american, north american",West Mineral,1.0,12.04,38.06,39.82,4.84
-Los Pirañas,Una Oportunidad más de triunfar en la vida,31.68,64.61,8,"cumbia, colombia, experimental, latin, psychedelic, cumbia experimental, spanish, surf, post punk, male vocalists",Glitterbeat Records,1.0,57.53,57.34,61.49,4.84
-Sierra Hull,A Tip Toe High Wire,31.15,78.5,10,"female vocalist, bluegrass, country, folk, mandolin, sierra hull, american, vocal, usa, alt-country",Sierra Hull,7.87,43.04,60.66,61.26,4.84
+Hamilton Leithauser,This Side of the Island,102.44,75.08,9,"indie, indie rock, singer-songwriter, rock, indie pop, usa, alternative, alternative rock, new york, guitar",Glassnote Music LLC,49.46,54.9,47.33,79.17,3.05
+Neil Young,Oceanside Countryside,101.87,82.37,10,"classic rock, singer-songwriter, rock, folk, folk rock, canadian, country, alt-country, neil young, 70s",Reprise,65.46,39.99,64.5,83.47,3.05
+Star 99,Gaman,101.32,80.75,10,indie pop,Lauren Records,1.0,23.71,76.71,85.31,1.0
+The Tubs,Cotton Crown,101.11,36.27,9,"jangle pop, indie rock, dream pop, indie, rock, british, indie pop, twee pop, power pop, uk",Trouble In Mind Records,8.75,62.5,67.77,81.28,1.68
+Frog Eyes,The Open Up,90.2,1.0,10,"indie, experimental, canadian, indie rock, freak folk, indie pop, rock, alternative, post-rock, folk",Paper Bag Records,10.52,41.37,71.94,66.37,1.0
+Bob Mould,Here We Go Crazy,88.2,33.53,11,"alternative, singer-songwriter, rock, indie, indie rock, alternative rock, punk, 90s, american, electronic",BMG Rights Management (US) LLC,1.0,31.75,80.48,77.84,51.52
+"Haroula Rose,Oliver Hill",Cycles,82.05,36.07,10,"female vocalist, folk, americana, psych folk, indie, singer-songwriter, usa, pop, indie folk, chicago",Ba Da Bing!,1.0,28.68,56.38,78.51,15.34
+HOUSE Of ALL,HOUSE Of ALL SOULS,80.86,1.0,10,"indie rock, post-punk",Tiny Global Productions,1.0,40.04,39.88,67.52,4.84
+Arny Margret,"I Miss You, I Do",80.36,38.09,10,"female vocalist, icelandic, indie pop, acoustic, indie folk, folk pop, fgg, 4-25, upcoming album 2023, folk guitar girl",One Little Independent,1.0,35.31,64.48,79.43,8.51
+Pale Blue Eyes,New Place,79.52,1.0,12,"post-punk, indie rock, indie pop, crank wave, alternative, dark, shoegaze, art punk, electronic, indie",Having Fun,1.0,22.96,72.36,68.58,4.84
+Lady Gaga,MAYHEM,79.05,37.31,14,"female vocalist, pop, dance, electronic, lady gaga, electropop, american, gaga, singer-songwriter, sexy",Interscope Records,56.25,54.19,50.19,70.29,11.92
+Benmont Tench,The Melancholy Season,78.81,1.0,13,"rock, singer-songwriter, hard rock, usa, soft rock, american, cafe largo, thrilling adventure hour",BMG Rights Management (US) LLC,1.0,42.73,39.47,76.18,51.52
+Matt Embree,Orion,78.63,1.0,8,"indie, alternative, singer-songwriter, witnessed",Born Losers Records,1.0,63.04,50.07,80.87,9.19
+LAKE,Bucolic Gone,74.8,40.31,10,"rock, classic rock, indie pop, new york, indie, queensbridge, rap, hip-hop, hip hop, indie rock",Don Giovanni Records,1.0,49.89,43.45,83.64,10.56
+Base Hollow,KRIPP KRONICLES I,74.03,1.0,5,uk,Base Hollow,1.0,31.51,46.44,85.63,4.84
+Michi,Dirty Talk,73.44,1.0,10,"female vocalist, j-pop, japanese, electronic, pop, jpop, trip-hop, dance, electronica, british",Stones Throw Records,1.0,38.62,28.2,73.1,17.39
+Vundabar,Surgery and Pleasure,73.29,38.29,11,"indie rock, surf rock, garage rock, indie, rock, boston, surf, usa, american, chill",Loma Vista Recordings,1.0,44.21,65.45,75.95,86.34
+Icewear Vezzo,UNDEFEATED - EP,72.57,1.0,9,"rap, detroit rap, hip-hop, detroit, hip hop, american, trap, michigan, united states",Iced Up Records,1.0,28.97,75.5,78.88,4.84
+SASAMI,Blood On the Silver Screen,72.18,1.0,13,"female vocalist, shoegaze, indie rock, singer-songwriter, usa, american, noise pop, california, queer, los angeles",Domino Recording Co,1.0,45.79,50.27,68.99,59.03
+Will Stratton,Points Of Origin,69.57,1.0,10,"singer-songwriter, folk, acoustic, indie folk, indie, chill, usa, guitar, american, mellow",Bella Union,1.0,29.35,80.49,82.27,13.97
+Richy Mitch & The Coal Miners,Colorado's On Fire Again,68.49,1.0,14,"folk, acoustic, indie, indie folk, country, indie rock, usa, americana, brass, colorado",Band of Wolves,10.82,31.64,54.44,77.33,4.84
+Freak Slug,I Blow Out Big Candles (But With a Cherry on Top),68.36,1.0,12,"british, indie, uk, lo-fi, rare sads, pop, alternative, indie pop, synth pop, england",Future Classic,1.0,27.42,63.08,80.83,4.84
+Fust,Big Ugly,68.2,46.73,11,"folk, indie rock, classic rock, metal, indie, alternative, rap, hip-hop, vocal, rock",Dear Life Records,1.0,41.58,68.29,76.57,7.14
+Old Pup,Spider Towns,67.03,1.0,11,gothic country,1099830 Records DK2,1.0,30.47,43.15,74.18,4.84
+"Croatian Amor,Lust For Youth",All Worlds,65.74,1.0,10,"female vocalist, synthpop, lo-fi, electronic, coldwave, swedish, minimal synth, new wave, post-punk, synth",Sacred Bones Records,1.0,25.88,60.79,67.95,2.37
+Lord Finesse,The SP 1200 Project: Sounds & Frequencies in Technicolor,64.01,1.0,17,"hip-hop, rap, underground hip-hop, hip hop, ditc, new york, east coast rap, underground rap, east coast, hiphop","Bossmen, LLC",1.0,46.42,40.57,80.92,4.84
+JENNIE,Ruby,63.06,1.0,14,"female vocalist, k-pop, korean, kpop, blackpink, pop, jennie, better than cardi b, finnish, yg entertainment",OA Entertainment/Columbia,1.0,53.27,44.37,74.3,4.84
+Fine China,I Felt Called,62.15,1.0,12,"indie, christian, rock, dream pop, electronic, indie rock, lo-fi, chamber pop, 90s, metal",Velvet Blue Music,1.0,47.34,64.27,71.7,4.84
+Mohammad Mostafa Heydarian,Noor-e Vojood,61.2,1.0,6,tanbur,Centripetal Force,1.0,18.06,39.22,73.3,4.84
+Moreish Idols,All In The Game,60.46,1.0,11,"dream pop, indie rock, post-punk, punk rock, art punk, indie, jazz, alternative, alternative rock, london",Speedy Wunderground / [PIAS],7.68,52.73,48.17,69.23,7.14
+6ix,Homebody,60.43,1.0,16,"funk, electronic, jazz, 60s, piano, psychedelic, sax, cello, voice, improvisation",6ix Productions LLC,1.0,20.59,70.31,75.95,4.84
+Kris Delmhorst,Ghosts in the Garden,60.41,1.0,11,"female vocalist, folk, singer-songwriter, alt-country, americana, acoustic, folk rock, boston, indie, american",CEN,1.0,9.53,50.08,77.69,4.84
+Melin Melyn,Mill On The Hill,60.32,1.0,12,"vocal, british, folk, indie pop, indie rock, psychedelic, bass, percussion, alternative country, lute",Blomonj,9.46,22.26,70.31,70.84,4.84
+Sylvie Lewis,Lives Wisely,59.85,1.0,11,"female vocalist, singer-songwriter, indie pop, melodic, jazz, greys anatomy, pop, folk, favorites, cabaret",Clover Music Group,1.0,34.9,45.29,76.44,4.84
+Capo Lee,Signed & Delivered,59.12,1.0,11,"grime, hip hop, rap, hip-hop, uk, london, english, ukhh, 7 stars, kilburn | grime, hip hop, hip-hop, electronic, british, rap, 5 stars, uk hip-hop, british hip hop, ukhh",Legacy Living Ltd,1.0,71.35,68.22,73.98,4.84
+Pyrex,Body,56.81,1.0,8,"hip-hop, hip hop, rap, italian, trap, vocal, pop, rock, punk, hardcore",Total Punk Records,1.0,13.13,78.36,66.3,4.84
+Foreign Fields,"Small Sessions, Vol. 1",56.6,11.79,7,"folk, indie, indie folk, acoustic, experimental, indie pop, all, electronic, pop, ambient",Nettwerk Music Group,18.05,49.06,48.52,71.48,48.11
+"JB Dunckel,Jonathan Fitoussi",Mirages 2,53.79,1.0,8,"electronic, french, chillout, soundtrack, ambient pop, space rock, france, air, français, art pop",Prototyp Recording,13.15,23.39,41.72,66.51,4.84
+Jeneba Kanneh-Mason,Fantasie,52.46,1.0,15,"classical, romantic, russian, piano, composer, composers, romantic classical, russia, instrumental, 20th century classical | composer, classical, american, instrumental, piano, organ, contemporary classical, modern classical, america, 20th century | classical, piano, impressionist, french, composers, impressionism, composer, instrumental, romantic, classic",Sony Classical,14.23,11.05,37.24,71.2,4.84
+Tobacco City,Horses,49.64,1.0,12,"soft rock, alternative country, indie, country, usa, americana, dream pop, alt-country, alt country, country rock",Scissor Tail Records,11.03,38.41,51.6,67.2,4.84
+"CA7RIEL,CA7RIEL & Paco Amoroso,Paco Amoroso",PAPOTA,47.63,4.8,9,"electropop, hip hop, rap, argentina, deep house, trap, pop rap",5020 Records,1.0,62.96,53.84,68.91,4.84
+Zombie Zombie,Funk Kraut,45.31,1.0,10,"electronic, psychedelic, krautrock, french, electro, experimental, screamo, france, electroclash, alternative",Born Bad Records,1.0,39.99,55.94,59.99,4.84
+HotWax,Hot Shock,43.2,82.24,10,"female vocalist, riot grrrl, crank wave, post-punk, queercore, garage rock, psychedelic rock, garage punk, heavy punk, indie rock",Marathon Artists,1.0,22.5,64.14,42.4,12.61
+Harrison Gordon,Spring Break!,41.45,1.0,6,"emo, pop punk, coworker-core",Gordon Nation,1.0,24.46,68.77,66.02,4.84
+Monde UFO,Flamingo Tower,41.36,77.1,11,"space rock, psychedelic rock, jazz, bossa nova, folk, ambient, lo-fi, avant-garde, drone, male vocalists",Fire Records,1.0,29.27,34.71,43.83,1.68
+Combust,Belly of the Beast,39.74,81.5,12,"hardcore, hardcore punk, nyhc, crossover, crossover thrash, usa, thrash, heavy metal, metalcore, metal",Triple B Records,1.0,23.54,53.6,51.8,1.0
+Spiritbox,Tsunami Sea,38.8,58.84,11,"female vocalist, metalcore, progressive metalcore, djent, progressive metal, canadian, alternative metal, metal, female fronted metal, nu metal",Rise Records,1.0,13.29,56.49,50.22,10.56
+Kedr Livanskiy,Myrtus Myth,35.66,1.0,11,"female vocalist, electronic, russian, techno, lo-fi, ambient, russia, house, outsider house, hypnagogic pop",2MR,1.0,51.81,71.61,59.19,4.84
+Annie DiRusso,Super Pedestrian,35.39,78.34,11,"female vocalist, indie pop, indie, indie rock, usa, pop rock, acoustic, american, folk rock, indie folk",Summer Soup Songs,34.36,39.99,41.24,82.43,4.84
+Raisa K,Affectionately,34.58,1.0,12,"female vocalist, electronic, experimental, indie rock, indie, alternative, indietronica, noise pop",15 love,1.0,41.16,82.04,58.65,4.84
+Clara Mann,Rift,34.35,82.1,10,"folk, bristol, indie folk, singer songwriter",The state51 Conspiracy,45.59,18.56,33.57,81.9,4.84
+"Espen Friberg,Flutter Ridder,Jenny Berger Myhre",Flutter Ridder,34.29,78.52,8,ambient,Students Of Decay,1.0,5.33,50.44,16.04,4.84
+Jason Isbell,Foxes in the Snow,33.89,84.45,11,"alt-country, americana, singer-songwriter, southern rock, country, rock, folk, american, alternative country, roots rock",Southeastern Records,17.65,40.39,42.84,60.18,4.84
+Franc Moody,Chewing The Fat,33.87,80.68,10,"funk, disco, electronic, dance, british, house, 4, disco house, indie dance, funky house",Night Time Stories (NTS),53.55,46.97,52.47,73.66,4.84
+Nick Brobak,Voice at Dawn,33.59,72.21,15,"rare sads, ambient, lo-fi, slowcore, indie folk, bedroom, bedroom pop, lo-fi indie, bummer",View No Country,1.0,38.07,41.1,59.36,4.84
+BUG MOMENT,The Lazer Collection,33.39,72.22,5,"emo, queer, milwaukee, wisconsin, experimental, indie rock, noise rock, experimental rock, shoegaze, noise pop",2025 BUG MOMENT,64.18,37.12,65.42,44.64,4.84
+Lagartijeando,7 Caminos,33.32,83.05,8,"argentina, electronic, experimental, dance, cumbia, trippy, argentinian, best played loud, latinoamerica, digital cumbia",WONDERWHEEL RECORDINGS,1.0,57.78,40.84,64.12,4.84
+SKLOSS,The Pattern Speaks,33.12,81.2,8,"post-rock, post rock, texas, austin, post-metal, post metal, austin texas",Fuzz Club,1.0,17.91,58.09,51.82,4.84
+Apollo Brown,Elevator Music,33.09,86.25,15,"instrumental hip-hop, hip-hop, instrumental, funky, hip hop, underground hip-hop, beats, detroit, producer, rap",Escapism,1.0,44.13,69.21,64.02,4.84
+Downward,Downward (2),32.59,82.65,10,"shoegaze, dream pop, alternative rock, emo, space rock, post-rock, post-hardcore, indie, indie rock, black metal",NEW MORALITY ZINE,1.0,25.34,54.49,50.52,4.84
+TOKiMONSTA,Feel It,32.43,79.3,5,"female vocalist, electronic, instrumental hip-hop, hip-hop, hip hop, japanese, korean, experimental, beats, wonky",Young Art Records,1.0,47.08,57.84,55.68,4.84
+"Bianca Scout,Marina Zispin,Martyn Reid","Now You See Me, Now You Don't",32.01,82.83,10,"synthpop, darkwave",Scenic Route Records,1.0,46.72,58.62,56.77,4.84
+Divorce,Drive to Goldenhammer,31.92,84.71,12,"female vocalist, noise rock, noise, aor, no wave, heavy metal, female fronted metal, punk, hard rock, punk rock",Gravity Records / Capitol Records UK,1.0,51.18,38.33,56.58,4.84
+shinetiac,Infiltrating Roku City,31.79,85.76,10,"electronic, instrumental, ambient, experimental, american, north american",West Mineral,1.0,12.04,38.06,39.82,4.84
+Kinski,Stumbledown Terrace,31.7,86.69,7,"post-rock, instrumental, experimental, indie, post rock, space rock, psychedelic, rock, indie rock, psychedelic rock",Comedy Minus One,1.0,9.87,63.39,38.97,4.84
+TOKiMONSTA,Eternal Reverie,31.61,83.9,10,"female vocalist, electronic, instrumental hip-hop, hip-hop, hip hop, japanese, korean, experimental, beats, wonky",Young Art Records,1.0,46.3,55.1,55.68,4.84
+Ingrown,Idaho,31.41,87.97,11,"hardcore, goregrind, pornogrind, grindcore, metalcore, hardcore punk, porngrind, powerviolence, metallic hardcore, metal",Closed Casket Activities,1.0,25.13,57.02,45.57,4.84
+Michael Cera Palin,We Could Be Brave,31.33,87.14,10,"indie, math rock, emo, midwest emo, indie rock, emo pop, rock, usa, punk rock, pop punk",Brain Synthesizer,18.32,33.69,82.33,53.4,4.84
+"Freestyle Man,Jimi Tenor",Sinus Amoris (Songs from the Bay of Love),31.3,85.69,9,"electronic, acid jazz, jazz, finnish, electronica, experimental, funk, warp, idm, trip-hop",Studio Barnhus,1.0,48.22,56.07,54.53,4.84
+Los Pirañas,Una Oportunidad más de triunfar en la vida,29.83,62.69,8,"cumbia, colombia, experimental, latin, psychedelic, cumbia experimental, spanish, surf, post punk, male vocalists",Glitterbeat Records,1.0,57.53,57.34,61.49,4.84
+Sierra Hull,A Tip Toe High Wire,29.38,86.37,10,"female vocalist, bluegrass, country, folk, mandolin, sierra hull, american, vocal, usa, alt-country",Sierra Hull,7.87,43.04,60.66,61.26,4.84
