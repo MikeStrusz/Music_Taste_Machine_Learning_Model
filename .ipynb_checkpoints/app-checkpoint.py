@@ -126,6 +126,14 @@ def load_album_covers():
         return pd.DataFrame(columns=['Artist', 'Album Name', 'Album Art'])
 
 @st.cache_data
+def load_album_links():
+    try:
+        return pd.read_csv('data/nmf_album_links.csv')
+    except Exception as e:
+        st.error(f"Error loading album links data: {e}")
+        return pd.DataFrame(columns=['Album Name', 'Artist Name(s)', 'Spotify URL'])
+
+@st.cache_data
 def load_similar_artists():
     try:
         return pd.read_csv('data/nmf_similar_artists.csv')
@@ -222,7 +230,7 @@ if st.session_state.feedback_updated:
 
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
     try:
-        album_links_df = pd.read_csv('data/nmf_album_links.csv')
+        album_links_df = load_album_links()
     except Exception as e:
         st.error(f"Error loading album links: {e}")
         album_links_df = pd.DataFrame()
@@ -436,6 +444,106 @@ def manage_album_covers():
             try:
                 album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
                 st.success(f"Saved album art URL for {artist} - {album}")
+                
+                # Clear cache to reflect the update
+                st.cache_data.clear()
+                st.experimental_rerun()
+            except Exception as e:
+                st.error(f"Failed to save: {e}")
+
+def manage_spotify_links():
+    st.title("🎵 Spotify Link Manager")
+    st.subheader("Manage Missing Spotify Links")
+    
+    # Load the current album links data and predictions data
+    album_links_df = load_album_links()
+    predictions_data = load_predictions()
+    
+    if predictions_data is None:
+        st.error("Could not load prediction data. Please check the predictions folder.")
+        return
+    
+    df, _ = predictions_data
+    all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
+    
+    # Rename Artist column to match album_links_df
+    all_albums_df = all_albums_df.rename(columns={'Artist': 'Artist Name(s)'})
+    
+    # Identify albums missing Spotify links
+    merged_df = all_albums_df.merge(
+        album_links_df,
+        left_on=['Album Name', 'Artist Name(s)'],
+        right_on=['Album Name', 'Artist Name(s)'],
+        how='left'
+    )
+    
+    missing_links = merged_df[merged_df['Spotify URL'].isna()].copy()
+    
+    # Show statistics
+    col1, col2 = st.columns(2)
+    with col1:
+        st.metric("Total Albums", len(all_albums_df))
+    with col2:
+        st.metric("Missing Spotify Links", len(missing_links))
+    
+    if len(missing_links) == 0:
+        st.success("All albums have Spotify links! 🎉")
+        return
+        
+    # Album selection
+    st.subheader("Select an album to update")
+    
+    selected_album_idx = st.selectbox(
+        "Albums missing Spotify links:",
+        options=range(len(missing_links)),
+        format_func=lambda x: f"{missing_links.iloc[x]['Artist Name(s)']} - {missing_links.iloc[x]['Album Name']}"
+    )
+    
+    if selected_album_idx is not None:
+        selected_album = missing_links.iloc[selected_album_idx]
+        artist = selected_album['Artist Name(s)']
+        album = selected_album['Album Name']
+        
+        st.write(f"**Selected:** {artist} - {album}")
+        
+        # Direct URL input
+        st.subheader("Enter Spotify URL")
+        direct_url = st.text_input("Spotify URL:", 
+                                  value=st.session_state.get(f"{artist}_{album}_spotify_url", ""))
+        
+        # Helper text
+        st.caption("Tip: Search for the album on Spotify, click 'Share', then 'Copy Link'. Paste the URL here without the 'https://' prefix.")
+        
+        # Format the URL if needed
+        if direct_url and direct_url.startswith('https://'):
+            direct_url = direct_url.replace('https://', '')
+            st.info("Removed 'https://' prefix from URL")
+        
+        # Save the direct URL
+        if direct_url and st.button("Save URL"):
+            # Create a new row for the dataframe
+            new_row = {
+                'Album Name': album,
+                'Artist Name(s)': artist,
+                'Spotify URL': direct_url
+            }
+            
+            # Check if this artist/album already exists
+            existing = album_links_df[(album_links_df['Artist Name(s)'] == artist) & 
+                                    (album_links_df['Album Name'] == album)]
+            
+            if not existing.empty:
+                # Update existing entry
+                album_links_df.loc[(album_links_df['Artist Name(s)'] == artist) & 
+                                 (album_links_df['Album Name'] == album), 'Spotify URL'] = direct_url
+            else:
+                # Add new entry
+                album_links_df = pd.concat([album_links_df, pd.DataFrame([new_row])], ignore_index=True)
+            
+            # Save the updated dataframe
+            try:
+                album_links_df.to_csv('data/nmf_album_links.csv', index=False)
+                st.success(f"Saved Spotify URL for {artist} - {album}")
                 
                 # Clear cache to reflect the update
                 st.cache_data.clear()
@@ -671,9 +779,10 @@ def main():
         "About Me"
     ]
 
-    # Add Album Cover Manager only if running locally
+    # Add Album Cover Manager and Spotify Link Manager only if running locally
     if not is_running_on_streamlit():
         page_options.append("Album Cover Manager")
+        page_options.append("Spotify Link Manager")
 
     page = st.sidebar.radio("Navigate", page_options)
     
@@ -734,6 +843,9 @@ def main():
     
     elif page == "Album Cover Manager":
         manage_album_covers()
+    
+    elif page == "Spotify Link Manager":
+        manage_spotify_links()
     
     elif page == "The Machine Learning Model":
         st.title("📓 The Machine Learning Model in my Jupyter Notebook")
