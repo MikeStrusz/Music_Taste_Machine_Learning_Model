@@ -6,6 +6,7 @@ from datetime import datetime
 import streamlit.components.v1 as components
 import glob
 import os
+import shutil
 import requests
 from PIL import Image
 from io import BytesIO
@@ -88,21 +89,79 @@ st.markdown("""
         border-radius: 8px;
         text-align: center;
     }
+    .public-rating-buttons {
+        display: flex;
+        gap: 5px;
+        margin-top: 5px;
+    }
+    .public-rating-stats {
+        font-size: 0.9rem;
+        color: #666;
+        margin-top: 5px;
+    }
+    .archive-selector {
+        margin-bottom: 20px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 8px;
+    }
+    .archive-button {
+        background-color: #f8f9fa;
+        color: #1e1e1e;
+        padding: 5px 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        margin-right: 5px;
+    }
+    .archive-button:hover {
+        background-color: #ffffff;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
     </style>
 """, unsafe_allow_html=True)
 
 @st.cache_data
-def load_predictions():
+def get_all_prediction_files():
     """
-    Load the predictions data and ensure required columns are present.
+    Get all prediction files and their corresponding dates.
     """
     prediction_files = glob.glob('predictions/*_Album_Recommendations.csv')
     if not prediction_files:
         st.error("No prediction files found!")
-        return None
+        return []
     
-    latest_file = max(prediction_files)
-    predictions_df = pd.read_csv(latest_file)
+    # Sort files by date (newest first)
+    file_dates = []
+    for file in prediction_files:
+        date_str = os.path.basename(file).split('_')[0]
+        try:
+            date_obj = datetime.strptime(date_str, '%m-%d-%y')
+            formatted_date = date_obj.strftime('%B %d, %Y')
+            file_dates.append((file, date_obj, formatted_date))
+        except ValueError:
+            # Skip files with invalid date format
+            continue
+    
+    # Sort by date (newest first)
+    file_dates.sort(key=lambda x: x[1], reverse=True)
+    return file_dates
+
+@st.cache_data
+def load_predictions(file_path=None):
+    """
+    Load the predictions data from a specific file or the latest file if none specified.
+    """
+    if file_path is None:
+        prediction_files = glob.glob('predictions/*_Album_Recommendations.csv')
+        if not prediction_files:
+            st.error("No prediction files found!")
+            return None
+        
+        file_path = max(prediction_files)
+    
+    predictions_df = pd.read_csv(file_path)
     
     # Ensure 'playlist_origin' column exists (silently add if missing)
     if 'playlist_origin' not in predictions_df.columns:
@@ -112,7 +171,10 @@ def load_predictions():
     if 'Artist Name(s)' not in predictions_df.columns:
         predictions_df['Artist Name(s)'] = 'Unknown Artist'  # Default value
     
-    date_str = os.path.basename(latest_file).split('_')[0]
+    # Remove duplicate albums if any
+    predictions_df = predictions_df.drop_duplicates(subset=['Artist', 'Album Name'], keep='first')
+    
+    date_str = os.path.basename(file_path).split('_')[0]
     analysis_date = datetime.strptime(date_str, '%m-%d-%y').strftime('%Y-%m-%d')
     
     return predictions_df, analysis_date
@@ -217,6 +279,114 @@ def load_feedback():
                 return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
     return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
 
+# Public feedback functions
+def save_public_feedback(album_name, artist, feedback, username="Anonymous"):
+    feedback_file = 'feedback/public_feedback.csv'
+    if not os.path.exists('feedback'):
+        os.makedirs('feedback')
+    
+    # Create a dataframe with the new feedback
+    new_feedback = pd.DataFrame({
+        'Album Name': [album_name],
+        'Artist': [artist],
+        'Feedback': [feedback],
+        'Username': [username],
+        'Timestamp': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+    })
+
+    # Load existing feedback if file exists
+    if os.path.exists(feedback_file):
+        try:
+            # Use proper quoting and escape characters when reading
+            existing_feedback = pd.read_csv(feedback_file, quoting=1)  # QUOTE_ALL
+            # Combine with new feedback
+            combined_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
+        except Exception as e:
+            st.warning(f"Error reading existing public feedback: {e}. Creating new file.")
+            # If reading fails, start fresh with just the new feedback
+            combined_feedback = new_feedback
+    else:
+        combined_feedback = new_feedback
+    
+    # Save with proper quoting to handle commas in fields
+    combined_feedback.to_csv(feedback_file, index=False, quoting=1)  # QUOTE_ALL
+    
+    # Clear cache after saving feedback
+    st.cache_data.clear()
+
+def load_public_feedback():
+    feedback_file = 'feedback/public_feedback.csv'
+    if os.path.exists(feedback_file):
+        try:
+            # Use quoting=1 (QUOTE_ALL) to properly handle commas in fields
+            return pd.read_csv(feedback_file, quoting=1)
+        except Exception as e:
+            st.warning(f"Error loading public feedback data: {e}")
+            # Try to recover the file
+            try:
+                # Attempt to read with different options
+                df = pd.read_csv(feedback_file, quoting=1, error_bad_lines=False) 
+                st.info("Partially recovered public feedback data")
+                return df
+            except:
+                # If all recovery attempts fail, provide an empty DataFrame as fallback
+                st.error("Could not recover public feedback data. Starting with fresh feedback file.")
+                # Backup the problematic file
+                if os.path.exists(feedback_file):
+                    backup_file = feedback_file + ".backup." + datetime.now().strftime("%Y%m%d%H%M%S")
+                    try:
+                        os.rename(feedback_file, backup_file)
+                        st.info(f"Backed up problematic feedback file to {backup_file}")
+                    except:
+                        pass
+                return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp'])
+    return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp'])
+
+def get_public_feedback_stats(album_name, artist):
+    """Get statistics for public feedback on a specific album"""
+    public_feedback_df = load_public_feedback()
+    
+    # Filter for this album
+    album_feedback = public_feedback_df[
+        (public_feedback_df['Album Name'] == album_name) & 
+        (public_feedback_df['Artist'] == artist)
+    ]
+    
+    if album_feedback.empty:
+        return {"like": 0, "mid": 0, "dislike": 0, "total": 0}
+    
+    # Count each feedback type
+    feedback_counts = album_feedback['Feedback'].value_counts().to_dict()
+    
+    # Ensure all categories exist
+    stats = {
+        "like": feedback_counts.get('like', 0),
+        "mid": feedback_counts.get('mid', 0),
+        "dislike": feedback_counts.get('dislike', 0),
+        "total": len(album_feedback)
+    }
+    
+    return stats
+
+def get_recent_public_feedback(album_name, artist, limit=3):
+    """Get the most recent public feedback for a specific album"""
+    public_feedback_df = load_public_feedback()
+    
+    # Filter for this album
+    album_feedback = public_feedback_df[
+        (public_feedback_df['Album Name'] == album_name) & 
+        (public_feedback_df['Artist'] == artist)
+    ]
+    
+    if album_feedback.empty:
+        return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp'])
+    
+    # Sort by timestamp (newest first) and take the top 'limit' entries
+    album_feedback['Timestamp'] = pd.to_datetime(album_feedback['Timestamp'])
+    recent_feedback = album_feedback.sort_values('Timestamp', ascending=False).head(limit)
+    
+    return recent_feedback
+
 if 'feedback_updated' not in st.session_state:
     st.session_state.feedback_updated = False
 
@@ -227,6 +397,10 @@ st.session_state.feedback_updated = True
 if st.session_state.feedback_updated:
     st.cache_data.clear()
     st.session_state.feedback_updated = False
+
+# For archive navigation
+if 'current_archive_index' not in st.session_state:
+    st.session_state.current_archive_index = 0
 
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
     try:
@@ -295,6 +469,49 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                             ▶ Play on Spotify
                         </a>
                     ''', unsafe_allow_html=True)
+                
+                # Public rating section with username input
+                st.markdown('<div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 8px;">', unsafe_allow_html=True)
+                st.markdown('<div style="font-weight: 600; margin-bottom: 8px;">Mike wants to know what you think!</div>', unsafe_allow_html=True)
+                
+                # Username input
+                username = st.text_input("Your name (optional):", key=f"username_input_{idx}", value="")
+                username = username.strip() if username else "Anonymous"
+                
+                # Rating buttons
+                st.markdown('<div class="public-rating-buttons">', unsafe_allow_html=True)
+                public_rating_cols = st.columns(3)
+                with public_rating_cols[0]:
+                    if st.button('👍', key=f"public_like_{idx}"):
+                        save_public_feedback(row['Album Name'], row['Artist'], 'like', username)
+                        st.rerun()
+                with public_rating_cols[1]:
+                    if st.button('😐', key=f"public_mid_{idx}"):
+                        save_public_feedback(row['Album Name'], row['Artist'], 'mid', username)
+                        st.rerun()
+                with public_rating_cols[2]:
+                    if st.button('👎', key=f"public_dislike_{idx}"):
+                        save_public_feedback(row['Album Name'], row['Artist'], 'dislike', username)
+                        st.rerun()
+                
+                # Display public rating stats
+                public_stats = get_public_feedback_stats(row['Album Name'], row['Artist'])
+                if public_stats['total'] > 0:
+                    recent_feedback = get_recent_public_feedback(row['Album Name'], row['Artist'], 3)
+                    feedback_display = ""
+                    for _, fb in recent_feedback.iterrows():
+                        emoji = "👍" if fb['Feedback'] == 'like' else "😐" if fb['Feedback'] == 'mid' else "👎"
+                        feedback_display += f"{fb['Username']} {emoji} • "
+                    
+                    if feedback_display:
+                        feedback_display = feedback_display[:-3]  # Remove trailing " • "
+                        st.markdown(f'<div class="public-rating-stats">{feedback_display}</div>', unsafe_allow_html=True)
+                    
+                    st.markdown(f'<div class="public-rating-stats">Total: {public_stats["like"]} 👍 | {public_stats["mid"]} 😐 | {public_stats["dislike"]} 👎</div>', unsafe_allow_html=True)
+                else:
+                    st.markdown('<div class="public-rating-stats">No ratings yet - be the first!</div>', unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
             
             with cols[2]:
                 st.markdown('<div class="metric-container">', unsafe_allow_html=True)
@@ -320,17 +537,17 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 else:
                     st.markdown('😶 Mike hasn\'t listened/rated this album.')
                 
-                # Only show feedback buttons if running locally
-                if not is_running_on_streamlit():
+                # Only show Mike's feedback buttons if running locally
+                if IS_LOCAL:
                     if st.button('👍', key=f"like_{idx}"):
                         save_feedback(row['Album Name'], row['Artist'], 'like')
-                        st.experimental_rerun()
+                        st.rerun()
                     if st.button('😐', key=f"mid_{idx}"):
                         save_feedback(row['Album Name'], row['Artist'], 'mid')
-                        st.experimental_rerun()
+                        st.rerun()
                     if st.button('👎', key=f"dislike_{idx}"):
                         save_feedback(row['Album Name'], row['Artist'], 'dislike')
-                        st.experimental_rerun()
+                        st.rerun()
             
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -354,102 +571,181 @@ def about_me_page():
 
 def manage_album_covers():
     st.title("🖼️ Album Cover Manager")
-    st.subheader("Manage Missing Album Artwork")
     
-    # Load the current album covers data and predictions data
-    album_covers_df = load_album_covers()
-    predictions_data = load_predictions()
+    # Create tabs for different functions
+    tab1, tab2 = st.tabs(["Add Missing Album Artwork", "Fix Existing Album Artwork"])
     
-    if predictions_data is None:
-        st.error("Could not load prediction data. Please check the predictions folder.")
-        return
-    
-    df, _ = predictions_data
-    all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
-    
-    # Identify albums missing artwork
-    merged_df = all_albums_df.merge(
-        album_covers_df,
-        left_on=['Artist', 'Album Name'],
-        right_on=['Artist', 'Album Name'],
-        how='left'
-    )
-    
-    missing_artwork = merged_df[merged_df['Album Art'].isna()].copy()
-    
-    # Show statistics
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Total Albums", len(all_albums_df))
-    with col2:
-        st.metric("Missing Artwork", len(missing_artwork))
-    
-    if len(missing_artwork) == 0:
-        st.success("All albums have artwork! 🎉")
-        return
+    with tab1:
+        st.subheader("Manage Missing Album Artwork")
         
-    # Album selection
-    st.subheader("Select an album to update")
-    
-    selected_album_idx = st.selectbox(
-        "Albums missing artwork:",
-        options=range(len(missing_artwork)),
-        format_func=lambda x: f"{missing_artwork.iloc[x]['Artist']} - {missing_artwork.iloc[x]['Album Name']}"
-    )
-    
-    if selected_album_idx is not None:
-        selected_album = missing_artwork.iloc[selected_album_idx]
-        artist = selected_album['Artist']
-        album = selected_album['Album Name']
+        # Load the current album covers data and predictions data
+        album_covers_df = load_album_covers()
+        predictions_data = load_predictions()
         
-        st.write(f"**Selected:** {artist} - {album}")
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
         
-        # Direct URL input
-        st.subheader("Enter Album Cover Image URL")
-        direct_url = st.text_input("Image URL:", 
-                                  value=st.session_state.get(f"{artist}_{album}_url", ""))
+        df, _ = predictions_data
+        all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
         
-        # Helper text
-        st.caption("Tip: Search for the album cover on Google Images, right-click on an image and select 'Copy image address'")
+        # Identify albums missing artwork
+        merged_df = all_albums_df.merge(
+            album_covers_df,
+            left_on=['Artist', 'Album Name'],
+            right_on=['Artist', 'Album Name'],
+            how='left'
+        )
         
-        # Preview the URL image if provided
-        if direct_url:
-            try:
-                st.image(direct_url, caption=f"{artist} - {album}", width=300)
-            except Exception as e:
-                st.error(f"Failed to load image from URL: {e}")
+        missing_artwork = merged_df[merged_df['Album Art'].isna()].copy()
         
-        # Save the direct URL
-        if direct_url and st.button("Save URL"):
-            # Create a new row for the dataframe
-            new_row = {
-                'Artist': artist,
-                'Album Name': album,
-                'Album Art': direct_url
-            }
+        # Show statistics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Albums", len(all_albums_df))
+        with col2:
+            st.metric("Missing Artwork", len(missing_artwork))
+        
+        if len(missing_artwork) == 0:
+            st.success("All albums have artwork! 🎉")
+        else:
+            # Album selection
+            st.subheader("Select an album to update")
+        
+            selected_album_idx = st.selectbox(
+                "Albums missing artwork:",
+                options=range(len(missing_artwork)),
+                format_func=lambda x: f"{missing_artwork.iloc[x]['Artist']} - {missing_artwork.iloc[x]['Album Name']}",
+                key="missing_artwork_selector"
+            )
             
-            # Check if this artist/album already exists
-            existing = album_covers_df[(album_covers_df['Artist'] == artist) & 
-                                     (album_covers_df['Album Name'] == album)]
-            
-            if not existing.empty:
-                # Update existing entry
-                album_covers_df.loc[(album_covers_df['Artist'] == artist) & 
-                                  (album_covers_df['Album Name'] == album), 'Album Art'] = direct_url
-            else:
-                # Add new entry
-                album_covers_df = pd.concat([album_covers_df, pd.DataFrame([new_row])], ignore_index=True)
-            
-            # Save the updated dataframe
-            try:
-                album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
-                st.success(f"Saved album art URL for {artist} - {album}")
+            if selected_album_idx is not None:
+                selected_album = missing_artwork.iloc[selected_album_idx]
+                artist = selected_album['Artist']
+                album = selected_album['Album Name']
                 
-                # Clear cache to reflect the update
-                st.cache_data.clear()
-                st.experimental_rerun()
-            except Exception as e:
-                st.error(f"Failed to save: {e}")
+                st.write(f"**Selected:** {artist} - {album}")
+                
+                # Direct URL input
+                st.subheader("Enter Album Cover Image URL")
+                direct_url = st.text_input("Image URL:", 
+                                          value=st.session_state.get(f"{artist}_{album}_url", ""),
+                                          key="missing_artwork_url")
+                
+                # Helper text
+                st.caption("Tip: Search for the album cover on Google Images, right-click on an image and select 'Copy image address'")
+                
+                # Preview the URL image if provided
+                if direct_url:
+                    try:
+                        st.image(direct_url, caption=f"{artist} - {album}", width=300)
+                    except Exception as e:
+                        st.error(f"Failed to load image from URL: {e}")
+                
+                # Save the direct URL
+                if direct_url and st.button("Save URL", key="save_missing_artwork"):
+                    # Create a new row for the dataframe
+                    new_row = {
+                        'Artist': artist,
+                        'Album Name': album,
+                        'Album Art': direct_url
+                    }
+                    
+                    # Check if this artist/album already exists
+                    existing = album_covers_df[(album_covers_df['Artist'] == artist) & 
+                                             (album_covers_df['Album Name'] == album)]
+                    
+                    if not existing.empty:
+                        # Update existing entry
+                        album_covers_df.loc[(album_covers_df['Artist'] == artist) & 
+                                          (album_covers_df['Album Name'] == album), 'Album Art'] = direct_url
+                    else:
+                        # Add new entry
+                        album_covers_df = pd.concat([album_covers_df, pd.DataFrame([new_row])], ignore_index=True)
+                    
+                    # Save the updated dataframe
+                    try:
+                        album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
+                        st.success(f"Saved album art URL for {artist} - {album}")
+                        
+                        # Clear cache to reflect the update
+                        st.cache_data.clear()
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Failed to save: {e}")
+    
+    with tab2:
+        st.subheader("Fix Existing Album Artwork")
+        
+        # Load the current album covers data
+        album_covers_df = load_album_covers()
+        
+        # Filter to only show albums with existing artwork
+        existing_artwork = album_covers_df[album_covers_df['Album Art'].notna()].copy()
+        
+        if len(existing_artwork) == 0:
+            st.info("No albums with existing artwork found.")
+        else:
+            # Show statistics
+            st.metric("Albums with Existing Artwork", len(existing_artwork))
+            
+            # Album selection
+            st.subheader("Select an album to fix")
+            
+            selected_album_idx = st.selectbox(
+                "Albums with existing artwork:",
+                options=range(len(existing_artwork)),
+                format_func=lambda x: f"{existing_artwork.iloc[x]['Artist']} - {existing_artwork.iloc[x]['Album Name']}",
+                key="existing_artwork_selector"
+            )
+            
+            if selected_album_idx is not None:
+                selected_album = existing_artwork.iloc[selected_album_idx]
+                artist = selected_album['Artist']
+                album = selected_album['Album Name']
+                current_url = selected_album['Album Art']
+                
+                st.write(f"**Selected:** {artist} - {album}")
+                
+                # Show current artwork
+                st.subheader("Current Album Cover")
+                try:
+                    st.image(current_url, caption=f"Current artwork for {artist} - {album}", width=300)
+                except Exception as e:
+                    st.error(f"Failed to load current image: {e}")
+                
+                # New URL input
+                st.subheader("Enter New Album Cover Image URL")
+                new_url = st.text_input("New Image URL:", 
+                                       value="",
+                                       key="existing_artwork_url")
+                
+                # Helper text
+                st.caption("Tip: Search for the album cover on Google Images, right-click on an image and select 'Copy image address'")
+                
+                # Preview the new URL image if provided
+                if new_url:
+                    try:
+                        st.image(new_url, caption=f"New artwork for {artist} - {album}", width=300)
+                    except Exception as e:
+                        st.error(f"Failed to load image from URL: {e}")
+                
+                # Save the new URL
+                if new_url and st.button("Update Artwork", key="update_existing_artwork"):
+                    # Update the existing entry
+                    album_covers_df.loc[(album_covers_df['Artist'] == artist) & 
+                                      (album_covers_df['Album Name'] == album), 'Album Art'] = new_url
+                    
+                    # Save the updated dataframe
+                    try:
+                        album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
+                        st.success(f"Updated album art URL for {artist} - {album}")
+                        
+                        # Clear cache to reflect the update
+                        st.cache_data.clear()
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Failed to update: {e}")
 
 def manage_spotify_links():
     st.title("🎵 Spotify Link Manager")
@@ -547,7 +843,7 @@ def manage_spotify_links():
                 
                 # Clear cache to reflect the update
                 st.cache_data.clear()
-                st.experimental_rerun()
+                st.rerun()
             except Exception as e:
                 st.error(f"Failed to save: {e}")
 
@@ -769,7 +1065,7 @@ def main():
     # Add the "Clear Cache and Refresh Data" button
     if st.sidebar.button("Clear Cache and Refresh Data"):
         st.cache_data.clear()
-        st.experimental_rerun()
+        st.rerun()
     
     # Navigation
     page_options = [
@@ -780,32 +1076,38 @@ def main():
     ]
 
     # Add Album Cover Manager and Spotify Link Manager only if running locally
-    if not is_running_on_streamlit():
+    if IS_LOCAL:
         page_options.append("Album Cover Manager")
         page_options.append("Spotify Link Manager")
 
     page = st.sidebar.radio("Navigate", page_options)
     
-    # Load datasets
-    predictions_data = load_predictions()
-    album_covers_df = load_album_covers()
-    similar_artists_df = load_similar_artists()
-    
-    if predictions_data is None:
-        st.error("Could not load prediction data. Please check the predictions folder.")
-        return
-    
-    df, analysis_date = predictions_data
-    
-    # Load the liked similar artists dataset
-    df_liked_similar = load_liked_similar()
-    
-    # Load the artist network graph (G)
-    G = build_graph(df, df_liked_similar, include_nmf=True)
+    # Get all prediction files
+    file_dates = get_all_prediction_files()
     
     if page == "Weekly Predictions":
         st.title("🎵 New Music Friday Regression Model")
         st.subheader("Personalized New Music Friday Recommendations")
+        
+        # Get the current date for display
+        if len(file_dates) > 1:
+            current_date = file_dates[st.session_state.current_archive_index][2]
+            selected_file = file_dates[st.session_state.current_archive_index][0]
+        else:
+            # If only one file, use it
+            selected_file = file_dates[0][0] if file_dates else None
+            current_date = file_dates[0][2] if file_dates else "Unknown"
+        
+        # Load the selected predictions file
+        predictions_data = load_predictions(selected_file)
+        album_covers_df = load_album_covers()
+        similar_artists_df = load_similar_artists()
+        
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
+        
+        df, analysis_date = predictions_data
         
         # Fixed the genre counting logic
         all_genres = set()
@@ -820,8 +1122,7 @@ def main():
         with col2:
             st.metric("Genres Analyzed", len(all_genres))
         with col3:
-            formatted_date = datetime.strptime(analysis_date, '%Y-%m-%d').strftime('%B %d, %Y')
-            st.metric("Analysis Date", formatted_date)
+            st.metric("Release Week", current_date)
         
         st.subheader("🏆 Top Album Predictions")
         
@@ -840,6 +1141,50 @@ def main():
         
         filtered_data = filtered_data.sort_values('avg_score', ascending=False)
         display_album_predictions(filtered_data, album_covers_df, similar_artists_df)
+        
+        # Archive navigation at the bottom of the page
+        if len(file_dates) > 1:
+            st.markdown("---")
+            st.markdown("### Browse Other Release Weeks")
+            
+            # Create a container for the archive navigation
+            with st.container():
+                col1, col2 = st.columns([3, 1])
+                
+                with col1:
+                    # Current release week display
+                    st.markdown(f"**Current Release Week:** {current_date}")
+                
+                with col2:
+                    # Archive navigation buttons
+                    cols = st.columns(2)
+                    with cols[0]:
+                        if st.session_state.current_archive_index < len(file_dates) - 1:
+                            if st.button("← Older", key="older_button"):
+                                st.session_state.current_archive_index += 1
+                                st.rerun()
+                    with cols[1]:
+                        if st.session_state.current_archive_index > 0:
+                            if st.button("Newer →", key="newer_button"):
+                                st.session_state.current_archive_index -= 1
+                                st.rerun()
+                
+                # Small link to view all archives
+                if st.button("View All Archives", key="view_all_archives"):
+                    st.session_state.show_all_archives = True
+                
+                # Show all archives if requested
+                if st.session_state.get("show_all_archives", False):
+                    st.markdown("### All Available Archives")
+                    for i, (_, _, date_str) in enumerate(file_dates):
+                        if st.button(date_str, key=f"archive_{i}"):
+                            st.session_state.current_archive_index = i
+                            st.session_state.show_all_archives = False
+                            st.rerun()
+                    
+                    if st.button("Hide Archives", key="hide_archives"):
+                        st.session_state.show_all_archives = False
+                        st.rerun()
     
     elif page == "Album Cover Manager":
         manage_album_covers()
@@ -865,7 +1210,29 @@ def main():
         about_me_page()
     
     elif page == "6 Degrees of Lucy Dacus":
+        # Load the liked similar artists dataset
+        df_liked_similar = load_liked_similar()
+        
+        # Use the latest predictions for the graph
+        latest_file = file_dates[0][0] if file_dates else None
+        predictions_data = load_predictions(latest_file)
+        
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
+            
+        df, _ = predictions_data
+        
+        # Load the artist network graph (G)
+        G = build_graph(df, df_liked_similar, include_nmf=True)
+        
         dacus_game_page(G)
 
 if __name__ == "__main__":
+    # Initialize session state for archive navigation
+    if 'current_archive_index' not in st.session_state:
+        st.session_state.current_archive_index = 0
+    if 'show_all_archives' not in st.session_state:
+        st.session_state.show_all_archives = False
+        
     main()
