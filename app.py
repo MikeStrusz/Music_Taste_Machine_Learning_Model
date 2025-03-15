@@ -93,6 +93,13 @@ st.markdown("""
         display: flex;
         gap: 5px;
         margin-top: 5px;
+        flex-wrap: wrap;
+    }
+    .public-rating-buttons button {
+        flex: 1;
+        min-width: 60px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
     .public-rating-stats {
         font-size: 0.9rem;
