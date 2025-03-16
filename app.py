@@ -488,16 +488,16 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 # Public rating section with username input
                 st.markdown('<div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 8px;">', unsafe_allow_html=True)
                 st.markdown('<div style="font-weight: 600; margin-bottom: 8px;">Mike wants to know what you think!</div>', unsafe_allow_html=True)
-                
+
                 # Username input
                 username = st.text_input("Your name (optional):", key=f"username_input_{idx}", value="")
                 username = username.strip() if username else "Anonymous"
 
                 # Create fixed-width columns for buttons
-                button_cols = st.columns([1, 1, 1])  # Equal width columns
+                button_cols = st.columns(3)  # Three equal-width columns for the buttons
 
                 with button_cols[0]:
-                    if st.button('👍', key=f"public_like_{idx}", use_container_width=True):
+                    if st.button('👍 Like', key=f"public_like_{idx}", use_container_width=True):
                         # Special handling for "Mike S"
                         if username == "Mike S":
                             save_feedback(row['Album Name'], row['Artist'], 'like')
@@ -508,7 +508,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         st.rerun()
 
                 with button_cols[1]:
-                    if st.button('😐', key=f"public_mid_{idx}", use_container_width=True):
+                    if st.button('😐 Mid', key=f"public_mid_{idx}", use_container_width=True):
                         # Special handling for "Mike S"
                         if username == "Mike S":
                             save_feedback(row['Album Name'], row['Artist'], 'mid')
@@ -519,7 +519,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         st.rerun()
 
                 with button_cols[2]:
-                    if st.button('👎', key=f"public_dislike_{idx}", use_container_width=True):
+                    if st.button('👎 Dislike', key=f"public_dislike_{idx}", use_container_width=True):
                         # Special handling for "Mike S"
                         if username == "Mike S":
                             save_feedback(row['Album Name'], row['Artist'], 'dislike')
