@@ -93,14 +93,8 @@ st.markdown("""
         display: flex;
         gap: 5px;
         margin-top: 5px;
-        flex-wrap: wrap;
-    }
-    .public-rating-buttons {
-    display: flex;
-    gap: 5px;
-    margin-top: 5px;
-    flex-wrap: nowrap;  /* Changed from wrap to nowrap */
-    justify-content: space-between;  /* Distribute buttons evenly */
+        flex-wrap: nowrap;  /* Changed from wrap to nowrap */
+        justify-content: space-between;  /* Distribute buttons evenly */
     }
 
     .public-rating-buttons button {
@@ -498,12 +492,12 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 # Username input
                 username = st.text_input("Your name (optional):", key=f"username_input_{idx}", value="")
                 username = username.strip() if username else "Anonymous"
-                
-                # Rating buttons
-                st.markdown('<div class="public-rating-buttons">', unsafe_allow_html=True)
-                public_rating_cols = st.columns(3)
-                with public_rating_cols[0]:
-                    if st.button('👍', key=f"public_like_{idx}"):
+
+                # Create fixed-width columns for buttons
+                button_cols = st.columns([1, 1, 1])  # Equal width columns
+
+                with button_cols[0]:
+                    if st.button('👍', key=f"public_like_{idx}", use_container_width=True):
                         # Special handling for "Mike S"
                         if username == "Mike S":
                             save_feedback(row['Album Name'], row['Artist'], 'like')
@@ -512,8 +506,9 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         else:
                             save_public_feedback(row['Album Name'], row['Artist'], 'like', username)
                         st.rerun()
-                with public_rating_cols[1]:
-                    if st.button('😐', key=f"public_mid_{idx}"):
+
+                with button_cols[1]:
+                    if st.button('😐', key=f"public_mid_{idx}", use_container_width=True):
                         # Special handling for "Mike S"
                         if username == "Mike S":
                             save_feedback(row['Album Name'], row['Artist'], 'mid')
@@ -522,8 +517,9 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         else:
                             save_public_feedback(row['Album Name'], row['Artist'], 'mid', username)
                         st.rerun()
-                with public_rating_cols[2]:
-                    if st.button('👎', key=f"public_dislike_{idx}"):
+
+                with button_cols[2]:
+                    if st.button('👎', key=f"public_dislike_{idx}", use_container_width=True):
                         # Special handling for "Mike S"
                         if username == "Mike S":
                             save_feedback(row['Album Name'], row['Artist'], 'dislike')
