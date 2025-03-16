@@ -1299,11 +1299,29 @@ def main():
         
         st.subheader("🏆 Top Album Predictions")
         
+        # Filter out genres that contain numbers or have more than 2 words
+        filtered_genres = []
+        for genre in all_genres:
+            # Skip if it contains any digits
+            if any(char.isdigit() for char in genre):
+                continue
+                
+            # Count words (treating hyphenated words as separate)
+            # Replace hyphens with spaces first, then count words
+            modified_genre = genre.replace('-', ' ')
+            word_count = len(modified_genre.split())
+            
+            # Only include if it has 2 or fewer words
+            if word_count <= 2:
+                filtered_genres.append(genre)
+
         genres = st.multiselect(
             "Filter by Genre",
-            options=sorted(list(all_genres)),
+            options=sorted(filtered_genres),
             default=[]
         )
+
+
         
         if genres:
             filtered_data = df[
