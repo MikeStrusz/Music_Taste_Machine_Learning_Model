@@ -22,6 +22,16 @@ def is_running_on_streamlit():
 # Use this flag to control feedback buttons
 IS_LOCAL = not is_running_on_streamlit()
 
+@st.cache_data
+def load_nuked_albums():
+    """
+    Load the list of nuked albums from the CSV file.
+    """
+    nuked_albums_file = 'data/nuked_albums.csv'
+    if os.path.exists(nuked_albums_file):
+        return pd.read_csv(nuked_albums_file)
+    return pd.DataFrame(columns=['Artist', 'Album Name', 'Reason'])
+
 st.set_page_config(
     page_title="New Music Friday Regression Model",
     page_icon="🎵",
@@ -594,11 +604,11 @@ def about_me_page():
     st.image("graphics/mike.jpeg", width=400)
     st.caption("Me on the Milwaukee Riverwalk, wearing one of my 50+ bowties.")
 
-def manage_album_covers():
-    st.title("🖼️ Album Cover Manager")
+def album_fixer_page():
+    st.title("🛠️ Album Fixer")
     
     # Create tabs for different functions
-    tab1, tab2 = st.tabs(["Add Missing Album Artwork", "Fix Existing Album Artwork"])
+    tab1, tab2, tab3 = st.tabs(["Add Missing Album Artwork", "Fix Spotify Links", "Nuke Albums"])
     
     with tab1:
         st.subheader("Manage Missing Album Artwork")
@@ -700,182 +710,211 @@ def manage_album_covers():
                         st.error(f"Failed to save: {e}")
     
     with tab2:
-        st.subheader("Fix Existing Album Artwork")
+        st.subheader("Fix Spotify Links")
         
-        # Load the current album covers data
-        album_covers_df = load_album_covers()
+        # Load the current album links data and predictions data
+        album_links_df = load_album_links()
+        predictions_data = load_predictions()
         
-        # Filter to only show albums with existing artwork
-        existing_artwork = album_covers_df[album_covers_df['Album Art'].notna()].copy()
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
         
-        if len(existing_artwork) == 0:
-            st.info("No albums with existing artwork found.")
-        else:
-            # Show statistics
-            st.metric("Albums with Existing Artwork", len(existing_artwork))
+        df, _ = predictions_data
+        all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
+        
+        # Rename Artist column to match album_links_df
+        all_albums_df = all_albums_df.rename(columns={'Artist': 'Artist Name(s)'})
+        
+        # Identify albums missing Spotify links
+        merged_df = all_albums_df.merge(
+            album_links_df,
+            left_on=['Album Name', 'Artist Name(s)'],
+            right_on=['Album Name', 'Artist Name(s)'],
+            how='left'
+        )
+        
+        missing_links = merged_df[merged_df['Spotify URL'].isna()].copy()
+        
+        # Show statistics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Albums", len(all_albums_df))
+        with col2:
+            st.metric("Missing Spotify Links", len(missing_links))
+        
+        if len(missing_links) == 0:
+            st.success("All albums have Spotify links! 🎉")
+            return
             
-            # Album selection
-            st.subheader("Select an album to fix")
+        # Album selection
+        st.subheader("Select an album to update")
+        
+        selected_album_idx = st.selectbox(
+            "Albums missing Spotify links:",
+            options=range(len(missing_links)),
+            format_func=lambda x: f"{missing_links.iloc[x]['Artist Name(s)']} - {missing_links.iloc[x]['Album Name']}"
+        )
+        
+        if selected_album_idx is not None:
+            selected_album = missing_links.iloc[selected_album_idx]
+            artist = selected_album['Artist Name(s)']
+            album = selected_album['Album Name']
             
-            selected_album_idx = st.selectbox(
-                "Albums with existing artwork:",
-                options=range(len(existing_artwork)),
-                format_func=lambda x: f"{existing_artwork.iloc[x]['Artist']} - {existing_artwork.iloc[x]['Album Name']}",
-                key="existing_artwork_selector"
-            )
+            st.write(f"**Selected:** {artist} - {album}")
             
-            if selected_album_idx is not None:
-                selected_album = existing_artwork.iloc[selected_album_idx]
-                artist = selected_album['Artist']
-                album = selected_album['Album Name']
-                current_url = selected_album['Album Art']
+            # Direct URL input
+            st.subheader("Enter Spotify URL")
+            direct_url = st.text_input("Spotify URL:", 
+                                      value=st.session_state.get(f"{artist}_{album}_spotify_url", ""))
+
+            # Helper text
+            st.caption("Tip: Search for the album on Spotify, click 'Share', then 'Copy Link'. Paste the full URL here (e.g., https://open.spotify.com/...).") 
+
+            # Format the URL if needed
+            if direct_url:
+                # Remove 'https://' or 'http://' if present
+                if direct_url.startswith('https://'):
+                    direct_url = direct_url.replace('https://', '', 1)  # Remove only the first occurrence
+                    st.info("Removed 'https://' prefix from URL")
+                elif direct_url.startswith('http://'):
+                    direct_url = direct_url.replace('http://', '', 1)  # Remove only the first occurrence
+                    st.info("Removed 'http://' prefix from URL")
+            
+            # Save the direct URL
+            if direct_url and st.button("Save URL"):
+                # Create a new row for the dataframe
+                new_row = {
+                    'Album Name': album,
+                    'Artist Name(s)': artist,
+                    'Spotify URL': direct_url
+                }
                 
-                st.write(f"**Selected:** {artist} - {album}")
+                # Check if this artist/album already exists
+                existing = album_links_df[(album_links_df['Artist Name(s)'] == artist) & 
+                                        (album_links_df['Album Name'] == album)]
                 
-                # Show current artwork
-                st.subheader("Current Album Cover")
+                if not existing.empty:
+                    # Update existing entry
+                    album_links_df.loc[(album_links_df['Artist Name(s)'] == artist) & 
+                                     (album_links_df['Album Name'] == album), 'Spotify URL'] = direct_url
+                else:
+                    # Add new entry
+                    album_links_df = pd.concat([album_links_df, pd.DataFrame([new_row])], ignore_index=True)
+                
+                # Save the updated dataframe
                 try:
-                    st.image(current_url, caption=f"Current artwork for {artist} - {album}", width=300)
-                except Exception as e:
-                    st.error(f"Failed to load current image: {e}")
-                
-                # New URL input
-                st.subheader("Enter New Album Cover Image URL")
-                new_url = st.text_input("New Image URL:", 
-                                       value="",
-                                       key="existing_artwork_url")
-                
-                # Helper text
-                st.caption("Tip: Search for the album cover on Google Images, right-click on an image and select 'Copy image address'")
-                
-                # Preview the new URL image if provided
-                if new_url:
-                    try:
-                        st.image(new_url, caption=f"New artwork for {artist} - {album}", width=300)
-                    except Exception as e:
-                        st.error(f"Failed to load image from URL: {e}")
-                
-                # Save the new URL
-                if new_url and st.button("Update Artwork", key="update_existing_artwork"):
-                    # Update the existing entry
-                    album_covers_df.loc[(album_covers_df['Artist'] == artist) & 
-                                      (album_covers_df['Album Name'] == album), 'Album Art'] = new_url
+                    album_links_df.to_csv('data/nmf_album_links.csv', index=False)
+                    st.success(f"Saved Spotify URL for {artist} - {album}")
                     
-                    # Save the updated dataframe
-                    try:
-                        album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
-                        st.success(f"Updated album art URL for {artist} - {album}")
-                        
-                        # Clear cache to reflect the update
-                        st.cache_data.clear()
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Failed to update: {e}")
-
-def manage_spotify_links():
-    st.title("🎵 Spotify Link Manager")
-    st.subheader("Manage Missing Spotify Links")
+                    # Clear cache to reflect the update
+                    st.cache_data.clear()
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Failed to save: {e}")
     
-    # Load the current album links data and predictions data
-    album_links_df = load_album_links()
-    predictions_data = load_predictions()
-    
-    if predictions_data is None:
-        st.error("Could not load prediction data. Please check the predictions folder.")
-        return
-    
-    df, _ = predictions_data
-    all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
-    
-    # Rename Artist column to match album_links_df
-    all_albums_df = all_albums_df.rename(columns={'Artist': 'Artist Name(s)'})
-    
-    # Identify albums missing Spotify links
-    merged_df = all_albums_df.merge(
-        album_links_df,
-        left_on=['Album Name', 'Artist Name(s)'],
-        right_on=['Album Name', 'Artist Name(s)'],
-        how='left'
-    )
-    
-    missing_links = merged_df[merged_df['Spotify URL'].isna()].copy()
-    
-    # Show statistics
-    col1, col2 = st.columns(2)
-    with col1:
-        st.metric("Total Albums", len(all_albums_df))
-    with col2:
-        st.metric("Missing Spotify Links", len(missing_links))
-    
-    if len(missing_links) == 0:
-        st.success("All albums have Spotify links! 🎉")
-        return
+    with tab3:
+        st.subheader("Nuke Albums")
         
-    # Album selection
-    st.subheader("Select an album to update")
-    
-    selected_album_idx = st.selectbox(
-        "Albums missing Spotify links:",
-        options=range(len(missing_links)),
-        format_func=lambda x: f"{missing_links.iloc[x]['Artist Name(s)']} - {missing_links.iloc[x]['Album Name']}"
-    )
-    
-    if selected_album_idx is not None:
-        selected_album = missing_links.iloc[selected_album_idx]
-        artist = selected_album['Artist Name(s)']
-        album = selected_album['Album Name']
+        # Load the current predictions data
+        predictions_data = load_predictions()
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
         
-        st.write(f"**Selected:** {artist} - {album}")
+        df, _ = predictions_data
         
-        # Direct URL input
-        st.subheader("Enter Spotify URL")
-        direct_url = st.text_input("Spotify URL:", 
-                                  value=st.session_state.get(f"{artist}_{album}_spotify_url", ""))
-
-        # Helper text
-        st.caption("Tip: Search for the album on Spotify, click 'Share', then 'Copy Link'. Paste the full URL here (e.g., https://open.spotify.com/...).") 
-
-        # Format the URL if needed
-        if direct_url:
-            # Remove 'https://' or 'http://' if present
-            if direct_url.startswith('https://'):
-                direct_url = direct_url.replace('https://', '', 1)  # Remove only the first occurrence
-                st.info("Removed 'https://' prefix from URL")
-            elif direct_url.startswith('http://'):
-                direct_url = direct_url.replace('http://', '', 1)  # Remove only the first occurrence
-                st.info("Removed 'http://' prefix from URL")
+        # Load or create the nuked albums CSV
+        nuked_albums_file = 'data/nuked_albums.csv'
+        if os.path.exists(nuked_albums_file):
+            nuked_albums_df = pd.read_csv(nuked_albums_file)
+        else:
+            nuked_albums_df = pd.DataFrame(columns=['Artist', 'Album Name', 'Reason'])
         
-        # Save the direct URL
-        if direct_url and st.button("Save URL"):
-            # Create a new row for the dataframe
-            new_row = {
-                'Album Name': album,
-                'Artist Name(s)': artist,
-                'Spotify URL': direct_url
-            }
-            
-            # Check if this artist/album already exists
-            existing = album_links_df[(album_links_df['Artist Name(s)'] == artist) & 
-                                    (album_links_df['Album Name'] == album)]
-            
-            if not existing.empty:
-                # Update existing entry
-                album_links_df.loc[(album_links_df['Artist Name(s)'] == artist) & 
-                                 (album_links_df['Album Name'] == album), 'Spotify URL'] = direct_url
-            else:
-                # Add new entry
-                album_links_df = pd.concat([album_links_df, pd.DataFrame([new_row])], ignore_index=True)
-            
-            # Save the updated dataframe
-            try:
-                album_links_df.to_csv('data/nmf_album_links.csv', index=False)
-                st.success(f"Saved Spotify URL for {artist} - {album}")
+        # Initialize session state for nuked albums if not already set
+        if 'nuked_albums' not in st.session_state:
+            st.session_state.nuked_albums = nuked_albums_df.to_dict('records')
+        
+        # Show statistics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Albums", len(df))
+        with col2:
+            st.metric("Nuked Albums", len(st.session_state.nuked_albums))
+        
+        # Suggest albums for nuking based on keywords
+        st.subheader("Suggestions for Nuking")
+        keywords = ["Live", "Deluxe", "Reissue", "Anniversary"]
+        suggested_albums = df[
+            df['Album Name'].str.contains('|'.join(keywords), case=False, regex=True)
+        ]
+        
+        if not suggested_albums.empty:
+            st.write("Albums with keywords like 'Live', 'Deluxe', 'Reissue', or 'Anniversary':")
+            for idx, row in suggested_albums.iterrows():
+                # Check if the album has already been nuked
+                already_nuked = any(
+                    (nuked['Artist'] == row['Artist']) and (nuked['Album Name'] == row['Album Name'])
+                    for nuked in st.session_state.nuked_albums
+                )
                 
-                # Clear cache to reflect the update
-                st.cache_data.clear()
+                # Only show the button if the album hasn't been nuked
+                if not already_nuked:
+                    if st.button(f"Nuke {row['Artist']} - {row['Album Name']}", key=f"suggested_nuke_{idx}"):
+                        # Add to nuked albums
+                        new_nuke = {
+                            'Artist': row['Artist'],
+                            'Album Name': row['Album Name'],
+                            'Reason': "Keyword match"
+                        }
+                        st.session_state.nuked_albums.append(new_nuke)
+                        nuked_albums_df = pd.DataFrame(st.session_state.nuked_albums)
+                        nuked_albums_df.to_csv(nuked_albums_file, index=False)
+                        st.success(f"Nuked {row['Artist']} - {row['Album Name']}")
+                        st.rerun()  # Refresh the page to update the UI
+                else:
+                    st.write(f"✅ {row['Artist']} - {row['Album Name']} has already been nuked.")
+        else:
+            st.info("No albums found with keywords like 'Live', 'Deluxe', 'Reissue', or 'Anniversary'.")
+        
+        # Manual nuking
+        st.subheader("Manually Nuke an Album")
+        all_albums = df[['Artist', 'Album Name']].drop_duplicates()
+        selected_album_idx = st.selectbox(
+            "Select an album to nuke:",
+            options=range(len(all_albums)),
+            format_func=lambda x: f"{all_albums.iloc[x]['Artist']} - {all_albums.iloc[x]['Album Name']}"
+        )
+        
+        if selected_album_idx is not None:
+            selected_album = all_albums.iloc[selected_album_idx]
+            artist = selected_album['Artist']
+            album = selected_album['Album Name']
+            
+            st.write(f"**Selected:** {artist} - {album}")
+            
+            # Reason for nuking
+            reason = st.text_input("Reason for nuking (optional):", key=f"nuke_reason_{selected_album_idx}")
+            
+            if st.button("Nuke This Album", key=f"nuke_button_{selected_album_idx}"):
+                # Add to nuked albums
+                new_nuke = {
+                    'Artist': artist,
+                    'Album Name': album,
+                    'Reason': reason if reason else "Manual nuke"
+                }
+                st.session_state.nuked_albums.append(new_nuke)
+                nuked_albums_df = pd.DataFrame(st.session_state.nuked_albums)
+                nuked_albums_df.to_csv(nuked_albums_file, index=False)
+                st.success(f"Nuked {artist} - {album}")
                 st.rerun()
-            except Exception as e:
-                st.error(f"Failed to save: {e}")
+        
+        # Show current nuked albums
+        st.subheader("Currently Nuked Albums")
+        if st.session_state.nuked_albums:
+            st.dataframe(pd.DataFrame(st.session_state.nuked_albums))
+        else:
+            st.info("No albums have been nuked yet.")
 
 def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")
@@ -1105,10 +1144,9 @@ def main():
         "About Me"
     ]
 
-    # Add Album Cover Manager and Spotify Link Manager only if running locally
+    # Add Album Fixer only if running locally
     if IS_LOCAL:
-        page_options.append("Album Cover Manager")
-        page_options.append("Spotify Link Manager")
+        page_options.append("Album Fixer")
 
     page = st.sidebar.radio("Navigate", page_options)
     
@@ -1138,6 +1176,16 @@ def main():
             return
         
         df, analysis_date = predictions_data
+        
+        # Load nuked albums
+        nuked_albums_df = load_nuked_albums()
+        
+        # Filter out nuked albums
+        if not nuked_albums_df.empty:
+            df = df[~df.apply(lambda row: (
+                (row['Artist'] in nuked_albums_df['Artist'].values) &
+                (row['Album Name'] in nuked_albums_df['Album Name'].values)
+            ), axis=1)]
         
         # Fixed the genre counting logic
         all_genres = set()
@@ -1216,11 +1264,8 @@ def main():
                         st.session_state.show_all_archives = False
                         st.rerun()
     
-    elif page == "Album Cover Manager":
-        manage_album_covers()
-    
-    elif page == "Spotify Link Manager":
-        manage_spotify_links()
+    elif page == "Album Fixer":
+        album_fixer_page()
     
     elif page == "The Machine Learning Model":
         st.title("📓 The Machine Learning Model in my Jupyter Notebook")
