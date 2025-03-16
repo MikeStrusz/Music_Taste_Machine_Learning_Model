@@ -108,22 +108,51 @@ st.markdown("""
     }
 
     .public-rating-buttons button {
-    flex: 1;
-    min-width: 40px;  /* Reduced from 60px for better mobile fit */
-    padding: 8px 12px;
-    font-size: 0.9rem;
+        flex: 1;
+        min-width: 40px;  /* Reduced from 60px for better mobile fit */
+        padding: 8px 12px;
+        font-size: 0.9rem;
     }
 
-/* Add this new media query for mobile devices */
-@media (max-width: 768px) {
-    .public-rating-buttons {
-        flex-direction: row;  /* Force horizontal layout even on mobile */
+    /* Light pink background for username input */
+    .stTextInput>div>div>input {
+        background-color: #fff0f5 !important;  /* Very light pink */
+        border-radius: 4px;
+        padding: 8px;
     }
-    .public-rating-buttons button {
-        padding: 6px 8px;  /* Smaller padding on mobile */
-        font-size: 0.85rem;  /* Slightly smaller font on mobile */
+
+    /* Light pink background for feedback buttons */
+    .stButton>button {
+        background-color: #fff0f5 !important;  /* Very light pink */
+        border: 1px solid #ffc0cb !important;  /* Slightly darker pink border */
+        color: #333 !important;  /* Darker text for better contrast */
+        border-radius: 4px;
+        transition: all 0.3s ease;
     }
-}
+
+    /* Hover effect for feedback buttons */
+    .stButton>button:hover {
+        background-color: #ffc0cb !important;  /* Slightly darker pink on hover */
+        border-color: #ff69b4 !important;  /* Even darker pink border on hover */
+        color: #000 !important;  /* Black text on hover for better contrast */
+    }
+
+    /* Light pink background for the review text area */
+    .stTextArea>div>div>textarea {
+        background-color: #fff0f5 !important;  /* Very light pink */
+        border-radius: 4px;
+        padding: 8px;
+    }
+
+    /* Light pink background for the feedback section container */
+    .feedback-container {
+        background-color: #fff0f5 !important;  /* Very light pink */
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+    }
+
+
     .archive-selector {
         margin-bottom: 20px;
         padding: 10px;
@@ -146,6 +175,7 @@ st.markdown("""
     }
     </style>
 """, unsafe_allow_html=True)
+
 
 @st.cache_data
 def get_all_prediction_files():
@@ -304,8 +334,48 @@ def load_feedback():
                 return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
     return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
 
-# Public feedback functions
-def save_public_feedback(album_name, artist, feedback, username="Anonymous"):
+# Updated feedback functions
+def save_feedback(album_name, artist, feedback, review=None):
+    feedback_file = 'feedback/feedback.csv'
+    if not os.path.exists('feedback'):
+        os.makedirs('feedback')
+    
+    # Create a dataframe with the new feedback
+    new_feedback = pd.DataFrame({
+        'Album Name': [album_name],
+        'Artist': [artist],
+        'Feedback': [feedback],
+        'Review': [review if review else ""]
+    })
+
+    # Load existing feedback if file exists
+    if os.path.exists(feedback_file):
+        try:
+            # Use proper quoting and escape characters when reading
+            existing_feedback = pd.read_csv(feedback_file, quoting=1)  # QUOTE_ALL
+            
+            # Remove existing feedback for this album and artist
+            existing_feedback = existing_feedback[
+                ~((existing_feedback['Album Name'] == album_name) & 
+                  (existing_feedback['Artist'] == artist))
+            ]
+            
+            # Combine with new feedback
+            combined_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
+        except Exception as e:
+            st.warning(f"Error reading existing feedback: {e}. Creating new file.")
+            # If reading fails, start fresh with just the new feedback
+            combined_feedback = new_feedback
+    else:
+        combined_feedback = new_feedback
+    
+    # Save with proper quoting to handle commas in fields
+    combined_feedback.to_csv(feedback_file, index=False, quoting=1)  # QUOTE_ALL
+    
+    # Clear cache after saving feedback
+    st.cache_data.clear()
+
+def save_public_feedback(album_name, artist, feedback, username="Anonymous", review=None):
     feedback_file = 'feedback/public_feedback.csv'
     if not os.path.exists('feedback'):
         os.makedirs('feedback')
@@ -316,7 +386,8 @@ def save_public_feedback(album_name, artist, feedback, username="Anonymous"):
         'Artist': [artist],
         'Feedback': [feedback],
         'Username': [username],
-        'Timestamp': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")]
+        'Timestamp': [datetime.now().strftime("%Y-%m-%d %H:%M:%S")],
+        'Review': [review if review else ""]
     })
 
     # Load existing feedback if file exists
@@ -338,6 +409,35 @@ def save_public_feedback(album_name, artist, feedback, username="Anonymous"):
     
     # Clear cache after saving feedback
     st.cache_data.clear()
+
+# Updated load feedback functions
+def load_feedback():
+    feedback_file = 'feedback/feedback.csv'
+    if os.path.exists(feedback_file):
+        try:
+            # Use quoting=1 (QUOTE_ALL) to properly handle commas in fields
+            return pd.read_csv(feedback_file, quoting=1)
+        except Exception as e:
+            st.warning(f"Error loading feedback data: {e}")
+            # Try to recover the file
+            try:
+                # Attempt to read with different options
+                df = pd.read_csv(feedback_file, quoting=1, error_bad_lines=False) 
+                st.info("Partially recovered feedback data")
+                return df
+            except:
+                # If all recovery attempts fail, provide an empty DataFrame as fallback
+                st.error("Could not recover feedback data. Starting with fresh feedback file.")
+                # Backup the problematic file
+                if os.path.exists(feedback_file):
+                    backup_file = feedback_file + ".backup." + datetime.now().strftime("%Y%m%d%H%M%S")
+                    try:
+                        os.rename(feedback_file, backup_file)
+                        st.info(f"Backed up problematic feedback file to {backup_file}")
+                    except:
+                        pass
+                return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Review'])
+    return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Review'])
 
 def load_public_feedback():
     feedback_file = 'feedback/public_feedback.csv'
@@ -364,8 +464,8 @@ def load_public_feedback():
                         st.info(f"Backed up problematic feedback file to {backup_file}")
                     except:
                         pass
-                return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp'])
-    return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp'])
+                return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp', 'Review'])
+    return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp', 'Review'])
 
 def get_public_feedback_stats(album_name, artist):
     """Get statistics for public feedback on a specific album"""
@@ -404,7 +504,7 @@ def get_recent_public_feedback(album_name, artist, limit=3):
     ]
     
     if album_feedback.empty:
-        return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp'])
+        return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp', 'Review'])
     
     # Sort by timestamp (newest first) and take the top 'limit' entries
     album_feedback['Timestamp'] = pd.to_datetime(album_feedback['Timestamp'])
@@ -412,21 +512,7 @@ def get_recent_public_feedback(album_name, artist, limit=3):
     
     return recent_feedback
 
-if 'feedback_updated' not in st.session_state:
-    st.session_state.feedback_updated = False
-
-# Then in save_feedback:
-st.session_state.feedback_updated = True
-
-# And check at the beginning of your app:
-if st.session_state.feedback_updated:
-    st.cache_data.clear()
-    st.session_state.feedback_updated = False
-
-# For archive navigation
-if 'current_archive_index' not in st.session_state:
-    st.session_state.current_archive_index = 0
-
+# The display_album_predictions function
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
     try:
         album_links_df = load_album_links()
@@ -452,13 +538,12 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
         st.error(f"Error merging data: {e}")
         merged_data = filtered_data
     
-    # Removed the filtering condition to show all albums
     filtered_albums = merged_data
     
     for idx, row in filtered_albums.iterrows():
         with st.container():
             st.markdown('<div class="album-container">', unsafe_allow_html=True)
-            cols = st.columns([2, 4, 1, 1])  # Define cols here
+            cols = st.columns([2, 4, 1, 1])
             
             with cols[0]:
                 if 'Album Art' in row and pd.notna(row['Album Art']):
@@ -496,48 +581,115 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     ''', unsafe_allow_html=True) 
                 
                 # Public rating section with username input
-                st.markdown('<div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 8px;">', unsafe_allow_html=True)
+                st.markdown('<div class="feedback-container">', unsafe_allow_html=True)
                 st.markdown('<div style="font-weight: 600; margin-bottom: 8px;">Mike wants to know what you think!</div>', unsafe_allow_html=True)
 
                 # Username input
                 username = st.text_input("Your name (optional):", key=f"username_input_{idx}", value="")
                 username = username.strip() if username else "Anonymous"
 
+                # Load existing feedback to pre-populate the review field
+                feedback_df = load_feedback()
+                existing_feedback = feedback_df[
+                    (feedback_df['Album Name'] == row['Album Name']) & 
+                    (feedback_df['Artist'] == row['Artist'])
+                ]
+                
+                # Create a unique key using album name and artist
+                unique_key = f"{row['Album Name']}_{row['Artist']}"
+
+                # Pre-populate the review field if feedback exists
+                existing_review = ""
+                if not existing_feedback.empty:
+                    existing_review = existing_feedback.iloc[0].get('Review', '')
+
+                # Add review input field
+                review = st.text_area("Mini review (optional):", 
+                                     value=existing_review, 
+                                     key=f"review_input_{unique_key}", 
+                                     max_chars=200, 
+                                     height=80)
+
+
                 # Create fixed-width columns for buttons
-                button_cols = st.columns(3)  # Three equal-width columns for the buttons
+                button_cols = st.columns(3)
 
+                # Create a unique key using album name and artist
+                unique_key = f"{row['Album Name']}_{row['Artist']}"
+
+                # Like Button
                 with button_cols[0]:
-                    if st.button('👍 Like', key=f"public_like_{idx}", use_container_width=True):
-                        # Special handling for "Mike S"
+                    if st.button('👍 Like', key=f"public_like_{unique_key}", use_container_width=True):
                         if username == "Mike S":
-                            save_feedback(row['Album Name'], row['Artist'], 'like')
+                            # Load existing feedback to check if a review already exists
+                            feedback_df = load_feedback()
+                            existing_feedback = feedback_df[
+                                (feedback_df['Album Name'] == row['Album Name']) & 
+                                (feedback_df['Artist'] == row['Artist'])
+                            ]
+                            
+                            # Preserve existing review if it exists
+                            existing_review = ""
+                            if not existing_feedback.empty:
+                                existing_review = existing_feedback.iloc[0].get('Review', '')
+                            
+                            # Save feedback with the new review (if provided) or the existing review
+                            save_feedback(row['Album Name'], row['Artist'], 'like', review or existing_review)
                             # Display as just "Mike"
                             username = "Mike"
                         else:
-                            save_public_feedback(row['Album Name'], row['Artist'], 'like', username)
+                            save_public_feedback(row['Album Name'], row['Artist'], 'like', username, review)
                         st.rerun()
 
+                # Mid Button
                 with button_cols[1]:
-                    if st.button('😐 Mid', key=f"public_mid_{idx}", use_container_width=True):
-                        # Special handling for "Mike S"
+                    if st.button('😐 Mid', key=f"public_mid_{unique_key}", use_container_width=True):
                         if username == "Mike S":
-                            save_feedback(row['Album Name'], row['Artist'], 'mid')
+                            # Load existing feedback to check if a review already exists
+                            feedback_df = load_feedback()
+                            existing_feedback = feedback_df[
+                                (feedback_df['Album Name'] == row['Album Name']) & 
+                                (feedback_df['Artist'] == row['Artist'])
+                            ]
+                            
+                            # Preserve existing review if it exists
+                            existing_review = ""
+                            if not existing_feedback.empty:
+                                existing_review = existing_feedback.iloc[0].get('Review', '')
+                            
+                            # Save feedback with the new review (if provided) or the existing review
+                            save_feedback(row['Album Name'], row['Artist'], 'mid', review or existing_review)
                             # Display as just "Mike"
                             username = "Mike"
                         else:
-                            save_public_feedback(row['Album Name'], row['Artist'], 'mid', username)
+                            save_public_feedback(row['Album Name'], row['Artist'], 'mid', username, review)
                         st.rerun()
 
+                # Dislike Button
                 with button_cols[2]:
-                    if st.button('👎 Dislike', key=f"public_dislike_{idx}", use_container_width=True):
-                        # Special handling for "Mike S"
+                    if st.button('👎 Dislike', key=f"public_dislike_{unique_key}", use_container_width=True):
                         if username == "Mike S":
-                            save_feedback(row['Album Name'], row['Artist'], 'dislike')
+                            # Load existing feedback to check if a review already exists
+                            feedback_df = load_feedback()
+                            existing_feedback = feedback_df[
+                                (feedback_df['Album Name'] == row['Album Name']) & 
+                                (feedback_df['Artist'] == row['Artist'])
+                            ]
+                            
+                            # Preserve existing review if it exists
+                            existing_review = ""
+                            if not existing_feedback.empty:
+                                existing_review = existing_feedback.iloc[0].get('Review', '')
+                            
+                            # Save feedback with the new review (if provided) or the existing review
+                            save_feedback(row['Album Name'], row['Artist'], 'dislike', review or existing_review)
                             # Display as just "Mike"
                             username = "Mike"
                         else:
-                            save_public_feedback(row['Album Name'], row['Artist'], 'dislike', username)
+                            save_public_feedback(row['Album Name'], row['Artist'], 'dislike', username, review)
                         st.rerun()
+
+                st.markdown('</div>', unsafe_allow_html=True)  # Close the feedback-container div
                 
                 # Display public rating stats
                 public_stats = get_public_feedback_stats(row['Album Name'], row['Artist'])
@@ -553,6 +705,16 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         st.markdown(f'<div class="public-rating-stats">{feedback_display}</div>', unsafe_allow_html=True)
                     
                     st.markdown(f'<div class="public-rating-stats">Total: {public_stats["like"]} 👍 | {public_stats["mid"]} 😐 | {public_stats["dislike"]} 👎</div>', unsafe_allow_html=True)
+                    
+                    # Display recent reviews
+                    if 'Review' in recent_feedback.columns:  # Check if the 'Review' column exists
+                        reviews_to_show = recent_feedback[recent_feedback['Review'].notna() & (recent_feedback['Review'] != "")]
+                        if not reviews_to_show.empty:
+                            st.markdown('<div class="recent-reviews" style="margin-top: 10px;">', unsafe_allow_html=True)
+                            for _, fb in reviews_to_show.iterrows():
+                                emoji = "👍" if fb['Feedback'] == 'like' else "😐" if fb['Feedback'] == 'mid' else "👎"
+                                st.markdown(f'<div style="font-style: italic; margin-bottom: 5px;">{fb["Username"]} {emoji}: "{fb["Review"]}"</div>', unsafe_allow_html=True)
+                            st.markdown('</div>', unsafe_allow_html=True)
                 else:
                     st.markdown('<div class="public-rating-stats">No ratings yet - be the first!</div>', unsafe_allow_html=True)
                 
@@ -573,17 +735,21 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 
                 if not existing_feedback.empty:
                     feedback = existing_feedback.iloc[0]['Feedback']
+                    review_text = existing_feedback.iloc[0].get('Review', '')
+                    
                     if feedback == 'like':
                         st.markdown('👍 Mike liked it')
                     elif feedback == 'mid':
                         st.markdown('😐 Mike thought it was mid')
                     elif feedback == 'dislike':
                         st.markdown('👎 Mike didn\'t like it')
+                    
+                    # Display Mike's review if it exists
+                    if review_text and not pd.isna(review_text):
+                        st.markdown(f'<div style="font-style: italic; margin-top: 5px;">"{review_text}"</div>', unsafe_allow_html=True)
                 else:
                     st.markdown('😶 Mike hasn\'t listened/rated this album.')
                 
-                # Removed Mike's feedback buttons
-            
             st.markdown('</div>', unsafe_allow_html=True)
 
 def about_me_page():
