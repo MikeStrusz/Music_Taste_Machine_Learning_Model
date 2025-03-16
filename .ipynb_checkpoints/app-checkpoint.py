@@ -93,12 +93,33 @@ st.markdown("""
         display: flex;
         gap: 5px;
         margin-top: 5px;
+        flex-wrap: wrap;
     }
-    .public-rating-stats {
-        font-size: 0.9rem;
-        color: #666;
-        margin-top: 5px;
+    .public-rating-buttons {
+    display: flex;
+    gap: 5px;
+    margin-top: 5px;
+    flex-wrap: nowrap;  /* Changed from wrap to nowrap */
+    justify-content: space-between;  /* Distribute buttons evenly */
     }
+
+    .public-rating-buttons button {
+    flex: 1;
+    min-width: 40px;  /* Reduced from 60px for better mobile fit */
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    }
+
+/* Add this new media query for mobile devices */
+@media (max-width: 768px) {
+    .public-rating-buttons {
+        flex-direction: row;  /* Force horizontal layout even on mobile */
+    }
+    .public-rating-buttons button {
+        padding: 6px 8px;  /* Smaller padding on mobile */
+        font-size: 0.85rem;  /* Slightly smaller font on mobile */
+    }
+}
     .archive-selector {
         margin-bottom: 20px;
         padding: 10px;
@@ -468,7 +489,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         <a href="https://{spotify_url}" target="_blank" class="spotify-button">
                             ▶ Play on Spotify
                         </a>
-                    ''', unsafe_allow_html=True)
+                    ''', unsafe_allow_html=True) 
                 
                 # Public rating section with username input
                 st.markdown('<div style="margin-top: 15px; padding: 10px; background-color: #f8f9fa; border-radius: 8px;">', unsafe_allow_html=True)
@@ -483,15 +504,33 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 public_rating_cols = st.columns(3)
                 with public_rating_cols[0]:
                     if st.button('👍', key=f"public_like_{idx}"):
-                        save_public_feedback(row['Album Name'], row['Artist'], 'like', username)
+                        # Special handling for "Mike S"
+                        if username == "Mike S":
+                            save_feedback(row['Album Name'], row['Artist'], 'like')
+                            # Display as just "Mike"
+                            username = "Mike"
+                        else:
+                            save_public_feedback(row['Album Name'], row['Artist'], 'like', username)
                         st.rerun()
                 with public_rating_cols[1]:
                     if st.button('😐', key=f"public_mid_{idx}"):
-                        save_public_feedback(row['Album Name'], row['Artist'], 'mid', username)
+                        # Special handling for "Mike S"
+                        if username == "Mike S":
+                            save_feedback(row['Album Name'], row['Artist'], 'mid')
+                            # Display as just "Mike"
+                            username = "Mike"
+                        else:
+                            save_public_feedback(row['Album Name'], row['Artist'], 'mid', username)
                         st.rerun()
                 with public_rating_cols[2]:
                     if st.button('👎', key=f"public_dislike_{idx}"):
-                        save_public_feedback(row['Album Name'], row['Artist'], 'dislike', username)
+                        # Special handling for "Mike S"
+                        if username == "Mike S":
+                            save_feedback(row['Album Name'], row['Artist'], 'dislike')
+                            # Display as just "Mike"
+                            username = "Mike"
+                        else:
+                            save_public_feedback(row['Album Name'], row['Artist'], 'dislike', username)
                         st.rerun()
                 
                 # Display public rating stats
@@ -537,17 +576,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 else:
                     st.markdown('😶 Mike hasn\'t listened/rated this album.')
                 
-                # Only show Mike's feedback buttons if running locally
-                if IS_LOCAL:
-                    if st.button('👍', key=f"like_{idx}"):
-                        save_feedback(row['Album Name'], row['Artist'], 'like')
-                        st.rerun()
-                    if st.button('😐', key=f"mid_{idx}"):
-                        save_feedback(row['Album Name'], row['Artist'], 'mid')
-                        st.rerun()
-                    if st.button('👎', key=f"dislike_{idx}"):
-                        save_feedback(row['Album Name'], row['Artist'], 'dislike')
-                        st.rerun()
+                # Removed Mike's feedback buttons
             
             st.markdown('</div>', unsafe_allow_html=True)
 
@@ -564,7 +593,7 @@ def about_me_page():
     
     st.markdown("## Let's Connect!")
     st.write("📧 Reach me at **mike.strusz@gmail.com**")
-    st.write("🔗 Connect with me on [LinkedIn](https://www.linkedin.com/in/mike-strusz/)")
+    st.write("🔗 Connect with me on [LinkedIn](https://www.linkedin.com/in/mike-strusz/) ")
     
     st.image("graphics/mike.jpeg", width=400)
     st.caption("Me on the Milwaukee Riverwalk, wearing one of my 50+ bowties.")
@@ -808,12 +837,12 @@ def manage_spotify_links():
                                   value=st.session_state.get(f"{artist}_{album}_spotify_url", ""))
         
         # Helper text
-        st.caption("Tip: Search for the album on Spotify, click 'Share', then 'Copy Link'. Paste the URL here without the 'https://' prefix.")
+        st.caption("Tip: Search for the album on Spotify, click 'Share', then 'Copy Link'. Paste the URL here without the 'https://' prefix.") 
         
         # Format the URL if needed
-        if direct_url and direct_url.startswith('https://'):
-            direct_url = direct_url.replace('https://', '')
-            st.info("Removed 'https://' prefix from URL")
+        if direct_url and direct_url.startswith('https://') :
+            direct_url = direct_url.replace('https://', '') 
+            st.info("Removed 'https://' prefix from URL") 
         
         # Save the direct URL
         if direct_url and st.button("Save URL"):
