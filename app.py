@@ -608,7 +608,7 @@ def album_fixer_page():
     st.title("🛠️ Album Fixer")
     
     # Create tabs for different functions
-    tab1, tab2, tab3 = st.tabs(["Add Missing Album Artwork", "Fix Spotify Links", "Nuke Albums"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Add Missing Album Artwork", "Fix Album Covers with Wrong Image", "Fix Spotify Links", "Nuke Albums"])
     
     with tab1:
         st.subheader("Manage Missing Album Artwork")
@@ -708,8 +708,102 @@ def album_fixer_page():
                         st.rerun()
                     except Exception as e:
                         st.error(f"Failed to save: {e}")
-    
+
     with tab2:
+        st.subheader("Fix Album Covers with Wrong Image")
+        
+        # Load the current album covers data and predictions data
+        album_covers_df = load_album_covers()
+        predictions_data = load_predictions()
+        
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
+        
+        df, _ = predictions_data
+        all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
+        
+        # Merge with album covers to get all albums with covers
+        merged_df = all_albums_df.merge(
+            album_covers_df,
+            left_on=['Artist', 'Album Name'],
+            right_on=['Artist', 'Album Name'],
+            how='inner'
+        )
+        
+        albums_with_covers = merged_df.copy()
+        
+        # Show statistics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Albums", len(all_albums_df))
+        with col2:
+            st.metric("Albums with Artwork", len(albums_with_covers))
+        
+        if len(albums_with_covers) == 0:
+            st.warning("No albums with artwork found.")
+        else:
+            # Album selection
+            st.subheader("Select an album to update its cover")
+        
+            selected_album_idx = st.selectbox(
+                "Albums with artwork:",
+                options=range(len(albums_with_covers)),
+                format_func=lambda x: f"{albums_with_covers.iloc[x]['Artist']} - {albums_with_covers.iloc[x]['Album Name']}",
+                key="fix_artwork_selector"
+            )
+            
+            if selected_album_idx is not None:
+                selected_album = albums_with_covers.iloc[selected_album_idx]
+                artist = selected_album['Artist']
+                album = selected_album['Album Name']
+                current_cover_url = selected_album['Album Art']
+                
+                st.write(f"**Selected:** {artist} - {album}")
+                
+                # Display current cover
+                st.subheader("Current Album Cover")
+                try:
+                    st.image(current_cover_url, caption=f"Current cover for {artist} - {album}", width=300)
+                except Exception as e:
+                    st.error(f"Failed to load current image: {e}")
+                
+                # Direct URL input for new cover
+                st.subheader("Enter New Album Cover Image URL")
+                new_url = st.text_input("New Image URL:", 
+                                      value="",
+                                      key="fix_artwork_url")
+                
+                # Helper text
+                st.caption("Tip: Search for the correct album cover on Google Images, right-click on an image and select 'Copy image address'")
+                
+                # Preview the new URL image if provided
+                if new_url:
+                    st.subheader("New Album Cover Preview")
+                    try:
+                        st.image(new_url, caption=f"New cover for {artist} - {album}", width=300)
+                    except Exception as e:
+                        st.error(f"Failed to load image from URL: {e}")
+                
+                # Save the new URL
+                if new_url and st.button("Update Album Cover", key="update_artwork"):
+                    # Update the existing entry
+                    album_covers_df.loc[(album_covers_df['Artist'] == artist) & 
+                                      (album_covers_df['Album Name'] == album), 'Album Art'] = new_url
+                    
+                    # Save the updated dataframe
+                    try:
+                        album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
+                        st.success(f"Updated album art URL for {artist} - {album}")
+                        
+                        # Clear cache to reflect the update
+                        st.cache_data.clear()
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Failed to save: {e}")
+
+    
+    with tab3:
         st.subheader("Fix Spotify Links")
         
         # Load the current album links data and predictions data
@@ -791,13 +885,14 @@ def album_fixer_page():
                 }
                 
                 # Check if this artist/album already exists
-                existing = album_links_df[(album_links_df['Artist Name(s)'] == artist) & 
-                                        (album_links_df['Album Name'] == album)]
+                existing_index = album_links_df[
+                    (album_links_df['Artist Name(s)'] == artist) & 
+                    (album_links_df['Album Name'] == album)
+                ].index
                 
-                if not existing.empty:
+                if not existing_index.empty:
                     # Update existing entry
-                    album_links_df.loc[(album_links_df['Artist Name(s)'] == artist) & 
-                                     (album_links_df['Album Name'] == album), 'Spotify URL'] = direct_url
+                    album_links_df.loc[existing_index, 'Spotify URL'] = direct_url
                 else:
                     # Add new entry
                     album_links_df = pd.concat([album_links_df, pd.DataFrame([new_row])], ignore_index=True)
@@ -813,7 +908,7 @@ def album_fixer_page():
                 except Exception as e:
                     st.error(f"Failed to save: {e}")
     
-    with tab3:
+    with tab4:
         st.subheader("Nuke Albums")
         
         # Load the current predictions data
