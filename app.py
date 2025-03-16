@@ -831,14 +831,19 @@ def manage_spotify_links():
         st.subheader("Enter Spotify URL")
         direct_url = st.text_input("Spotify URL:", 
                                   value=st.session_state.get(f"{artist}_{album}_spotify_url", ""))
-        
+
         # Helper text
-        st.caption("Tip: Search for the album on Spotify, click 'Share', then 'Copy Link'. Paste the URL here without the 'https://' prefix.") 
-        
+        st.caption("Tip: Search for the album on Spotify, click 'Share', then 'Copy Link'. Paste the full URL here (e.g., https://open.spotify.com/...).") 
+
         # Format the URL if needed
-        if direct_url and direct_url.startswith('https://') :
-            direct_url = direct_url.replace('https://', '') 
-            st.info("Removed 'https://' prefix from URL") 
+        if direct_url:
+            # Remove 'https://' or 'http://' if present
+            if direct_url.startswith('https://'):
+                direct_url = direct_url.replace('https://', '', 1)  # Remove only the first occurrence
+                st.info("Removed 'https://' prefix from URL")
+            elif direct_url.startswith('http://'):
+                direct_url = direct_url.replace('http://', '', 1)  # Remove only the first occurrence
+                st.info("Removed 'http://' prefix from URL")
         
         # Save the direct URL
         if direct_url and st.button("Save URL"):
