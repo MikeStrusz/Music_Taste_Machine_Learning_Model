@@ -1189,28 +1189,71 @@ def album_fixer_page():
             st.info("No albums have been nuked yet.")
 
     with tab5:
-        st.subheader("Manage Anonymous Reviews")
+        st.subheader("Manage Reviews")
         
         # Load public feedback
         public_feedback_df = load_public_feedback()
         
-        # Filter for anonymous reviews
-        anonymous_reviews = public_feedback_df[public_feedback_df['Username'] == "Anonymous"].copy()
-        
         # Show statistics
-        col1, col2 = st.columns(2)
+        col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("Total Reviews", len(public_feedback_df))
         with col2:
-            st.metric("Anonymous Reviews", len(anonymous_reviews))
+            st.metric("Anonymous Reviews", len(public_feedback_df[public_feedback_df['Username'] == "Anonymous"]))
+        with col3:
+            st.metric("Mike's Reviews", len(public_feedback_df[public_feedback_df['Username'] == "Mike"]))
+        with col4:
+            # Count reviews with usernames similar to Mike (case insensitive)
+            mike_like_reviews = public_feedback_df[
+                public_feedback_df['Username'].str.lower().str.contains('mike')
+            ]
+            st.metric("Mike-like Reviews", len(mike_like_reviews))
         
-        if len(anonymous_reviews) == 0:
-            st.success("No anonymous reviews found!")
+        if public_feedback_df.empty:
+            st.info("No reviews found!")
         else:
-            # Display anonymous reviews with delete buttons
-            st.subheader("Anonymous Reviews")
+            # Add filter options
+            filter_options = ["All Reviews", "Anonymous Reviews Only", "Mike's Reviews Only", 
+                             "Mike-like Reviews", "Other Users' Reviews"]
+            filter_choice = st.radio("Filter reviews:", filter_options)
             
-            for idx, row in anonymous_reviews.iterrows():
+            # Apply filter
+            if filter_choice == "Anonymous Reviews Only":
+                filtered_reviews = public_feedback_df[public_feedback_df['Username'] == "Anonymous"].copy()
+            elif filter_choice == "Mike's Reviews Only":
+                filtered_reviews = public_feedback_df[public_feedback_df['Username'] == "Mike"].copy()
+            elif filter_choice == "Mike-like Reviews":
+                filtered_reviews = public_feedback_df[
+                    public_feedback_df['Username'].str.lower().str.contains('mike')
+                ].copy()
+            elif filter_choice == "Other Users' Reviews":
+                filtered_reviews = public_feedback_df[
+                    (~public_feedback_df['Username'].str.lower().str.contains('mike')) & 
+                    (public_feedback_df['Username'] != "Anonymous")
+                ].copy()
+            else:
+                filtered_reviews = public_feedback_df.copy()
+            
+            # Sort options
+            sort_options = ["Newest First", "Oldest First", "Album Name", "Artist Name"]
+            sort_choice = st.selectbox("Sort by:", sort_options)
+            
+            # Apply sorting
+            if sort_choice == "Newest First":
+                filtered_reviews['Timestamp'] = pd.to_datetime(filtered_reviews['Timestamp'])
+                filtered_reviews = filtered_reviews.sort_values('Timestamp', ascending=False)
+            elif sort_choice == "Oldest First":
+                filtered_reviews['Timestamp'] = pd.to_datetime(filtered_reviews['Timestamp'])
+                filtered_reviews = filtered_reviews.sort_values('Timestamp', ascending=True)
+            elif sort_choice == "Album Name":
+                filtered_reviews = filtered_reviews.sort_values('Album Name')
+            elif sort_choice == "Artist Name":
+                filtered_reviews = filtered_reviews.sort_values('Artist')
+            
+            # Display reviews with delete buttons
+            st.subheader(f"Reviews ({len(filtered_reviews)})")
+            
+            for idx, row in filtered_reviews.iterrows():
                 with st.container():
                     cols = st.columns([3, 1, 1])
                     
@@ -1218,7 +1261,7 @@ def album_fixer_page():
                         feedback_emoji = "👍" if row['Feedback'] == 'like' else "😐" if row['Feedback'] == 'mid' else "👎"
                         review_text = f"\"{row['Review']}\"" if row['Review'] and not pd.isna(row['Review']) else "No review text"
                         st.write(f"**{row['Artist']} - {row['Album Name']}** {feedback_emoji}")
-                        st.write(f"Date: {row['Timestamp']}")
+                        st.write(f"User: **{row['Username']}** | Date: {row['Timestamp']}")
                         st.write(review_text)
                     
                     with cols[2]:
@@ -1228,24 +1271,81 @@ def album_fixer_page():
                             
                             # Save the updated dataframe
                             public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
-                            st.success(f"Deleted anonymous review for {row['Artist']} - {row['Album Name']}")
+                            st.success(f"Deleted review for {row['Artist']} - {row['Album Name']} by {row['Username']}")
                             
                             # Clear cache and rerun
                             st.cache_data.clear()
                             st.rerun()
             
-            # Add a button to delete all anonymous reviews
-            if st.button("Delete All Anonymous Reviews"):
-                # Remove all anonymous reviews
-                public_feedback_df = public_feedback_df[public_feedback_df['Username'] != "Anonymous"]
-                
-                # Save the updated dataframe
-                public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
-                st.success(f"Deleted all {len(anonymous_reviews)} anonymous reviews")
-                
-                # Clear cache and rerun
-                st.cache_data.clear()
-                st.rerun()
+            # Add bulk delete options
+            st.subheader("Bulk Delete Options")
+            bulk_options = st.columns(4)
+            
+            with bulk_options[0]:
+                if st.button("Delete All Anonymous Reviews"):
+                    # Remove all anonymous reviews
+                    public_feedback_df = public_feedback_df[public_feedback_df['Username'] != "Anonymous"]
+                    
+                    # Save the updated dataframe
+                    public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                    st.success(f"Deleted all anonymous reviews")
+                    
+                    # Clear cache and rerun
+                    st.cache_data.clear()
+                    st.rerun()
+            
+            with bulk_options[1]:
+                if st.button("Delete All Mike-like Reviews"):
+                    # Count before deletion
+                    count_before = len(public_feedback_df)
+                    
+                    # Remove all reviews with usernames containing 'mike' (case insensitive)
+                    public_feedback_df = public_feedback_df[
+                        ~public_feedback_df['Username'].str.lower().str.contains('mike')
+                    ]
+                    
+                    # Count after deletion
+                    count_deleted = count_before - len(public_feedback_df)
+                    
+                    # Save the updated dataframe
+                    public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                    st.success(f"Deleted {count_deleted} Mike-like reviews")
+                    
+                    # Clear cache and rerun
+                    st.cache_data.clear()
+                    st.rerun()
+            
+            with bulk_options[2]:
+                if st.button("Delete All Displayed Reviews"):
+                    # Get the indices of the filtered reviews
+                    indices_to_delete = filtered_reviews.index
+                    
+                    # Remove these reviews
+                    public_feedback_df = public_feedback_df.drop(indices_to_delete)
+                    
+                    # Save the updated dataframe
+                    public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                    st.success(f"Deleted {len(indices_to_delete)} displayed reviews")
+                    
+                    # Clear cache and rerun
+                    st.cache_data.clear()
+                    st.rerun()
+            
+            with bulk_options[3]:
+                if st.button("Delete All Reviews", key="delete_all_reviews"):
+                    # Confirm deletion with a warning
+                    st.warning("⚠️ This will delete ALL reviews! Are you sure?")
+                    if st.button("Yes, Delete ALL Reviews", key="confirm_delete_all"):
+                        # Create empty dataframe with same columns
+                        empty_df = pd.DataFrame(columns=public_feedback_df.columns)
+                        
+                        # Save the empty dataframe
+                        empty_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                        st.success(f"Deleted all {len(public_feedback_df)} reviews")
+                        
+                        # Clear cache and rerun
+                        st.cache_data.clear()
+                        st.rerun()
 
 
 def dacus_game_page(G):
