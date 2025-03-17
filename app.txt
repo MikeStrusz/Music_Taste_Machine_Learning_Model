@@ -114,17 +114,17 @@ st.markdown("""
         font-size: 0.9rem;
     }
 
-    /* Light gray background for username input */
+    /* Light pink background for username input */
     .stTextInput>div>div>input {
-        background-color: #f8f9fa !important;  /* Light gray */
+        background-color: #fff0f5 !important;  /* Very light pink */
         border-radius: 4px;
         padding: 8px;
     }
 
-    /* Light gray background for feedback buttons */
+    /* Light pink background for feedback buttons */
     .stButton>button {
-        background-color: #f8f9fa !important;  /* Light gray */
-        border: 1px solid #e0e0e0 !important;  /* Light gray border */
+        background-color: #fff0f5 !important;  /* Very light pink */
+        border: 1px solid #ffc0cb !important;  /* Slightly darker pink border */
         color: #333 !important;  /* Darker text for better contrast */
         border-radius: 4px;
         transition: all 0.3s ease;
@@ -132,26 +132,25 @@ st.markdown("""
 
     /* Hover effect for feedback buttons */
     .stButton>button:hover {
-        background-color: #e9ecef !important;  /* Slightly darker gray on hover */
-        border-color: #ced4da !important;  /* Darker gray border on hover */
+        background-color: #ffc0cb !important;  /* Slightly darker pink on hover */
+        border-color: #ff69b4 !important;  /* Even darker pink border on hover */
         color: #000 !important;  /* Black text on hover for better contrast */
     }
 
-    /* Light gray background for the review text area */
+    /* Light pink background for the review text area */
     .stTextArea>div>div>textarea {
-        background-color: #f8f9fa !important;  /* Light gray */
+        background-color: #fff0f5 !important;  /* Very light pink */
         border-radius: 4px;
         padding: 8px;
     }
 
-    /* Light gray background for the feedback section container */
+    /* Light pink background for the feedback section container */
     .feedback-container {
-        background-color: #f8f9fa !important;  /* Light gray */
+        background-color: #fff0f5 !important;  /* Very light pink */
         padding: 10px;
         border-radius: 8px;
         margin-top: 10px;
     }
-
 
 
     .archive-selector {
@@ -600,15 +599,13 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 unique_key = f"{row['Album Name']}_{row['Artist']}"
 
                 # Pre-populate the review field if feedback exists
-                # But set value to empty string to prevent persistence
                 existing_review = ""
                 if not existing_feedback.empty:
                     existing_review = existing_feedback.iloc[0].get('Review', '')
-                    # We still load it to display elsewhere, but don't use it in the text area
 
-                # Add review input field with empty value to prevent persistence
+                # Add review input field
                 review = st.text_area("Mini review (optional):", 
-                                     value="", 
+                                     value=existing_review, 
                                      key=f"review_input_{unique_key}", 
                                      max_chars=200, 
                                      height=80)
@@ -777,7 +774,7 @@ def album_fixer_page():
     st.title("🛠️ Album Fixer")
     
     # Create tabs for different functions
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Add Missing Album Artwork", "Fix Album Covers with Wrong Image", "Fix Spotify Links", "Nuke Albums", "Manage Anonymous Reviews"])
+    tab1, tab2, tab3, tab4 = st.tabs(["Add Missing Album Artwork", "Fix Album Covers with Wrong Image", "Fix Spotify Links", "Nuke Albums"])
     
     with tab1:
         st.subheader("Manage Missing Album Artwork")
@@ -1179,66 +1176,6 @@ def album_fixer_page():
             st.dataframe(pd.DataFrame(st.session_state.nuked_albums))
         else:
             st.info("No albums have been nuked yet.")
-
-    with tab5:
-        st.subheader("Manage Anonymous Reviews")
-        
-        # Load public feedback
-        public_feedback_df = load_public_feedback()
-        
-        # Filter for anonymous reviews
-        anonymous_reviews = public_feedback_df[public_feedback_df['Username'] == "Anonymous"].copy()
-        
-        # Show statistics
-        col1, col2 = st.columns(2)
-        with col1:
-            st.metric("Total Reviews", len(public_feedback_df))
-        with col2:
-            st.metric("Anonymous Reviews", len(anonymous_reviews))
-        
-        if len(anonymous_reviews) == 0:
-            st.success("No anonymous reviews found!")
-        else:
-            # Display anonymous reviews with delete buttons
-            st.subheader("Anonymous Reviews")
-            
-            for idx, row in anonymous_reviews.iterrows():
-                with st.container():
-                    cols = st.columns([3, 1, 1])
-                    
-                    with cols[0]:
-                        feedback_emoji = "👍" if row['Feedback'] == 'like' else "😐" if row['Feedback'] == 'mid' else "👎"
-                        review_text = f"\"{row['Review']}\"" if row['Review'] and not pd.isna(row['Review']) else "No review text"
-                        st.write(f"**{row['Artist']} - {row['Album Name']}** {feedback_emoji}")
-                        st.write(f"Date: {row['Timestamp']}")
-                        st.write(review_text)
-                    
-                    with cols[2]:
-                        if st.button("Delete", key=f"delete_review_{idx}"):
-                            # Remove this review
-                            public_feedback_df = public_feedback_df.drop(idx)
-                            
-                            # Save the updated dataframe
-                            public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
-                            st.success(f"Deleted anonymous review for {row['Artist']} - {row['Album Name']}")
-                            
-                            # Clear cache and rerun
-                            st.cache_data.clear()
-                            st.rerun()
-            
-            # Add a button to delete all anonymous reviews
-            if st.button("Delete All Anonymous Reviews"):
-                # Remove all anonymous reviews
-                public_feedback_df = public_feedback_df[public_feedback_df['Username'] != "Anonymous"]
-                
-                # Save the updated dataframe
-                public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
-                st.success(f"Deleted all {len(anonymous_reviews)} anonymous reviews")
-                
-                # Clear cache and rerun
-                st.cache_data.clear()
-                st.rerun()
-
 
 def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")
