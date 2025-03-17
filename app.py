@@ -643,8 +643,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         else:
                             save_public_feedback(row['Album Name'], row['Artist'], 'like', username, review)
                         
-                        # Clear the review input by setting session state
-                        st.session_state[f"review_input_{unique_key}"] = ""
+                        # Just rerun - the review will be cleared because we set value=""
                         st.rerun()
 
                 # Mid Button
@@ -670,8 +669,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         else:
                             save_public_feedback(row['Album Name'], row['Artist'], 'mid', username, review)
                         
-                        # Clear the review input by setting session state
-                        st.session_state[f"review_input_{unique_key}"] = ""
+                        # Just rerun - the review will be cleared because we set value=""
                         st.rerun()
 
                 # Dislike Button
@@ -697,9 +695,9 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         else:
                             save_public_feedback(row['Album Name'], row['Artist'], 'dislike', username, review)
                         
-                        # Clear the review input by setting session state
-                        st.session_state[f"review_input_{unique_key}"] = ""
+                        # Just rerun - the review will be cleared because we set value=""
                         st.rerun()
+
 
 
                 st.markdown('</div>', unsafe_allow_html=True)  # Close the feedback-container div
