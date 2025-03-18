@@ -1563,6 +1563,22 @@ def main():
     - Automated Label Analysis
     """)
     
+# Debug section to check feedback files
+if st.sidebar.checkbox("Debug - Check Feedback Files"):
+    st.write("Checking feedback directory...")
+    st.write(f"Feedback directory exists: {os.path.exists('feedback/')}")
+    if os.path.exists('feedback/'):
+        st.write("Files in feedback directory:")
+        st.write(os.listdir('feedback/'))
+        
+        if os.path.exists('feedback/public_feedback.csv'):
+            st.write("Public feedback file exists")
+            try:
+                df = pd.read_csv('feedback/public_feedback.csv')
+                st.write(f"Public feedback entries: {len(df)}")
+            except Exception as e:
+                st.write(f"Error reading public feedback: {e}")
+    
     # Add the "Clear Cache and Refresh Data" button
     if st.sidebar.button("Clear Cache and Refresh Data"):
         st.cache_data.clear()
