@@ -785,7 +785,14 @@ def album_fixer_page():
     st.title("🛠️ Album Fixer")
     
     # Create tabs for different functions
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Add Missing Album Artwork", "Fix Album Covers with Wrong Image", "Fix Spotify Links", "Nuke Albums", "Manage Anonymous Reviews"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "Add Missing Album Artwork", 
+        "Fix Album Covers with Wrong Image", 
+        "Fix Spotify Links", 
+        "Nuke Albums", 
+        "Manage Anonymous Reviews",
+        "Data Backup & Restore"
+    ])
     
     with tab1:
         st.subheader("Manage Missing Album Artwork")
@@ -1346,7 +1353,8 @@ def album_fixer_page():
                         # Clear cache and rerun
                         st.cache_data.clear()
                         st.rerun()
-
+            with tab6:
+                data_backup_restore_tab()
 
 def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")

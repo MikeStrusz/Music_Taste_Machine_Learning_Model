@@ -785,7 +785,14 @@ def album_fixer_page():
     st.title("🛠️ Album Fixer")
     
     # Create tabs for different functions
-    tab1, tab2, tab3, tab4, tab5 = st.tabs(["Add Missing Album Artwork", "Fix Album Covers with Wrong Image", "Fix Spotify Links", "Nuke Albums", "Manage Anonymous Reviews"])
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "Add Missing Album Artwork", 
+        "Fix Album Covers with Wrong Image", 
+        "Fix Spotify Links", 
+        "Nuke Albums", 
+        "Manage Anonymous Reviews",
+        "Data Backup & Restore"
+    ])
     
     with tab1:
         st.subheader("Manage Missing Album Artwork")
@@ -1346,7 +1353,8 @@ def album_fixer_page():
                         # Clear cache and rerun
                         st.cache_data.clear()
                         st.rerun()
-
+            with tab6:
+                data_backup_restore_tab()
 
 def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")
@@ -1562,22 +1570,6 @@ def main():
     - Genre-based Learning
     - Automated Label Analysis
     """)
-    
-# Debug section to check feedback files
-if st.sidebar.checkbox("Debug - Check Feedback Files"):
-    st.write("Checking feedback directory...")
-    st.write(f"Feedback directory exists: {os.path.exists('feedback/')}")
-    if os.path.exists('feedback/'):
-        st.write("Files in feedback directory:")
-        st.write(os.listdir('feedback/'))
-        
-        if os.path.exists('feedback/public_feedback.csv'):
-            st.write("Public feedback file exists")
-            try:
-                df = pd.read_csv('feedback/public_feedback.csv')
-                st.write(f"Public feedback entries: {len(df)}")
-            except Exception as e:
-                st.write(f"Error reading public feedback: {e}")
     
     # Add the "Clear Cache and Refresh Data" button
     if st.sidebar.button("Clear Cache and Refresh Data"):
