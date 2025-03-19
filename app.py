@@ -1353,8 +1353,18 @@ def album_fixer_page():
                         # Clear cache and rerun
                         st.cache_data.clear()
                         st.rerun()
+
             with tab6:
-                data_backup_restore_tab()
+                # Import the data_backup_restore module
+                try:
+                    from data_backup_restore import data_backup_restore_tab
+                    # Call the function to render the tab content
+                    data_backup_restore_tab()
+                except ImportError:
+                    st.error("Could not load data_backup_restore module. Make sure data_backup_restore.py is in your project directory.")
+                except Exception as e:
+                    st.error(f"Error loading Data Backup & Restore tab: {e}")
+
 
 def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")
