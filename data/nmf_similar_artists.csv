@@ -1,79 +1,88 @@
-Artist,Similar Artists
-Men I Trust,"Tokyo Tea Room, The Marías, Crumb, no vacation, Vansire"
-Desire,"Glass Candy, Chromatics, Johnny Jewel, College, Farah"
-Japanese Breakfast,"Alvvays, Jay Som, Snail Mail, Soccer Mommy, Bumper"
-Greentea Peng,"Enny, IAMDDB, PIP MILLETT, Eliza, Yazmin Lacey"
-Tamino,"Warhaus, Hozier, Vlad Holiday, Isaac Gracie, mehro"
-My Morning Jacket,"Monsters of Folk, Wilco, The War on Drugs, Band of Horses, Blitzen Trapper"
-YHWH Nailgun,"Prostitute, Sprain, Gilla Band, Divorce, Model/Actriz"
-Vijay Iyer,"Vijay Iyer Trio, Ambrose Akinmusire, Charles Lloyd, Christian McBride, Ethan Iverson"
-Flying Lotus,"Teebs, Samiyam, Daedelus, J Dilla, Prefuse 73"
-Kuedo,"iTAL tEK, Pye Corner Audio, SKY H1, Holy Other, Zomby"
-Saba,"Smino, PIVOT Gang, Isaiah Rashad, EarthGang, Jid"
-More Eaze,"Rachika Nayar, Dialect, Claire Rousay, Ulla, Slowfoam"
-Phil Cook,"DeYarmond Edison, Hiss Golden Messenger, Langhorne Slim, Billy Bragg & Wilco, Megafaun"
-Barry Hyde,"Hyde & Beast, Man & The Echo, Vangoffey, OhBoy!, Weirds"
-Brian D'Addario,"Uni Boys, Michael D'Addario, The Lemon Twigs, Milk 'n' Cookies, Billy Tibbals"
-Benefits,"R.A. the Rugged Man, KRS-One, El-P, Canibus, The Beatnuts"
-Clikatat Ikatowi,"Honeywell, Thumbnail, Don Martin Three, Antioch Arrow, Sleepytime Trio"
-Deacon Blue,"The Beautiful South, Del Amitri, The Christians, Wet Wet Wet, Then Jerico"
-Cross Record,"Circuit des Yeux, Sea Oleena, Widowspeak, Miki Berenyi Trio, Trace Mountains"
-Dutch Interior,"Florry, MJ Lenderman, Wombo, Horsegirl, Cola"
-Ed Kuepper,"Died Pretty, The Triffids, Beasts of Bourbon, You Am I, The Church"
-Floodlights,"These New South Whales, RVG, Girl and Girl, King Stingray, Anna B Savage"
-Greer,"Fleece, Jhariah, Trillian, Atlas, Christian Leave"
-Gustaffson,"Peter Alexander Jobson, Seduloz, Quiet Husband, Sharon Van Etten & The Attachment Theory, Jacob Alon"
-Jaco Jaco,"Echo Thrills, Hether, Billy Uomo, BALTHVS, Fleece"
-Lonnie Holley,"Blue Lake, Irreversible Entanglements, Colin Stetson, Alabaster Deplume, Helado Negro"
-Jeffrey Lewis,"The Moldy Peaches, Kimya Dawson, The Extra Glenns, ajj, The Mountain Goats"
-Kinlaw,"Elvin Brandhi, Maxwell Sterling, Amazondotcom, Tadleeh, WHY BE"
-Ora the Molecule,"Tgc, Reave, MISUN, Burning Peacocks, Litany"
-Pictoria Vark,"Riverby, Rat Tally, Swim Camp, Smol Data, Suzie True"
-Swami John Reis,"Meat Wave, The Night Marchers, Dead Moon, The Murder City Devils, Dion Lunadon"
-The Horrors,"These New Puritans, Doves, Wild Beasts, The Kills, The Maccabees"
-The Infinity Ring,"One Leg One Eye, Lankum, Maria W Horn & Sara Parkman, Jaye Jayle, Ellereve"
-Weatherday,"Five Pebbles, Asian Glow, Weatherday, Asian Glow, birds fear death, Car Seat Headrest"
-The Taxpayers,"Ramshackle Glory, Mischief Brew, Pat The Bunny, Defiance, Ohio, Days N' Daze"
-Welly,"Deadletter, Home Counties, Courting, Man/Woman/Chainsaw, Do Nothing"
-Alice Coltrane,"Pharoah Sanders, Sun Ra, Alice Coltrane, Pharoah Sanders, Don Cherry, John Coltrane"
-Young Widows,"These Arms Are Snakes, Whores., METZ, Pissed Jeans, KEN mode"
-Ashley Jackson,"cocomi, Iiro Rantala, Lavinia Meijer, Emily Granger, Max Richter"
-Samuel Coleridge-Taylor,"Florence Beatrice Price, Louise Farrenc, Joseph Boulogne Chevalier de Saint-Georges, William Grant Still, Paul Dukas"
-Claude Debussy,"Maurice Ravel, Franz Liszt, Robert Schumann, Frédéric Chopin, Erik Satie"
-Brandee Younger,"Makaya McCraven, Matthew Halsall, Nubya Garcia, Melissa Aldana, Alfa Mist"
-Margaret Bonds,"Florence Beatrice Price, William Grant Still, George Walker, Jonathan Dove, Harry Burleigh"
-Traditional,"Ensemble Galilei, Craig Duncan, The Chieftains, Burl Ives, Jeet Gannguli"
-Macie Stewart,"shana cleveland, Hand Habits, Naima Bock, Jana Horn, This Is the Kit"
-Jessica Simpson,"Ashlee Simpson, Lindsay Lohan, Willa Ford, Hilary Duff, Mandy Moore"
-David Ramirez,"Noah Gundersen, Ryan Adams, Drew Holcomb & the Neighbors, Donovan Woods, Nathaniel Rateliff"
-Maddox Batson,"Timmy McKeever, Jenna Davis, Jonas Conner, Adrien Nunez, Zach John King"
-Ryan Hurd,"Jameson Rodgers, Jordan Davis, Cole Swindell, Parmalee, Cody Johnson"
-Amine Laje,"Miroloja, antraum, Jesse Maas, Varhat, Christopher Ledger"
-Graham Reynolds,"Panayiotis Antellis, The Scholars Baroque Ensemble, Tatiana Lisovskaya, Nikos Kalogeropoulos, Golden Arm Trio"
-Jefre Cantu-Ledesma,"Tim Hecker, Belong, Yellow Swans, Steve Hauschildt, Windy & Carl"
-Lucy Liyou,"Claire Rousay, LI YILEI, Lia Kohl, More Eaze, Rachika Nayar"
-Loradeniz,"Ah! Kosmos, Norrda, Soft Analog, Cava Grande, Hannok"
-nimino,"Swimming Paul, it's murph, LaVern, ATrip, notsobad"
-Gianni Ferrio,"Carlo Rustichelli, Francesco De Masi, Bruno Nicolai, Carlo Savina, Roberto Pregadio"
-Franco Campanino,"Paolo Vasile, Bixio-Frizzi-Tempera, Guido and Maurizio De Angelis, Lallo Gori, Franco Bixio"
-Carlo Savina,"Berto Pisano, Gianni Ferrio, Carlo Rustichelli, Bruno Nicolai, Riz Ortolani"
-Don Powell,"Roberto Pregadio and Walter Rizzati, Benedetto Ghiglia, Peter Tevis, Michele Lacerenza, Guido E Maurizio De Angelis"
-Nico Fidenco,"Stelvio Cipriani, Gianni Ferrio, Fabio Frizzi, Tony Dallara, Rita Pavone"
-Vassil Kojucharov,"sante maria romitelli, Angelo Francesco Lavagnino, Riz Ortolani, Bruno Nicolai, Carlo Rustichelli"
-Riz Ortolani,"Bruno Nicolai, Fabio Frizzi, Carlo Rustichelli, Carlo Savina, Francesco De Masi"
-Stelvio Cipriani,"Fred Bongusto, Michael Small, Nora Orlandi, Sven Libaek, Piero Umiliani"
-Bruno Nicolai,"Fabio Frizzi, Riz Ortolani, Gianni Ferrio, Francesco De Masi, Stelvio Cipriani"
-Giuseppe De Luca,"Titta Ruffo, Pasquale Amato, Robert Merrill, Renato Bruson, Carlo Galeffi"
-Daniele Patucchi,"Benedetto Ghiglia, sante maria romitelli, Angelo Francesco Lavagnino, Marcello Giombini, Enrico Simonetti"
-LA NIÑA,"Roshelle, Beatrice Quinta, Laila Al Habash, Emma Nolde, Maria Antonietta"
-Annie and the Caldwells,"The Isley Brothers, Cymande, A Song For You, James Austin, Mighty Walker Brothers"
-XIXA,"ORKESTA MENDOZA, Terror/Cactus, Rolando Bruno, Grupo Celeste, Los Beta 5"
-Bathe,"Ray Lozano, Planet Giza, Rayana Jay, Casper Sage, Baddaman cerk"
-Goya Gumbani,"iiye, Caleb Giles, Maassai, KAM-BU, Nappy Nina"
-Previous Industries,"Open Mike Eagle, E L U C I D, ShrapKnel, Heems, Blu"
-Mali,"Dhruv Visvanath, Raghav Meattle, Easy Wanderlings, Parvaaz, Nikhil D'Souza"
-Gnod,"Oneida, Ex-Easter Island Head, Shit and Shine, Harvestman, Moundabout"
-Artturi Rönkä,"Sami Jaakkola Quartet, Daniel Sommer, Tomi Nikku, Uxila Exile, Kalevi Hämäläinen Group"
-Timo Lassy,"Dalindéo, The Five Corners Quintet, Auteur Jazz, Jukka Eskola, Jo Stance"
-Selena Gomez,"Selena Gomez & the Scene, Miley Cyrus, Bridgit Mendler, Camila Cabello, Bebe Rexha"
-benny blanco,"Jawsh 685, Jung Kook, J-Hope, BTS, Charlie Puth"
+Artist,Similar Artists,status
+Japanese Breakfast,"Alvvays, Jay Som, Snail Mail, Soccer Mommy, Bumper",success
+Desire,"Glass Candy, Chromatics, Johnny Jewel, College, Sally Shapiro",success
+Greentea Peng,"Enny, IAMDDB, PIP MILLETT, Eliza, yaya bey",success
+Men I Trust,"Tokyo Tea Room, The Marías, Crumb, no vacation, Vansire",success
+Tamino,"Warhaus, Vlad Holiday, Hozier, Isaac Gracie, mehro",success
+My Morning Jacket,"Monsters of Folk, Wilco, Band of Horses, The War on Drugs, Blitzen Trapper",success
+YHWH Nailgun,"Divorce, Prostitute, Black Eyes, Sprain, Gilla Band",success
+Vijay Iyer,"Vijay Iyer Trio, Ambrose Akinmusire, Charles Lloyd, Ethan Iverson, Christian McBride",success
+Flying Lotus,"Teebs, Samiyam, Daedelus, Prefuse 73, J Dilla",success
+Kuedo,"iTAL tEK, Pye Corner Audio, SKY H1, Holy Other, Zomby",success
+Saba,"Smino, PIVOT Gang, Isaiah Rashad, EarthGang, Mick Jenkins",success
+More Eaze,"Rachika Nayar, Dialect, Claire Rousay, more eaze & kaho matsui, Ulla",success
+Brian D'Addario,"Uni Boys, Michael D'Addario, The Lemon Twigs, Milk 'n' Cookies, Billy Tibbals",success
+Phil Cook,"DeYarmond Edison, Hiss Golden Messenger, Langhorne Slim, Megafaun, Billy Bragg & Wilco",success
+Barry Hyde,"Hyde & Beast, Man & The Echo, Vangoffey, OhBoy!, Weirds",success
+Benefits,"R.A. the Rugged Man, El-P, KRS-One, Canibus, The Beatnuts",success
+Clikatat Ikatowi,"Honeywell, Thumbnail, Don Martin Three, Antioch Arrow, Sleepytime Trio",success
+Cross Record,"Circuit des Yeux, Miki Berenyi Trio, Sea Oleena, Widowspeak, Trace Mountains",success
+Deacon Blue,"Del Amitri, The Beautiful South, The Christians, Wet Wet Wet, Then Jerico",success
+Dutch Interior,"Florry, MJ Lenderman, Wombo, Cola, Man/Woman/Chainsaw",success
+Ed Kuepper,"Died Pretty, The Triffids, You Am I, Beasts of Bourbon, The Church",success
+Greer,"Fleece, Jhariah, Trillian, Atlas, Christian Leave",success
+Floodlights,"These New South Whales, Girl and Girl, King Stingray, Dick Diver, Rolling Blackouts Coastal Fever",success
+Gustaffson,"Jacob Alon, Peter Alexander Jobson, Sharon Van Etten & The Attachment Theory, Seduloz, Quiet Husband",success
+Jaco Jaco,"Hether, Echo Thrills, BALTHVS, Billy Uomo, Pink Skies",success
+Jeffrey Lewis,"The Moldy Peaches, Kimya Dawson, The Extra Glenns, ajj, The Mountain Goats",success
+Kinlaw,"Elvin Brandhi, Maxwell Sterling, Amazondotcom, Tadleeh, Lisel",success
+Lonnie Holley,"Blue Lake, Irreversible Entanglements, Colin Stetson, Alabaster Deplume, Helado Negro",success
+Ora the Molecule,"Tgc, Reave, Burning Peacocks, MISUN, Litany",success
+Swami John Reis,"Meat Wave, The Night Marchers, Dead Moon, Radioactivity, Dion Lunadon",success
+Pictoria Vark,"Riverby, Rat Tally, Swim Camp, Smol Data, Suzie True",success
+The Horrors,"These New Puritans, Doves, The Kills, Klaxons, Wild Beasts",success
+The Infinity Ring,"One Leg One Eye, Lankum, Maria W Horn & Sara Parkman, Jaye Jayle, Ellereve",success
+The Taxpayers,"Ramshackle Glory, Mischief Brew, Pat The Bunny, Defiance, Ohio, Wingnut Dishwashers Union",success
+Weatherday,"Asian Glow, Asian Glow, Weatherday, Five Pebbles, Car Seat Headrest, birds fear death",success
+Welly,"Home Counties, Deadletter, Courting, Do Nothing, Man/Woman/Chainsaw",success
+Alice Coltrane,"Pharoah Sanders, Sun Ra, Alice Coltrane, Pharoah Sanders, Don Cherry, Andrew Hill",success
+Young Widows,"These Arms Are Snakes, Whores., METZ, Pissed Jeans, KEN mode",success
+Ashley Jackson,"cocomi, Lavinia Meijer, Attacca Quartet, Emily Granger, Max Richter",success
+Samuel Coleridge-Taylor,"Florence Beatrice Price, Louise Farrenc, Joseph Boulogne Chevalier de Saint-Georges, William Grant Still, Paul Dukas",success
+Claude Debussy,"Maurice Ravel, Franz Liszt, Frédéric Chopin, Robert Schumann, Erik Satie",success
+Margaret Bonds,"Florence Beatrice Price, William Grant Still, Jonathan Dove, George Walker, Harry Burleigh",success
+Brandee Younger,"Makaya McCraven, Matthew Halsall, Nubya Garcia, Alfa Mist, Melissa Aldana",success
+Traditional,"Ensemble Galilei, Craig Duncan, The Chieftains, Burl Ives, Jeet Gannguli",success
+Macie Stewart,"Naima Bock, shana cleveland, Jana Horn, Hand Habits, Bedouine",success
+David Ramirez,"Noah Gundersen, Ryan Adams, Drew Holcomb & the Neighbors, Donovan Woods, Josh Ritter",success
+Jessica Simpson,"Ashlee Simpson, Hilary Duff, Lindsay Lohan, Willa Ford, Mandy Moore",success
+Maddox Batson,"Timmy McKeever, Jenna Davis, Jonas Conner, Adrien Nunez, Zach John King",success
+Ryan Hurd,"Jordan Davis, Jameson Rodgers, Parmalee, Cole Swindell, Morgan Wade",success
+Amine Laje,"Miroloja, antraum, Jesse Maas, Varhat, Christopher Ledger",success
+Graham Reynolds,"Panayiotis Antellis, The Scholars Baroque Ensemble, Nikos Kalogeropoulos, Tatiana Lisovskaya, Golden Arm Trio",success
+Jefre Cantu-Ledesma,"Tim Hecker, Belong, Yellow Swans, Windy & Carl, Fennesz",success
+Lucy Liyou,"Claire Rousay, LI YILEI, Lia Kohl, More Eaze, Rachika Nayar",success
+Loradeniz,"Ah! Kosmos, Norrda, Cava Grande, Soft Analog, Hannok",success
+nimino,"Swimming Paul, it's murph, tobiahs, LaVern, notsobad",success
+Sopa Boba,"Yes Basketball, Pales, Bermud, The 113",success
+Gianni Ferrio,"Carlo Rustichelli, Francesco De Masi, Bruno Nicolai, Carlo Savina, Roberto Pregadio",success
+Franco Campanino,"Paolo Vasile, Bixio-Frizzi-Tempera, Guido and Maurizio De Angelis, Lallo Gori, Franco Bixio",success
+Carlo Savina,"Berto Pisano, Gianni Ferrio, Carlo Rustichelli, Bruno Nicolai, Riz Ortolani",success
+Don Powell,"Roberto Pregadio and Walter Rizzati, Benedetto Ghiglia, Peter Tevis, Michele Lacerenza, Guido E Maurizio De Angelis",success
+Nico Fidenco,"Tony Dallara, Stelvio Cipriani, Fabio Frizzi, Gianni Ferrio, Rita Pavone",success
+Riz Ortolani,"Bruno Nicolai, Fabio Frizzi, Claudio Simonetti, Carlo Rustichelli, Carlo Savina",success
+Vassil Kojucharov,"sante maria romitelli, Angelo Francesco Lavagnino, Riz Ortolani, Carlo Rustichelli, Bruno Nicolai",success
+Bruno Nicolai,"Riz Ortolani, Fabio Frizzi, Gianni Ferrio, Francesco De Masi, Roberto Pregadio",success
+Daniele Patucchi,"Benedetto Ghiglia, sante maria romitelli, Angelo Francesco Lavagnino, Marcello Giombini, Carlo Maria Cordio",success
+Giuseppe De Luca,"Titta Ruffo, Pasquale Amato, Robert Merrill, Renato Bruson, Carlo Galeffi",success
+Stelvio Cipriani,"Fred Bongusto, Michael Small, Nora Orlandi, Piero Umiliani, Piero Piccioni",success
+LA NIÑA,"Roshelle, Beatrice Quinta, Laila Al Habash, Emma Nolde, Maria Antonietta",success
+Annie and the Caldwells,"the little shadows, The Isley Brothers, The Brothers and Sisters, Cymande, Another Taste",success
+XIXA,"ORKESTA MENDOZA, Terror/Cactus, Rolando Bruno, Grupo Celeste, Don Couto",success
+Bathe,"Odie, Lucy Park, Ray Lozano, Planet Giza, Rayana Jay",success
+Goya Gumbani,"iiye, Caleb Giles, Maassai, KAM-BU, Nappy Nina",success
+Mali,"Dhruv Visvanath, Raghav Meattle, Easy Wanderlings, Parvaaz, Nikhil D'Souza",success
+Previous Industries,"Open Mike Eagle, ShrapKnel, E L U C I D, Aesop Rock, Heems",success
+Gnod,"Oneida, Ex-Easter Island Head, Shit and Shine, Moundabout, Harvestman",success
+Timo Lassy,"Dalindéo, The Five Corners Quintet, Auteur Jazz, Jukka Eskola, Jo Stance",success
+Selena Gomez,"Selena Gomez & the Scene, Miley Cyrus, Bridgit Mendler, Camila Cabello, Selena Gomez & Marshmello",success
+Artturi Rönkä,"Sami Jaakkola Quartet, Daniel Sommer, Tomi Nikku, Mariam Sandhu, Uxila Exile",success
+benny blanco,"Jawsh 685, Jung Kook, J-Hope, BTS, Agust D",success
+PremRock,"Curly Castro, Steel Tipped Dove, Defcee, Small Bills, Skech185 and Atd",success
+Corpus Offal,"Mephitic Corpse, PURULENCY, Atavistic Decay, Reeking Aura, church of disgust",success
+Gates to Hell,"Snuffed on Sight, Simulakra, Sanction, Invoke, Year Of The Knife",success
+Spiritworld,"Enforced, Power Trip, High Command, Fugitive, Gatecreeper",success
+Bloodywood,"Heilung, Skáld, Wardruna, Nytt Land, Danheim",success
+Kassian,"Cinthie, Adam Pits, Cameo Blush, Tour-Maubourg, Tom VR",success
+Lil Bean,"Iamsu!, Lil Pete, Lil Bean & ZayBang, Mozzy, ZayBang",success
+Lola Kirke,"Kaitlin Butts, Margo Price, Katie Pruitt, Morgan Wade, Jaime Wyatt",success
