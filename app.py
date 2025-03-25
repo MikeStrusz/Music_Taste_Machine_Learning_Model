@@ -13,7 +13,7 @@ from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 from typing import Dict
-import networkx as nx 
+import networkx as nx
 
 # Check if App is Running Locally or on Streamlit's Servers
 def is_running_on_streamlit():
