@@ -1221,7 +1221,7 @@ def album_fixer_page():
         else:
             # Add filter options
             filter_options = ["All Reviews", "Anonymous Reviews Only", "Mike's Reviews Only", 
-                             "Mike-like Reviews", "Other Users' Reviews"]
+                            "Mike-like Reviews", "Other Users' Reviews"]
             filter_choice = st.radio("Filter reviews:", filter_options)
             
             # Apply filter
@@ -1353,6 +1353,7 @@ def album_fixer_page():
                         # Clear cache and rerun
                         st.cache_data.clear()
                         st.rerun()
+
     with tab6:
         # Import the data_backup_restore module
         try:
@@ -1363,7 +1364,6 @@ def album_fixer_page():
             st.error("Could not load data_backup_restore module. Make sure data_backup_restore.py is in your project directory.")
         except Exception as e:
             st.error(f"Error loading Data Backup & Restore tab: {e}")
-
 
 def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")
