@@ -527,13 +527,6 @@ def improved_album_link_matching(filtered_data, album_links_df):
         # Step 2: For missing links, try artist overlap
         missing_links = exact_match[exact_match['Spotify URL'].isna()]
         if not missing_links.empty:
-            def has_artist_overlap(artist1, artist2):
-                if pd.isna(artist1) or pd.isna(artist2):
-                    return False
-                artists1 = set(a.strip().lower() for a in artist1.split(','))
-                artists2 = set(a.strip().lower() for a in artist2.split(','))
-                return len(artists1.intersection(artists2)) > 0
-                
             for idx, row in missing_links.iterrows():
                 album_name = row['Album Name']
                 artist = row['Artist']
@@ -542,31 +535,16 @@ def improved_album_link_matching(filtered_data, album_links_df):
                 potential_matches = album_links_df[album_links_df['Album Name'] == album_name]
                 if not potential_matches.empty:
                     for _, match_row in potential_matches.iterrows():
-                        if has_artist_overlap(artist, match_row['Artist Name(s)']):
+                        # Check if any artist names overlap
+                        artists1 = set(a.strip().lower() for a in artist.split(','))
+                        artists2 = set(a.strip().lower() for a in match_row['Artist Name(s)'].split(','))
+                        if len(artists1.intersection(artists2)) > 0:
                             exact_match.loc[idx, 'Spotify URL'] = match_row['Spotify URL']
                             exact_match.loc[idx, 'Artist Name(s)'] = match_row['Artist Name(s)']
                             break
-                
-                # Step 3: If still no match, try fuzzy matching
-                if pd.isna(exact_match.loc[idx, 'Spotify URL']):
-                    # Get fuzzy matches for album name
-                    album_matches = []
-                    for _, link_row in album_links_df.iterrows():
-                        album_score = fuzz.ratio(album_name.lower(), link_row['Album Name'].lower())
-                        if album_score > 85:  # High threshold for album names
-                            album_matches.append((link_row, album_score))
-                    
-                    # Sort by score
-                    album_matches.sort(key=lambda x: x[1], reverse=True)
-                    
-                    # If we have high-confidence matches, use the best one
-                    if album_matches and album_matches[0][1] > 90:
-                        exact_match.loc[idx, 'Spotify URL'] = album_matches[0][0]['Spotify URL']
-                        exact_match.loc[idx, 'Artist Name(s)'] = album_matches[0][0]['Artist Name(s)']
         
         merged_data = exact_match
     return merged_data
-
 
 # The display_album_predictions function
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
