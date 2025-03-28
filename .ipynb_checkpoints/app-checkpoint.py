@@ -13,7 +13,7 @@ from io import BytesIO
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 from typing import Dict
-import networkx as nx
+import networkx as nx 
 
 # Check if App is Running Locally or on Streamlit's Servers
 def is_running_on_streamlit():
@@ -513,6 +513,61 @@ def get_recent_public_feedback(album_name, artist, limit=3):
     
     return recent_feedback
 
+def improved_album_link_matching(filtered_data, album_links_df):
+    merged_data = filtered_data.copy()
+    if not album_links_df.empty:
+        # Step 1: Try exact matching first
+        exact_match = filtered_data.merge(
+            album_links_df[['Album Name', 'Artist Name(s)', 'Spotify URL']],
+            left_on=['Album Name', 'Artist'],
+            right_on=['Album Name', 'Artist Name(s)'],
+            how='left'
+        )
+        
+        # Step 2: For missing links, try artist overlap
+        missing_links = exact_match[exact_match['Spotify URL'].isna()]
+        if not missing_links.empty:
+            def has_artist_overlap(artist1, artist2):
+                if pd.isna(artist1) or pd.isna(artist2):
+                    return False
+                artists1 = set(a.strip().lower() for a in artist1.split(','))
+                artists2 = set(a.strip().lower() for a in artist2.split(','))
+                return len(artists1.intersection(artists2)) > 0
+                
+            for idx, row in missing_links.iterrows():
+                album_name = row['Album Name']
+                artist = row['Artist']
+                
+                # Try album name exact match with artist overlap
+                potential_matches = album_links_df[album_links_df['Album Name'] == album_name]
+                if not potential_matches.empty:
+                    for _, match_row in potential_matches.iterrows():
+                        if has_artist_overlap(artist, match_row['Artist Name(s)']):
+                            exact_match.loc[idx, 'Spotify URL'] = match_row['Spotify URL']
+                            exact_match.loc[idx, 'Artist Name(s)'] = match_row['Artist Name(s)']
+                            break
+                
+                # Step 3: If still no match, try fuzzy matching
+                if pd.isna(exact_match.loc[idx, 'Spotify URL']):
+                    # Get fuzzy matches for album name
+                    album_matches = []
+                    for _, link_row in album_links_df.iterrows():
+                        album_score = fuzz.ratio(album_name.lower(), link_row['Album Name'].lower())
+                        if album_score > 85:  # High threshold for album names
+                            album_matches.append((link_row, album_score))
+                    
+                    # Sort by score
+                    album_matches.sort(key=lambda x: x[1], reverse=True)
+                    
+                    # If we have high-confidence matches, use the best one
+                    if album_matches and album_matches[0][1] > 90:
+                        exact_match.loc[idx, 'Spotify URL'] = album_matches[0][0]['Spotify URL']
+                        exact_match.loc[idx, 'Artist Name(s)'] = album_matches[0][0]['Artist Name(s)']
+        
+        merged_data = exact_match
+    return merged_data
+
+
 # The display_album_predictions function
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
     try:
@@ -529,15 +584,11 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
         )
         
         if not album_links_df.empty:
-            merged_data = merged_data.merge(
-                album_links_df[['Album Name', 'Artist Name(s)', 'Spotify URL']],
-                left_on=['Album Name', 'Artist'],
-                right_on=['Album Name', 'Artist Name(s)'],
-                how='left'
-            )
+            merged_data = improved_album_link_matching(merged_data, album_links_df)
     except Exception as e:
         st.error(f"Error merging data: {e}")
         merged_data = filtered_data
+
     
     filtered_albums = merged_data
     
