@@ -1,0 +1,58 @@
+Artist,Album Name,avg_score,confidence_score,Track_Count,Genres,Label,Artist_Centrality,Mood_Score,Energy_Profile,Genres_encoded,Record_Label_Frequency_Encoded
+chloe moriondo,oyster,100.0,43.93,13,"female vocalist, indie pop, indie, folk, singer-songwriter, acoustic, bedroom pop, indie rock, dream pop, ukulele",Fueled by Ramen / Public Consumption,29.38,55.36,42.42,82.7,1.0
+Unknown Mortal Orchestra,IC-02 Bogotá,100.0,44.78,8,"lo-fi, psychedelic, indie rock, indie, alternative, psychedelic rock, psychedelic pop, trip-hop, new zealand, rock",Jagjaguwar,36.04,65.26,57.03,60.83,79.4
+Hannah Cohen,Earthstar Mountain,100.0,90.91,10,"female vocalist, singer-songwriter, folk, indie, melancholy, indie folk, indie pop, usa, american, alternative",Congrats Records,1.0,48.11,37.43,79.06,1.0
+"Antt Beatz,Boldy James",Hommage,100.0,1.25,11,"rap, hip-hop, gangsta rap, hip hop, detroit, jazz rap, boom bap, conscious hip hop, drumless, the alchemist",Boldy James / Antt Beatz / EMPIRE,29.5,70.06,78.74,62.14,1.0
+Serebii,Dime,100.0,90.91,10,"new zealand, electronic, indie",Innovative Leisure,1.0,56.32,69.97,79.06,1.0
+Butcher Brown,Letters From The Atlantic,100.0,1.0,12,"jazz, funk, soul, jazz fusion, hip-hop, hip hop, fusion, jazz hop, instrumental, rap",Concord Jazz,26.21,32.1,66.04,50.19,1.0
+Great Grandpa,"Patience, Moonbeam",100.0,46.15,12,"female vocalist, indie rock, indie, noise pop, grunge, rock, usa, american, noise, pop",Run For Cover Records,44.53,12.76,53.59,56.23,26.91
+SPELLLING,Portrait of My Heart,100.0,1.0,11,"female vocalist, art pop, ethereal wave, experimental, baroque pop, synthpop, minimal synth, darkwave, progressive pop, electronic",Sacred Bones Records,36.13,42.96,60.52,56.0,2.33
+girlpuppy,Sweetness,100.0,90.0,9,"female vocalist, indie pop, electronic, indie, alternative, indie rock, singer-songwriter, acoustic, synth pop, american",Captured Tracks,41.48,7.56,43.64,77.99,1.66
+"Alison Krauss,Alison Krauss & Union Station",Arcadia,100.0,49.11,10,"female vocalist, bluegrass, country, folk, americana, alt-country, singer-songwriter, american, alison krauss, acoustic",Down The Road,1.0,17.74,35.61,63.8,1.0
+Lucy Dacus,Forever Is A Feeling,100.0,92.86,13,"female vocalist, indie, singer-songwriter, indie rock, folk, indie folk, american, indie pop, usa, queer","Lucy Dacus, under exclusive license to Geffen Records.",64.48,20.02,29.32,82.25,1.0
+Kingdom Molongi,Kembo,99.93,47.54,10,try,Nyege Nyege Tapes,1.0,12.45,43.94,63.26,1.0
+YT,OI!,99.89,51.76,12,"reggae, dancehall, ragga, dancehall reggae, british, uk, jerk, rap, haile selassie, hip-hop",G2G,1.0,54.48,48.5,65.59,1.0
+Perfume Genius,Glory,99.8,44.94,11,"singer-songwriter, ambient, experimental, indie, lo-fi, indie pop, chamber pop, art pop, american, pure",Matador,42.96,32.0,47.51,61.15,46.85
+Hans Nieswandt,Fluoreszent,99.63,45.86,10,"electronic, house, techno, deutsch, german, chillout, electronica, electro, germany, club",Bureau B,1.0,53.27,68.77,63.39,1.0
+Pug Johnson,El Cabron,99.31,32.61,11,"red dirt,texas country",Break Maiden Records,1.0,61.96,38.74,63.26,1.0
+Wallows,More,98.41,41.49,7,"indie, indie rock, alternative, indie pop, rock, alternative rock, usa, american, los angeles, pop",Atlantic Records,46.68,59.49,61.96,78.6,90.7
+Ruger,BlownBoy RU,97.32,82.15,13,"afrobeats, pop, nigeria, trap, afropop, nigerian pop, street pop",Promised Land Recordings,1.0,39.76,46.94,63.7,1.0
+Moomin,Into The Distance,97.01,71.12,10,"deep house, house, electronic, reggae, j-reggae, minimal, smallville, japanese, dancehall, japanese reggae",Oathcreations,1.0,61.08,55.72,62.29,1.0
+Postcards,Ripe,97.01,83.12,10,"female vocalist, indie pop, indie, lebanon, dream pop, montreal, country, indie rock, pop punk, under 2000 listeners",Ruptured,1.0,20.87,78.53,77.06,1.0
+Jessie Reyez,PAID IN MEMORIES,96.88,72.47,20,"female vocalist, pop, rnb, soul, canadian, hip-hop, jessie reyez, hip hop, canada, contemporary",Jessie Reyez Profit Split,1.0,35.19,40.9,64.56,1.0
+Maya Delilah,The Long Way Round,96.54,34.86,12,"female vocalist, soul, rnb, pop, singer-songwriter, guitar, jazz, british, uk, funk",Blue Note Records,1.0,34.44,63.35,65.38,1.0
+Salin,Rammana,94.66,42.63,10,"soul, funk, rnb, canadian, drums, montreal, quebec, neo soul, neo-soul, female drummers",Salin,1.0,50.43,45.41,64.86,1.0
+Somebody's Child,When Youth Fades Away,92.22,42.88,11,"indie pop, indie rock, pop rock, irish, ireland, indie-pop",Frenchkiss Records,1.0,33.08,74.44,78.72,8.31
+Free Range,Lost & Found,90.81,39.67,13,"techno, experimental, ebm, folk, electro, house, american, acid, indie folk, folk pop",Mick Music,53.31,44.84,50.56,62.32,7.64
+Sam Akpro,Evenfall,90.71,1.0,10,"electronic, alternative, alternative rnb",Anti/Epitaph,1.0,61.75,67.11,61.47,97.34
+Will Smith,Based on a True Story,89.59,24.98,14,"hip-hop, rap, pop, hip hop, rnb, will smith, american, 90s, dance, philadelphia",SLANG X Influence,10.7,86.64,45.14,65.26,1.0
+Mess Esque,"Jay Marie, Comfort Me",84.13,17.16,8,"indie, indie pop, indie rock, post-rock, dream pop, australian, australia, two-piece, 2020s, milk records",Drag City,1.0,27.3,36.85,75.94,6.32
+The Sure Fire Soul Ensemble,Gemini,83.93,1.0,11,"jazz, funk, soul, deep funk, jazz fusion, usa, jazz funk, afrobeat, breakbeats, united states",Colemine Records,1.0,62.17,42.78,60.16,1.0
+Destroyer,Dan's Boogie,82.56,1.0,9,"indie, indie rock, canadian, singer-songwriter, indie pop, chamber pop, alternative, rock, lo-fi, pop",Merge Records,14.38,29.07,60.32,82.63,38.21
+Bria Salmena,Big Dog,80.87,1.0,12,"country, canada, shoegaze",Sub Pop Records,1.0,35.48,59.86,59.16,83.39
+CocoRosie,Little Death Wishes,80.54,39.56,12,"female vocalist, indie, experimental, folk, freak folk, alternative, new weird america, electronic, indie rock, lo-fi",Joyful Noise Recordings,1.0,33.6,58.09,62.85,10.3
+Cactus Lee,Cactus Lee,77.48,1.0,10,"country, americana, folk",Western Vinyl,12.07,56.24,78.85,73.03,1.66
+"Little Dragon,Yukimi",For You,73.97,36.98,13,"indie, electronic, electronica, ninja tune, ethereal, rnb, neo-soul, art pop",Ninja Tune,1.0,76.95,58.83,69.18,8.97
+Quinine,First Ever Whippet On Acid,73.38,31.7,12,"alternative rock, shoegaze, sacramento",Winspear,1.0,30.97,69.81,61.44,10.97
+SACRED PAWS,Jump Into Life,66.3,1.0,11,"post-punk, scottish, indie, indie pop, female, punk, indie rock, jangle pop, glasgow, scotland",Merge Records,1.0,33.24,78.35,82.48,38.21
+James Elkington,Pastel De Nada,63.35,1.0,27,"folk, country, singer-songwriter, british, uk, instrumental, acoustic, guitar, england, avant-garde",No Quarter,1.0,44.17,55.35,54.03,10.3
+Logic1000,DJ-Kicks: Logic1000,59.52,1.0,35,"female vocalist, trip-hop, ethereal wave, trip hop, electronic, germany, dream pop, synthpop, ambient dub, australia | electronic, ambient, ambient dub, dub, instrumental, american, dub techno, atmospheric drum and bass, chicago, ambient techno | electronic, ambient, kompakt, minimal, techno, minimal techno, microhouse, glitch, electronica, idm",!K7 Records,1.0,41.25,81.92,45.27,1.0
+Fusilier,Ambush,56.33,1.0,9,"electronica, soul, alternative, rhythm and blues, afro-beat, afro-punk",IS NOT MUSIC.,1.0,50.47,63.89,64.93,1.0
+Snapped Ankles,Hard Times Furious Dancing,51.63,72.93,9,"post-punk, krautrock, crank wave, garage rock, psychedelic rock, experimental, indie rock, art punk, electronic, england",The Leaf Label,8.86,31.98,63.7,51.78,1.0
+"Amelia Barratt,Bryan Ferry",Loose Talk,50.56,67.06,11,"glam rock, 80s, new wave, rock, pop, british, singer-songwriter, new romantic, classic rock, art rock",Dene Jesmond Enterprises,1.0,26.4,56.3,59.04,1.0
+Shit And Shine,Mannheim Hbf,50.21,1.0,11,"noise rock, noise, experimental, psychedelic, drone, stoner rock, techno, industrial, electro, london",12XU,1.0,30.26,60.79,16.43,1.0
+CEM,FORMA,49.77,1.0,6,"ambient, experimental, electro, techno, glitch",Danse Noire,1.0,8.42,51.65,23.54,1.0
+Mumford & Sons,RUSHMERE,48.0,81.21,10,"folk, indie, british, acoustic, bluegrass, indie folk, folk rock, alternative, rock, alt-country",Glassnote Entertainment Group LLC,22.74,33.48,47.77,72.2,15.62
+Dead Meadow,Voyager To Voyager,46.86,62.7,8,"stoner rock, psychedelic, psychedelic rock, indie rock, indie, rock, stoner, space rock, neo-psychedelia, american",Heavy Psych Sounds,1.0,39.99,49.36,54.97,1.0
+OHYUNG,You Are Always On My Mind,45.82,65.14,11,"ambient, experimental, hip-hop, electronic, rap, usa, abstract, brooklyn, queer, experimental rap",NNA Tapes,1.0,31.73,42.64,42.7,1.0
+DJ Python,i was put on this earth,45.55,60.5,5,"deep house, house, electronic, deep reggaeton, reggaeton, ambient house, usa, idm, new york, latin",XL Recordings,1.0,35.05,53.75,57.84,26.25
+" Blake & Grant,Bernard Butler,Butler","Butler, Blake and Grant",44.83,56.18,10,"progressive rock, 70s, indiepop, psychedelic, new zealand, maori, psychedelic rock, christchurch",355 Recordings,1.0,29.09,35.34,44.41,1.0
+JIVEBOMB,ETHEREAL,44.02,84.13,10,"female vocalist, hardcore, hardcore punk, punk, female vocal, baltimore, maryland, rock, usa, american",Flatspot Records,1.0,29.94,70.47,47.63,1.0
+Bag People,Bag People,40.17,84.95,12,"noise rock, post-punk",Drag City,1.0,18.66,71.2,40.75,6.32
+Palmyra,Restless,39.82,82.19,10,"folk, usa, technical death metal, deathcore, welcome to nightvale, technical deathcore",Oh Boy Records,1.0,30.23,54.06,33.11,8.31
+lilo,Blood Ties,39.72,65.87,10,"idm, breaks, dresden, deutsch, breakcore, sachsen, electronic, mexico, under 2000 listeners, suburban trash industries",Dalliance Recordings,1.0,12.3,41.67,56.54,1.0
+"Function,Mønic,Regis,Rivet,Sandwell District",End Beginnings,39.64,81.91,8,"techno, minimal techno, dub techno, minimal, electronic, experimental, ambient, industrial techno, ambient techno, deep techno",Point Of Departure,1.0,42.57,56.11,42.09,1.0
+"Pacific Coliseum,Teen Daze",Voice Wave,34.28,65.98,12,"canadian, balearic beat, downtempo, canada, chillwave",Noire & Blanche,1.0,55.73,52.93,44.54,1.0
+Yetsuby,4EVA,33.46,73.13,10,"electronic, experimental, idm, ambient, techno, vocal, downtempo, singer-songwriter, industrial, house",Pink Oyster,1.0,42.21,64.57,30.87,1.0
+Photay,Windswept,32.95,33.85,9,"ambient, electronic, experimental, chillwave, indie, electronica, usa, instrumental, indie electronic, house",Mexican Summer,1.0,15.65,44.19,39.72,8.97
+Wolfgang Flür,Times,32.21,80.17,13,"electronic, germany, experimental, electro, 70s, 80s, ambient, progressive rock, new age, space",SFE,1.0,50.6,61.13,39.55,1.0
