@@ -1,63 +1,64 @@
 Artist,Album Name,avg_score,confidence_score,track_count,Genres,Label,Artist_Centrality,Mood_Score,Energy_Profile
-Ball Park Music,Like Love,100.0,86.88,20,"female vocalist, indie pop, australian, indie, indie rock, unearthed, aussie, pop, rock, piano | collection, female vocalist, indie pop, australian",Prawn Records,36.66,15.06,83.86
-"George Clanton, TV Girl",Fauxllennium (Japanese Deluxe Edition),100.0,80.72,28,"indie pop, lo-fi, indie, chillwave, pop, san diego, american, dream pop, california, birp | indie pop, pop, lo-fi, shoegaze, dream pop, free downloads, indie dance, albums","Blissful Serenity Industries, LLC",47.25,48.09,49.2
-Craig Finn,Always Been,100.0,91.96,22,"albums, rock, singer-songwriter, alternative | rock, singer-songwriter, alternative, alt-country, usa, indie, minnesota, folk, american",Tamarac,32.3,53.94,54.5
-Babe Rainbow,Slipper imp and shakaerator,100.0,91.3,22,"psychedelic pop, sunshine pop, psychedelic rock, soft rock, psychedelic, neo-psychedelia | electronic, psychedelic, doomstep",KGLW - pdoom,60.93,100.0,53.34
-SYML,Nobody Lives Here,100.0,54.17,22,"indie, indie pop, dream pop, pop, american, chillout, electronic, folk, post-rock, usa",Nettwerk Music Group,46.4,18.61,53.72
-Rachel Chinouriri,Little House,100.0,74.86,12,"indie pop, indie rock, pop rock, cozy, female vocalist, pop, indie | singer-songwriter, alternative, indie pop, indie rock, pop rock, rnb, english, bedroom pop | female vocalist, pop, indie pop, indie, singer-songwriter, rnb, british, alternative, britpop, electronic",Parlophone UK,41.88,57.53,74.9
-"Homeboy Sandman, yeyts.",Corn Hole Legend,100.0,81.82,10,"hip-hop, underground hip-hop, rap, hip hop, stones throw, new york, underground rap, american, underground hip hop, queens",Homeboy Sandman,56.94,72.61,64.47
-Miki Berenyi Trio,Tripla,100.0,55.14,9,"shoegaze, dream pop, indie pop",Bella Union,1.0,41.63,57.68
-Wet,Two Lives,100.0,93.83,22,"alternative, female vocalist, indie pop, electronic | female vocalist, indie pop, electronic, alternative rnb, ambient, indie, punk, american, usa, synthpop",30SF,34.17,37.15,42.41
-Jon Bryant,Therapy Notes,99.97,45.95,13,"folk, blues, indie, canadian, jazz, pop, rock, indie rock, singer-songwriter, pop rock",Nettwerk Music Group,1.0,45.26,53.51
-"David Longstreth, Dirty Projectors, stargaze",Song of the Earth,99.85,87.06,48,"female vocalist, experimental, indie, freak folk, folk, indie rock, indie pop, american, new york, avant-garde",New Amsterdam/Nonesuch,59.34,36.15,35.17
-The Ophelias,Spring Grove,98.24,34.18,26,"female vocalist, indie rock, indie | female vocalist, indie rock, indie, indie pop, pop rock, sf, komotion, alternative, progressive rock",Get Better Records,25.27,44.5,53.58
-Sleigh Bells,Bunky Becky Birthday Boy,97.99,41.22,22,"female vocalist, electronic, noise pop | noise pop, electronic, indie, lo-fi, female vocalist, alternative, hip-hop",Mom+Pop,37.17,49.89,75.42
-Σtella,Adagio,97.97,32.96,9,"female vocalist, indie pop, greek",Sub Pop Records,1.0,60.08,47.19
-Sarah Mary Chadwick,"Take Me Out To a Bar / What Am I, Gatsby?",97.44,38.37,9,"female vocalist, indie, singer-songwriter, soul, singer songwriter, indie pop, sad, australian, folk rock",Kill Rock Stars,1.0,25.25,59.75
-Malcolm Todd,Malcolm Todd,95.47,12.54,14,"alternative rnb, indie, indie rock",Columbia,7.99,51.39,60.59
-Will Johnson,Diamond City,93.87,22.68,9,"singer-songwriter, folk, indie, indie rock, alt-country, duyster, texas, alternative rock, americana, melancholy",Keeled Scales,1.0,21.83,78.67
-Brandi Carlile,Who Believes In Angels?,92.28,15.63,13,"americana, folk rock, singer-songwriter, alt-country, indie, country, folk, indie folk | folk, americana, country, singer-songwriter, blues, folk rock, vinyl | female vocalist, singer-songwriter, folk, indie, alt-country, acoustic, rock, american, country, folk rock",EMI,9.82,21.36,69.41
-Lily Seabird,Trash Mountain,90.03,21.38,9,"indie pop, indie rock, lo-fi, singer-songwriter, dream pop, american, vermont",Lame-O Records,1.0,18.24,58.14
-Florist,Jellywish,87.36,26.62,20,"indie folk, folk, ambient, indie, singer-songwriter, calm, indie pop, usa, pop | female vocalist, indie pop, lo-fi, indie folk, folk, usa, indie, pop, american, folk pop",Double Double Whammy,52.23,31.64,68.85
-The Nightingales,The Awful Truth,84.62,30.97,13,"post-punk, punk, john peel, alternative, england, birmingham, klangbad, soul, indie rock",Fire Records,1.0,23.17,69.55
-Momma,Welcome to My Blue Sky,83.15,26.79,36,"female vocalist, indie rock, indie, alternative, rock, usa, grunge, indie pop, garage, pop | female vocalist, indie rock, indie | indie rock, indie, rock, grunge, alternative, emo, usa, car",Polyvinyl Records,65.43,59.54,52.38
-Mekons,Horror,73.16,21.07,12,"female vocalist, post-punk, punk, british, alt-country, indie, punk rock, alternative, rock, alternative rock",Fire Records,1.0,46.8,62.61
-Glare,Sunset Funeral,66.67,22.61,11,"shoegaze, post-punk, indie rock, dream pop, indie, rock, alternative, screamo, rock pop, skramz",Deathwish Inc.,1.0,29.05,45.35
-Brown Horse,All The Right Weaknesses,64.79,1.0,11,"indie rock, folk rock, country rock, british, alt-country, norwich",Loose Music,1.0,38.48,44.89
-Essence Martins,Sleeping On It,63.61,1.0,6,"indie, soul, british, folk, singer-songwriter",Essence Martins / FAE,1.0,37.53,39.18
-The Waterboys,"Life, Death And Dennis Hopper",60.47,1.0,25,"folk rock, rock, celtic, alternative, celtic rock, folk, irish, british, scottish",Sun Records,12.07,46.67,40.5
-Dumb Things,Self Help,59.52,1.0,10,"jangle pop, australia, brisbane, slacker pop, hidden bay records",Dumb Things,1.0,49.31,62.17
-Record Setter,Evoke Invoke,57.97,1.0,6,"screamo, emo, post-hardcore, punk, punk rock, rock, waiting, american, fun, melodic hardcore",Record Setter,9.61,21.08,67.59
-"Black Country, New Road",Forever Howlong,54.87,1.0,11,"hard rock, blues rock, rock, classic rock, supergroup, blues, glenn hughes, joe bonamassa, american",Ninja Tune,1.0,36.65,67.95
-Panchiko,Ginkgo,54.19,1.0,13,"indie, rock, alternative rock, indie pop, indie rock, downtempo, pop rock, dream pop, psychedelia, neo-psychedelia",Nettwerk Music Group,1.0,48.89,46.19
-Mannequin Death Squad,Wise and Dangerous,53.7,1.0,11,"punk, rock, grunge, alternative rock, punk rock, australia, melbourne",Mannequin Death Squad,1.0,48.89,37.79
-duendita,a strong desire to survive,53.25,1.0,10,"rnb, soul, hip-hop, jazz, female, hip hop, new york, united states",10k,8.0,20.95,48.8
-Skrillex,F*CK U SKRILLEX YOU THINK UR ANDY WARHOL BUT UR NOT!! <3,52.72,1.0,34,"dubstep, hybrid trap, electronic, cool, trap, edm, breakcore, electro, electronica",OWSLA/Atlantic,1.0,61.04,68.76
-"Andrew, Jesse the Tree, sleepingdogs",DOGSTOEVSKY,52.56,1.37,12,usa,Three Dollar Pistol Music LLC,1.0,58.03,35.8
-Ursula,I Don't Like Anything,51.36,1.0,13,"estonian, eesti, indie, rock, alternative, indie rock, ursula, estonia, punk, alternative rock",Indecision Records,1.0,24.92,73.25
-Jane Remover,Revengeseekerz,50.53,1.0,12,"rage, digicore, industrial hip hop, bass house, electronic, hip hop, electroclash, female vocalist, shoegaze, indietronica",deadAir,1.0,36.95,37.95
-Sweet Williams,Four Five,49.99,1.0,45,"indie, post-rock, slowcore, brighton, noise-rock, sloath, charlottefield, anteojos booking",Wrong Speed Records,1.0,24.68,67.33
-L.A. WITCH,DOGGOD,49.82,1.0,9,"female vocalist, garage rock, lo-fi, indie, rock, indie rock, psychedelic rock, usa, alternative rock, california",Suicide Squeeze Records,1.0,30.06,42.02
-Kitchen,"Blue Heeler in Ugly Snowlight, Grey on Gray on Gray on White",48.95,21.34,20,"experimental, slowcore, instrumental, lo-fi, bedroom pop, swiss, basel, rare sads, canada, post rock",okwhatever,1.0,33.86,37.37
-Sister Ray,Believer,48.92,1.0,11,"indie, folk, indie pop, indie rock, indie folk, think about you, chillout, electronic, electronica, hip hop",Royal Mountain Records,1.0,39.95,62.73
-Buffet Lunch,Perfect Hit!,47.68,3.78,13,"indie rock, lo-fi, post-punk, art rock, punk rock, art punk",Upset The Rhythm,1.0,47.8,52.14
-Hataalii,I'LL BE AROUND,47.33,1.0,14,"indie, rock, country, indie pop, indie rock, post punk",Panther Mountain,1.0,30.86,38.37
-Heaven,Dream Aloud,46.98,1.0,10,"female vocalist, horrorcore, hard rock, heavy metal, underground hip-hop, melodic rock, aor, hip-hop, rock, synthpop",Telepathic Love Records,1.0,52.4,65.64
-Florida Man,Plastique,46.37,54.85,9,"post-punk, noise, haunted, noise rock, lo-fi, post punk, noise punk, fallow field, electronic, punk",Florida Man,1.0,35.32,63.46
-DJ Koze,Music Can Hear Us,46.33,31.84,15,"electronic, minimal, techno, kompakt, electronica, minimal techno, house, german, electro, tech house",Pampa Records,10.44,22.04,81.14
-Index For Working Musik,Which Direction Goes The Beam,45.85,27.73,12,"experimental, indie rock, post-punk, krautrock, art rock, psychedelic rock, united kingdom",Tough Love Records,1.0,32.92,76.59
-Scowl,Are We All Angels,45.14,1.0,11,"female vocalist, hardcore, hardcore punk, punk, grindcore, powerviolence, punk rock, alternative rock, usa, female vocal",Dead Oceans,1.0,44.25,77.28
-Djo,The Crux,43.7,27.97,12,"eclectic, psychedelic pop, indie, psychedelic",Twenty20 LLC,1.0,39.58,51.3
-Babebee,all that heaven allows,41.22,1.0,11,"electronic, hyperpop, electropop, glitch, queer, bedroom pop, art pop",Lauren Records,1.0,22.65,61.02
-Kyle Gordon,Kyle Gordon Is Wonderful,40.71,1.0,20,"eurodance, comedy, parody, electropop, pop, usa, dance, american, dj, dance pop",BMG Rights Management (US) LLC,1.0,47.64,40.27
-Riki Lindhome,No Worries If Not,39.81,1.0,13,"female vocalist, acoustic, indie, singer-songwriter, alternative, experimental, american, california, novelty, actresses",No Worries If Not,1.0,42.46,52.73
-Camp Trash,Camp Trash / Dowsing,39.76,1.0,6,"emo, indie rock, pop punk, indie, alternative, midwest emo, pop, power pop, usa, pop rock | emo, midwest emo, indie, pop punk, pop-punk, indie rock, american, punk rock, chicago, indiemo",Camp Trash,13.86,35.86,53.56
-Snooze,I KNOW HOW YOU WILL DIE,39.02,4.93,13,"female vocalist, chillout, lounge, downtempo, electronic, math rock, french, trip-hop, rock, acid jazz",649467 Records DK,1.0,10.04,64.02
-Dustin Wong,Gloria,37.79,59.18,14,"experimental, wave electronic, minimalism, noise, instrumental, post-rock, lo-fi, minimalist, ambient, kurt",Hausu Mountain,1.0,30.06,62.2
-Baerd,"Lookout, Look Out",37.54,1.0,8,"indie, folk, indie rock, indie pop, usa, spacey, indie folk, bedroom pop",Tone Tree Music / Baerd,21.32,36.14,70.04
-Penelope Trappes,A Requiem,37.0,1.0,10,"female vocalist, ambient, experimental, ethereal, ambient pop, electronic, dark ambient, ethereal wave, singer-songwriter, australian",One Little Independent,1.0,6.24,73.82
-Anika,Abyss,36.14,1.0,10,"female vocalist, electronic, lo-fi, avant-garde, experimental, post-punk, dub, stones throw, beat, no wave",Sacred Bones Records,1.0,36.03,63.27
-Marina Sena,Coisas Naturais,36.1,1.0,13,"peter, mpb, pop, brazilian, latin pop, indie, female vocalist, ethnic, greek",Sony Music Entertainment,1.0,39.83,42.42
-"Michael Grigoni, Pan-American","New World, Lonely Ride",34.94,1.0,10,"ambient, electronic, post-rock, experimental, electronica, minimal, kranky, idm, post rock, drone",kranky,1.0,14.9,81.46
-Marlon Williams,Te Whare Tīwekaweka,30.78,5.04,14,"country, new zealand, folk",Marlon Williams,1.0,33.31,77.72
-Pigs Pigs Pigs Pigs Pigs Pigs Pigs,Death Hilarious,30.72,1.0,9,"stoner rock, stoner metal, sludge, doom metal, psychedelic rock, noise rock, united kingdom, england, sludge metal, british",Missing Piece Records,1.0,27.26,81.32
+"George Clanton, TV Girl",Fauxllennium (Japanese Deluxe Edition),100.0,88.31,28,"indie pop, lo-fi, indie, chillwave, pop, san diego, american, dream pop, california, birp | indie pop, pop, lo-fi, shoegaze, dream pop, free downloads, indie dance, albums","Blissful Serenity Industries, LLC",40.56,48.09,49.2
+Wet,Two Lives,100.0,93.48,22,"female vocalist, indie pop, electronic, alternative rnb, ambient, indie, punk, american, usa, synthpop | alternative, female vocalist, indie pop, electronic",30SF,29.37,37.15,42.41
+Malcolm Todd,Malcolm Todd,100.0,46.67,14,"alternative rnb, indie, indie rock",Columbia,6.98,51.39,60.59
+Rachel Chinouriri,Little House,100.0,70.94,12,"female vocalist, pop, indie pop, indie, singer-songwriter, rnb, british, alternative, britpop, electronic | indie pop, indie rock, pop rock, cozy, female vocalist, pop, indie | singer-songwriter, alternative, indie pop, indie rock, pop rock, rnb, english, bedroom pop",Parlophone UK,35.96,57.53,74.9
+Ball Park Music,Like Love,100.0,71.38,20,"female vocalist, indie pop, australian, indie, indie rock, unearthed, aussie, pop, rock, piano | collection, female vocalist, indie pop, australian",Prawn Records,31.5,15.06,83.86
+Miki Berenyi Trio,Tripla,100.0,56.89,9,"shoegaze, dream pop, indie pop",Bella Union,1.0,41.63,57.68
+"David Longstreth, Dirty Projectors, stargaze",Song of the Earth,100.0,95.92,48,"female vocalist, experimental, indie, freak folk, folk, indie rock, indie pop, american, new york, avant-garde",New Amsterdam/Nonesuch,50.9,36.15,35.17
+Babe Rainbow,Slipper imp and shakaerator,100.0,95.65,22,"electronic, psychedelic, doomstep | psychedelic pop, sunshine pop, psychedelic rock, soft rock, psychedelic, neo-psychedelia",KGLW - pdoom,52.26,100.0,53.34
+"Homeboy Sandman, yeyts.",Corn Hole Legend,100.0,81.82,10,"hip-hop, underground hip-hop, rap, hip hop, stones throw, new york, underground rap, american, underground hip hop, queens",Homeboy Sandman,48.85,72.61,64.47
+SYML,Nobody Lives Here,100.0,63.84,22,"indie, indie pop, dream pop, pop, american, chillout, electronic, folk, post-rock, usa",Nettwerk Music Group,39.83,18.61,53.72
+Craig Finn,Always Been,99.91,93.76,22,"albums, rock, singer-songwriter, alternative | rock, singer-songwriter, alternative, alt-country, usa, indie, minnesota, folk, american",Tamarac,27.77,53.94,54.5
+The Ophelias,Spring Grove,99.83,46.55,26,"female vocalist, indie rock, indie, indie pop, pop rock, sf, komotion, alternative, progressive rock | female vocalist, indie rock, indie",Get Better Records,21.75,44.5,53.58
+Record Setter,Evoke Invoke,99.4,79.98,6,"screamo, emo, post-hardcore, punk, punk rock, rock, waiting, american, fun, melodic hardcore",Record Setter,8.36,21.08,67.59
+Σtella,Adagio,99.23,59.05,9,"female vocalist, indie pop, greek",Sub Pop Records,1.0,60.08,47.19
+Sarah Mary Chadwick,"Take Me Out To a Bar / What Am I, Gatsby?",98.59,39.93,9,"female vocalist, indie, singer-songwriter, soul, singer songwriter, indie pop, sad, australian, folk rock",Kill Rock Stars,1.0,25.25,59.75
+Sleigh Bells,Bunky Becky Birthday Boy,97.17,36.04,22,"female vocalist, electronic, noise pop | noise pop, electronic, indie, lo-fi, female vocalist, alternative, hip-hop",Mom+Pop,31.94,49.89,75.42
+Will Johnson,Diamond City,96.46,39.0,9,"singer-songwriter, folk, indie, indie rock, alt-country, duyster, texas, alternative rock, americana, melancholy",Keeled Scales,1.0,21.83,78.67
+Jane Remover,Revengeseekerz,95.85,79.91,12,"rage, digicore, industrial hip hop, bass house, electronic, hip hop, electroclash, female vocalist, shoegaze, indietronica",deadAir,1.0,36.95,37.95
+Sweet Williams,Four Five,95.49,73.06,45,"indie, post-rock, slowcore, brighton, noise-rock, sloath, charlottefield, anteojos booking",Wrong Speed Records,1.0,24.68,67.33
+Jon Bryant,Therapy Notes,95.16,36.46,13,"folk, blues, indie, canadian, jazz, pop, rock, indie rock, singer-songwriter, pop rock",Nettwerk Music Group,1.0,45.26,53.51
+"Black Country, New Road",Forever Howlong,94.53,38.54,11,"hard rock, blues rock, rock, classic rock, supergroup, blues, glenn hughes, joe bonamassa, american",Ninja Tune,1.0,36.65,67.95
+L.A. WITCH,DOGGOD,94.48,75.29,9,"female vocalist, garage rock, lo-fi, indie, rock, indie rock, psychedelic rock, usa, alternative rock, california",Suicide Squeeze Records,1.0,30.06,42.02
+Lily Seabird,Trash Mountain,87.25,38.16,9,"indie pop, indie rock, lo-fi, singer-songwriter, dream pop, american, vermont",Lame-O Records,1.0,18.24,58.14
+Brandi Carlile,Who Believes In Angels?,86.54,24.57,13,"female vocalist, singer-songwriter, folk, indie, alt-country, acoustic, rock, american, country, folk rock | pop, classic rock, singer-songwriter, rock, piano, british, elton john, male vocalists | folk, americana, country, singer-songwriter, blues, folk rock, vinyl",EMI,8.54,21.36,69.41
+Momma,Welcome to My Blue Sky,85.95,38.1,36,"indie rock, indie, rock, grunge, alternative, emo, usa, car | female vocalist, indie rock, indie | female vocalist, indie rock, indie, alternative, rock, usa, grunge, indie pop, garage, pop",Polyvinyl Records,56.1,59.54,52.38
+Florist,Jellywish,85.91,34.63,20,"female vocalist, indie pop, lo-fi, indie folk, folk, usa, indie, pop, american, folk pop | indie folk, folk, ambient, indie, singer-songwriter, calm, indie pop, usa, pop",Double Double Whammy,44.82,31.64,68.85
+Brown Horse,All The Right Weaknesses,85.7,1.0,11,"indie rock, folk rock, country rock, british, alt-country, norwich",Loose Music,1.0,38.48,44.89
+Riki Lindhome,No Worries If Not,84.16,73.81,13,"female vocalist, acoustic, indie, singer-songwriter, alternative, experimental, american, california, novelty, actresses",No Worries If Not,1.0,42.46,52.73
+Mekons,Horror,82.18,30.41,12,"female vocalist, post-punk, punk, british, alt-country, indie, punk rock, alternative, rock, alternative rock",Fire Records,1.0,46.8,62.61
+The Nightingales,The Awful Truth,82.11,40.04,13,"post-punk, punk, john peel, alternative, england, birmingham, klangbad, soul, indie rock",Fire Records,1.0,23.17,69.55
+"Andrew, Jesse the Tree, sleepingdogs",DOGSTOEVSKY,79.1,11.39,12,usa,Three Dollar Pistol Music LLC,1.0,58.03,35.8
+Glare,Sunset Funeral,71.02,39.21,11,"shoegaze, post-punk, indie rock, dream pop, indie, rock, alternative, screamo, rock pop, skramz",Deathwish Inc.,1.0,29.05,45.35
+Essence Martins,Sleeping On It,69.05,16.33,6,"indie, soul, british, folk, singer-songwriter",Essence Martins / FAE,1.0,37.53,39.18
+Heaven,Dream Aloud,64.09,15.89,10,"female vocalist, horrorcore, hard rock, heavy metal, underground hip-hop, melodic rock, aor, hip-hop, rock, synthpop",Telepathic Love Records,1.0,52.4,65.64
+Mannequin Death Squad,Wise and Dangerous,61.66,1.0,11,"punk, rock, grunge, alternative rock, punk rock, australia, melbourne",Mannequin Death Squad,1.0,48.89,37.79
+Buffet Lunch,Perfect Hit!,58.21,8.87,13,"indie rock, lo-fi, post-punk, art rock, punk rock, art punk",Upset The Rhythm,1.0,47.8,52.14
+Skrillex,F*CK U SKRILLEX YOU THINK UR ANDY WARHOL BUT UR NOT!! <3,57.85,1.35,34,"dubstep, hybrid trap, electronic, cool, trap, edm, breakcore, electro, electronica",OWSLA/Atlantic,1.0,61.04,68.76
+Panchiko,Ginkgo,57.17,1.0,13,"indie, rock, alternative rock, indie pop, indie rock, downtempo, pop rock, dream pop, psychedelia, neo-psychedelia",Nettwerk Music Group,1.0,48.89,46.19
+Roomer,Leaving It All to Chance,56.58,1.0,9,Indie Rock,Squama,1.0,19.16,77.56
+The Waterboys,"Life, Death And Dennis Hopper",54.4,1.0,25,"folk rock, rock, celtic, alternative, celtic rock, folk, irish, british, scottish",Sun Records,10.47,46.67,40.5
+Dumb Things,Self Help,53.89,1.0,10,"jangle pop, australia, brisbane, slacker pop, hidden bay records",Dumb Things,1.0,49.31,62.17
+duendita,a strong desire to survive,53.81,1.0,10,"rnb, soul, hip-hop, jazz, female, hip hop, new york, united states",10k,6.98,20.95,48.8
+Ursula,I Don't Like Anything,51.23,1.0,13,"estonian, eesti, indie, rock, alternative, indie rock, ursula, estonia, punk, alternative rock",Indecision Records,1.0,24.92,73.25
+DJ Koze,Music Can Hear Us,50.69,48.12,15,"electronic, minimal, techno, kompakt, electronica, minimal techno, house, german, electro, tech house",Pampa Records,9.07,22.04,81.14
+Anika,Abyss,48.09,80.34,10,"female vocalist, electronic, lo-fi, avant-garde, experimental, post-punk, dub, stones throw, beat, no wave",Sacred Bones Records,1.0,36.03,63.27
+Scowl,Are We All Angels,47.9,1.0,11,"female vocalist, hardcore, hardcore punk, punk, grindcore, powerviolence, punk rock, alternative rock, usa, female vocal",Dead Oceans,1.0,44.25,77.28
+Sister Ray,Believer,46.86,1.0,11,"indie, folk, indie pop, indie rock, indie folk, think about you, chillout, electronic, electronica, hip hop",Royal Mountain Records,1.0,39.95,62.73
+Hataalii,I'LL BE AROUND,46.79,1.0,14,"indie, rock, country, indie pop, indie rock, post punk",Panther Mountain,1.0,30.86,38.37
+Florida Man,Plastique,45.41,70.58,9,"post-punk, noise, haunted, noise rock, lo-fi, post punk, noise punk, fallow field, electronic, punk",Florida Man,1.0,35.32,63.46
+Camp Trash,Camp Trash / Dowsing,45.07,1.0,6,"emo, indie rock, pop punk, indie, alternative, midwest emo, pop, power pop, usa, pop rock | emo, midwest emo, indie, pop punk, pop-punk, indie rock, american, punk rock, chicago, indiemo",Camp Trash,12.0,35.86,53.56
+Kyle Gordon,Kyle Gordon Is Wonderful,42.31,1.0,20,"eurodance, comedy, parody, electropop, pop, usa, dance, american, dj, dance pop",BMG Rights Management (US) LLC,1.0,47.64,40.27
+Pigs Pigs Pigs Pigs Pigs Pigs Pigs,Death Hilarious,42.01,51.83,9,"stoner rock, stoner metal, sludge, doom metal, psychedelic rock, noise rock, united kingdom, england, sludge metal, british",Missing Piece Records,1.0,27.26,81.32
+Kitchen,"Blue Heeler in Ugly Snowlight, Grey on Gray on Gray on White",40.72,42.29,20,"experimental, slowcore, instrumental, lo-fi, bedroom pop, swiss, basel, rare sads, canada, post rock",okwhatever,1.0,33.86,37.37
+Djo,The Crux,40.33,48.8,12,"eclectic, psychedelic pop, indie, psychedelic",Twenty20 LLC,1.0,39.58,51.3
+Marlon Williams,Te Whare Tīwekaweka,39.47,19.75,14,"country, new zealand, folk",Marlon Williams,1.0,33.31,77.72
+Snooze,I KNOW HOW YOU WILL DIE,38.86,36.98,13,"female vocalist, chillout, lounge, downtempo, electronic, math rock, french, trip-hop, rock, acid jazz",649467 Records DK,1.0,10.04,64.02
+Dustin Wong,Gloria,37.8,53.7,14,"experimental, wave electronic, minimalism, noise, instrumental, post-rock, lo-fi, minimalist, ambient, kurt",Hausu Mountain,1.0,30.06,62.2
+"Michael Grigoni, Pan-American","New World, Lonely Ride",37.64,16.95,10,"ambient, electronic, post-rock, experimental, electronica, minimal, kranky, idm, post rock, drone",kranky,1.0,14.9,81.46
+Index For Working Musik,Which Direction Goes The Beam,36.04,34.65,12,"experimental, indie rock, post-punk, krautrock, art rock, psychedelic rock, united kingdom",Tough Love Records,1.0,32.92,76.59
+Babebee,all that heaven allows,33.47,1.0,11,"electronic, hyperpop, electropop, glitch, queer, bedroom pop, art pop",Lauren Records,1.0,22.65,61.02
+Penelope Trappes,A Requiem,32.1,14.31,10,"female vocalist, ambient, experimental, ethereal, ambient pop, electronic, dark ambient, ethereal wave, singer-songwriter, australian",One Little Independent,1.0,6.24,73.82
+Baerd,"Lookout, Look Out",31.99,1.0,8,"indie, folk, indie rock, indie pop, usa, spacey, indie folk, bedroom pop",Tone Tree Music / Baerd,18.38,36.14,70.04
+Marina Sena,Coisas Naturais,31.18,1.0,13,"peter, mpb, pop, brazilian, latin pop, indie, female vocalist, ethnic, greek",Sony Music Entertainment,1.0,39.83,42.42
