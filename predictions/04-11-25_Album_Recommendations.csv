@@ -1,51 +1,56 @@
 Artist,Album Name,avg_score,confidence_score,track_count,Genres,Label,Artist_Centrality,Mood_Score,Energy_Profile
-Tara Nome Doyle,Ekko,100.0,59.39,10,"indie pop, norwegian, irish, berlin, singer-songwriter, piano, chamber pop, female vocal, art pop",FatCat Records,1.0,14.32,55.76
-Bon Iver,"SABLE, fABLE",100.0,57.04,60,"indie folk, folk, indie, acoustic, vinyl, american, alt-country | folk, indie, singer-songwriter, acoustic, lo-fi, indie folk, american, alternative, alt-country, indie rock | folk, indie, singer-songwriter, indie folk, jagjaguwar, digital, lo-fi, american, alt-country",Jagjaguwar,44.19,28.86,71.88
-Turnpike Troubadours,The Price of Admission,99.43,83.22,11,"country, red dirt, country rock, folk, americana, oklahoma, american, lastfmsc, rock, energetic",Bossier City Records,17.72,34.68,66.44
-Daughter of Swords,Alex,97.12,34.77,36,"folk, usa, indie folk | folk, usa, indie folk, north carolina",Psychic Hotline,51.25,46.12,73.23
-Gerald Clayton,Ones & Twos,96.18,66.36,12,"jazz, contemporary jazz, piano, nu jazz, american, jazz piano, instrumental, nu-jazz, composer, tolisten",Blue Note Records,1.0,53.0,58.22
-Dead Pioneers,PO$T AMERICAN,95.78,54.37,15,"punk, punk rock, rock, folk, blues, american, colorado, denver, country, usa",Hassle Records,1.0,27.95,61.06
-"Primavera en Salonico, Savina Yannatou",Watersong,95.2,56.84,13,"female vocalist, greek, world, folk, mediterranean, world music, greece, vocal, ecm, mediterranean folk",ECM Records,1.0,19.26,59.39
-Valerie June,"Owls, Omens, and Oracles",95.06,28.23,28,"female vocalist, folk, blues, country, alt-country, soul, americana, singer-songwriter, bluegrass, usa | folk, blues",Concord Records,34.38,37.37,83.17
-Jon Pardi,Honkytonk Hollywood,94.66,48.82,17,"country, contemporary country, american, california, male vocalists, country pop, modern country, ilg",Capitol Records Nashville,1.0,78.79,56.13
-Tapeworms,Grand Voyage,92.47,29.8,12,"shoegaze, french, indie pop, indietronica, dream pop, synth pop, noise pop, français",Music Website,1.0,46.13,43.06
-Painting,Snapshot Of Pure Attention,88.91,23.51,6,"electronic, pop, experimental post-punk",Sinnbus,1.0,12.04,46.75
-Joni,Things I Left Behind,88.25,30.01,10,"female vocalist, electronic, progressive trance, trance, indie, pop, swedish, indie pop, indie rock, singer-songwriter",Keeled Scales,1.0,39.48,53.48
-"Galactic, Irma Thomas",Audience With the Queen,86.61,51.38,9,"funk, jazz, fusion, jam, jam band, new orleans, jazz funk, rock, acid jazz, hip-hop",Tchoup-zilla Records,1.0,21.95,48.41
-Jadu Heart,POST HEAVEN,86.18,28.51,24,"female vocalist, chillwave, experimental, electronic, alternative, dream pop, rnb, british, alternative rnb, indie pop | female vocalist, chillwave, experimental",VLF Records,36.89,25.55,46.53
-Kills Birds,Crave,74.79,29.38,5,"female vocalist, hard rock, rock, punk, grunge, shoegaze, punk rock, indie, alternative rock, indie rock",Lucky Number,1.0,18.11,40.26
-Mamalarky,Hex Key,59.26,1.0,13,"indie rock, dream pop, indie pop, los angeles, indie, rock, lo-fi, psychedelic pop, psychedelic, quirky",Epitaph,5.66,66.27,45.42
-OK Go,And the Adjacent Possible,59.09,1.0,12,"indie, indie rock, rock, alternative, alternative rock, indie pop, pop, american, power pop, ok go",PARACADUTE,1.0,67.84,51.62
-HONEYMOAN,Pink Hell,58.66,1.0,11,"indie pop, south african, south africa, indie, rock, alternative, indie rock, funk, shoegaze",HONEYMOAN,1.0,39.27,84.45
-Public Body,Finger Food,57.42,1.0,12,"crank wave, post-punk, indie rock, post-brexit new wave, punk rock, art punk, dance-punk, united kingdom, acute sounds",Public Body Recordings,1.0,56.76,50.78
-Ken Carson,More Chaos,56.28,1.0,21,"rage, trap, opium, cloud rap, rap, atlanta, plugg, hip hop, pop rap, soundcloud",Opium/Interscope,1.0,24.07,73.56
-Grandmas House,Anything For You,55.08,1.0,5,"female vocalist, post-punk, crank wave, riot grrrl, punk rock, garage punk, punk, indie rock, post punk, bristol",Duchess Box Records,1.0,28.19,73.1
-key vs. locket,i felt like a sketch,53.64,1.0,14,"indie rock, singer-songwriter, brazil, brazilian, indie folk",key vs. locket,1.0,24.39,85.17
-Kwashibu Area Band,Love Warrior’s Anthem,53.39,1.0,7,"ghana, highlife",Soundway Records Ltd,1.0,59.07,75.62
-James Bright,Imaginal,52.68,7.37,10,"female vocalist, chillout, mellow, james bright, downtempo, instrumental, favorites, lounge, jazz, british",Life On Earth Recordings,1.0,32.7,47.07
-Berner,Carbon,52.68,1.0,6,"rap, hyphy, hip-hop, hip hop, bay area, gangsta rap, berner, california, west coast, san francisco",Bern One Entertainment,1.0,39.77,40.81
-Salif Keita,So Kono,52.57,1.0,9,"african, mali, world, world music, africa, salif keita, malian, jazz, west africa, folk",No Format!,1.0,67.76,43.73
-Casper Skulls,Kit-Cat,51.42,1.0,11,"indie rock, post-punk, garage rock, punk rock, indie, punk, alternative, canada, toronto, dark punk",Next Door Records,1.0,52.21,53.33
-Astels,The Meeting,48.97,1.0,13,"female vocalist, electronic, funk, rnb, jazz, soul, yandex music",Astels,1.0,43.82,55.44
-Nell Smith,Anxious,48.31,24.11,10,"female vocalist, indie, singer-songwriter, psychedelic pop, canadian, psychedelic, neo-psychedelia, discweekly",Bella Union,1.0,44.6,67.56
-Eyedress,Stoner,46.22,1.0,21,"female vocalist, electronic, experimental, indie, psychedelic, pop, lo-fi, philippines, indie pop, post-punk",RCA Records Label,8.33,55.27,65.56
-Teen Mortgage,Devil Ultrasonic Dream,46.19,1.0,11,"garage punk, punk rock, egg punk, punk, garage rock, heavy punk, crank wave, rock, surf punk, duo",Roadrunner Records,10.17,48.49,50.45
-"LaRussell, Mike G Beatz",MAKE HIP-HOP FUN AGAIN!,42.75,1.0,16,"hip-hop, rap, hip hop, california, west coast, vallejo, bay area",Good Compenny / EMPIRE,1.0,53.29,50.65
-The Wrecks,INSIDE :,42.57,1.0,6,"female vocalist, rock, indie rock, alternative, pop rock, pop punk, punk, usa, american, pop",Lava / Republic Records,13.69,39.77,58.15
-Charif Megarbane,Hawalat (Habibi Funk 030) [Bonus Edition],42.49,9.26,19,"lebanese, jazz, folk, lebanon, fusion, funk, instrumental, arabic, jazz fusion, composer",HABIBI Funk Records,1.0,62.79,53.21
-fantasy of a broken heart,Chaos Practitioner,42.47,1.0,6,"indie, shoegaze, dream pop, indie rock, usa, brooklyn",Dots Per Inch Music,11.8,65.52,73.98
-Cold Specks,Light for the Midnight,42.4,1.03,10,"female vocalist, soul, canadian, acoustic, doom soul, canada, singer-songwriter, folk, lastfmsc, rock",Mute,1.0,27.14,60.32
-Speedway,A Life's Refrain,42.35,11.71,12,"female vocalist, hardcore, hardcore punk, pop rock, pop, rock, punk, scottish, pop-rock, melodic hardcore",Revelation Records,1.0,21.45,43.03
-Cassia,"everyone, outside",41.93,1.0,13,"indie, indie pop, pop, rock, british, indie rock, uk, synth pop, synth, synthpop",love sundays,11.73,59.28,51.38
-My Raining Stars,Momentum,41.89,1.0,10,"indie pop, indie, alternative, indie rock, twee, shoegaze, independant, gitarrenpop",Shelflife,1.0,31.87,59.38
-MARK,The Firstfruit - The 1st Album,40.79,1.0,13,"korean, rap, k-pop, kpop, aoty, nct, mark da isa, dreamies da liz",SM Entertainment,1.0,57.26,39.7
-Bedridden,Moths Strapped To Each Other's Backs,40.64,1.0,10,"shoegaze, alternative rock, united states",Winspear,1.0,25.09,76.22
-Briain,Cognitive Dissonance,37.13,72.66,11,"electro, idm, breakbeat",Art-E-Fax,1.0,56.97,66.53
-Trousdale,Growing Pains,36.83,1.0,12,"female vocalist, indie pop, folk, acoustic, pop, indie, usa, pop rock, indie folk, los angeles",Independent Co.,14.02,58.95,51.67
-Adja,Golden Retrieve Her,34.38,1.0,11,"techno, electronic, minimal, techhouse, minimal techno, minimal techno artists, pokerflat, acid, tech, boogie woogie",SDBAN ULTRA,1.0,45.76,57.99
-"Air, Vegyn",Blue Moon Safari,34.09,1.0,10,"electronic, ambient, experimental, idm, glitch hop, instrumental hip hop, british, downtempo, uk, trap",Parlophone (France),1.0,29.41,60.41
-Jetstream Pony,Bowerbirds and Blue Things,33.97,1.0,12,"shoegaze, indie pop, indie, indie rock, uk, dream pop, brighton, deezer",Spinout Nuggets / Shelflife Records,16.03,38.82,68.69
-Kuunatic,Wheels of Ömon,31.01,26.88,8,"psychedelic, japan, japanese, experimental, tribal, psychedelic rock, indie, rock, avantgarde, dreampop",Glitterbeat Records,1.0,19.76,47.17
-The Mars Volta,Lucro sucio; Los ojos del vacio,30.65,1.0,18,"progressive rock, experimental, rock, alternative, progressive, alternative rock, indie, psychedelic, experimental rock, psychedelic rock",Clouds Hill,1.0,8.18,30.22
-"Ben Shirken, Ex Wiish",H.D. Reliquary,28.05,1.0,11,"dark ambient, ambient | dark ambient, ambient, experimental",29 Speedway,1.0,15.05,54.01
-Clutter,Loves You,26.73,1.0,6,"ambient, experimental, djent, electronic, progressive metal, soundscape, glitch, pixies palace, cinematic, avant-garde",PNKSLM Recordings,1.0,41.05,46.52
+Tara Nome Doyle,Ekko,99.21,60.74,10,"indie pop, norwegian, irish, berlin, singer-songwriter, piano, chamber pop, female vocal, art pop",FatCat Records,1.0,14.32,55.76
+Daughter of Swords,Alex,98.3,43.72,36,"folk, usa, indie folk, north carolina | folk, usa, indie folk",Psychic Hotline,35.17,46.12,73.23
+Bon Iver,"SABLE, fABLE",94.73,43.38,60,"folk, indie, singer-songwriter, indie folk, jagjaguwar, digital, lo-fi, american, alt-country | folk, indie, singer-songwriter, acoustic, lo-fi, indie folk, american, alternative, alt-country, indie rock | indie folk, folk, indie, acoustic, vinyl, american, alt-country",Jagjaguwar,22.66,28.86,71.88
+Painting,Snapshot Of Pure Attention,90.49,18.64,6,"electronic, pop, experimental post-punk",Sinnbus,1.0,12.04,46.75
+Valerie June,"Owls, Omens, and Oracles",89.88,29.18,28,"female vocalist, folk, blues, country, alt-country, soul, americana, singer-songwriter, bluegrass, usa | folk, blues",Concord Records,27.54,37.37,83.17
+Joni,Things I Left Behind,87.52,35.59,10,"female vocalist, electronic, progressive trance, trance, indie, pop, swedish, indie pop, indie rock, singer-songwriter",Keeled Scales,1.0,39.48,53.48
+Tapeworms,Grand Voyage,83.17,11.68,12,"shoegaze, french, indie pop, indietronica, dream pop, synth pop, noise pop, français",Music Website,1.0,46.13,43.06
+Jadu Heart,POST HEAVEN,78.62,38.41,24,"female vocalist, chillwave, experimental, electronic, alternative, dream pop, rnb, british, alternative rnb, indie pop | female vocalist, chillwave, experimental",VLF Records,27.66,25.55,46.53
+"Rocky, Ross Lynch, THE DRIVER ERA",Obsession,78.08,1.0,22,"alternative, indie, pop, indie pop, indie rock, pop rock, ross lynch | alternative, pop rock, aoty",TOO Records,30.21,68.16,65.97
+Cold Specks,Light for the Midnight,67.63,28.93,10,"female vocalist, soul, canadian, acoustic, doom soul, canada, singer-songwriter, folk, lastfmsc, rock",Mute,1.0,27.14,60.32
+Kills Birds,Crave,66.04,41.11,5,"female vocalist, hard rock, rock, punk, grunge, shoegaze, punk rock, indie, alternative rock, indie rock",Lucky Number,1.0,18.11,40.26
+Public Body,Finger Food,60.15,3.61,12,"crank wave, post-punk, indie rock, post-brexit new wave, punk rock, art punk, dance-punk, united kingdom, acute sounds",Public Body Recordings,1.0,56.76,50.78
+Ken Carson,More Chaos,59.94,1.0,21,"rage, trap, opium, cloud rap, rap, atlanta, plugg, hip hop, pop rap, soundcloud",Opium/Interscope,1.0,24.07,73.56
+key vs. locket,i felt like a sketch,56.93,1.0,14,"indie rock, singer-songwriter, brazil, brazilian, indie folk",key vs. locket,1.0,24.39,85.17
+Kwashibu Area Band,Love Warrior’s Anthem,56.89,10.6,7,"ghana, highlife",Soundway Records Ltd,1.0,59.07,75.62
+Casper Skulls,Kit-Cat,56.35,1.0,11,"indie rock, post-punk, garage rock, punk rock, indie, punk, alternative, canada, toronto, dark punk",Next Door Records,1.0,52.21,53.33
+Olivia Font,Invictam,55.99,1.0,8,"Indie Pop, Dream Pop, Bedroom Pop, Synth-Pop, Chillwave",Modern Obscure Music,1.0,10.82,33.71
+Charif Megarbane,Hawalat (Habibi Funk 030) [Bonus Edition],55.02,53.68,19,"lebanese, jazz, folk, lebanon, fusion, funk, instrumental, arabic, jazz fusion, composer",HABIBI Funk Records,1.0,62.79,53.21
+James Bright,Imaginal,53.76,46.36,10,"female vocalist, chillout, mellow, james bright, downtempo, instrumental, favorites, lounge, jazz, british",Life On Earth Recordings,1.0,32.7,47.07
+fantasy of a broken heart,Chaos Practitioner,53.07,1.0,6,"indie, shoegaze, dream pop, indie rock, usa, brooklyn",Dots Per Inch Music,6.07,65.52,73.98
+Röyksopp,True Electric,52.58,74.27,38,"electronic, chillout, ambient, electronica, norwegian, trip-hop, downtempo, dance, indie, electro",Dog Triumph,6.45,35.63,47.61
+Primavera en Salonico,Watersong,52.45,1.0,14,"female vocalist, greek, world, folk, mediterranean, world music, greece, vocal, ecm, mediterranean folk | Mediterranean Folk, World Music, Arabic Fusion, Ethnic, Storytelling Music",ECM Records,1.0,19.26,59.39
+Magnolia Park,VAMP,52.42,51.61,11,"pop punk, emo, alternative rock, american, alternative metal, florida, emo rap, electronic, rock, punk",Epitaph,4.58,32.53,48.83
+Dead Pioneers,PO$T AMERICAN,52.12,18.36,15,"punk, punk rock, rock, folk, blues, american, colorado, denver, country, usa",Hassle Records,1.0,27.95,61.06
+Gerald Clayton,Ones & Twos,51.07,4.56,12,"jazz, contemporary jazz, piano, nu jazz, american, jazz piano, instrumental, nu-jazz, composer, tolisten",Blue Note Records,1.0,53.0,58.22
+"Ben Shirken, Ex Wiish",H.D. Reliquary,50.66,1.0,11,"Singer-Songwriter, Indie Folk, Acoustic, Alternative, Lo-Fi",29 Speedway,1.0,15.05,54.01
+OK Go,And the Adjacent Possible,47.11,10.66,12,"indie, indie rock, rock, alternative, alternative rock, indie pop, pop, american, power pop, ok go",PARACADUTE,1.0,67.84,51.62
+Mamalarky,Hex Key,46.98,1.0,13,"indie rock, dream pop, indie pop, los angeles, indie, rock, lo-fi, psychedelic pop, psychedelic, quirky",Epitaph,3.42,66.27,45.42
+Speedway,A Life's Refrain,46.88,59.49,12,"female vocalist, hardcore, hardcore punk, pop rock, pop, rock, punk, scottish, pop-rock, melodic hardcore",Revelation Records,1.0,21.45,43.03
+Turnpike Troubadours,The Price of Admission,46.45,62.56,11,"country, red dirt, country rock, folk, americana, oklahoma, american, lastfmsc, rock, energetic",Bossier City Records,10.1,34.68,66.44
+Bedridden,Moths Strapped To Each Other's Backs,45.79,1.0,10,"shoegaze, alternative rock, united states",Winspear,1.0,25.09,76.22
+My Raining Stars,Momentum,45.59,1.0,10,"indie pop, indie, alternative, indie rock, twee, shoegaze, independant, gitarrenpop",Shelflife,1.0,31.87,59.38
+"LaRussell, Mike G Beatz",MAKE HIP-HOP FUN AGAIN!,45.35,1.0,16,"hip-hop, rap, hip hop, california, west coast, vallejo, bay area",Good Compenny / EMPIRE,1.0,53.29,50.65
+Jon Pardi,Honkytonk Hollywood,44.93,63.87,17,"country, contemporary country, american, california, male vocalists, country pop, modern country, ilg",Capitol Records Nashville,1.0,78.79,56.13
+Jetstream Pony,Bowerbirds and Blue Things,44.36,1.0,12,"shoegaze, indie pop, indie, indie rock, uk, dream pop, brighton, deezer",Spinout Nuggets / Shelflife Records,13.49,38.82,68.69
+Astels,The Meeting,44.11,1.0,13,"female vocalist, electronic, funk, rnb, jazz, soul, yandex music",Astels,1.0,43.82,55.44
+Salif Keita,So Kono,43.66,1.0,9,"african, mali, world, world music, africa, salif keita, malian, jazz, west africa, folk",No Format!,1.0,67.76,43.73
+Cassia,"everyone, outside",42.06,2.27,13,"indie, indie pop, pop, rock, british, indie rock, uk, synth pop, synth, synthpop",love sundays,12.98,59.28,51.38
+"Galactic, Irma Thomas",Audience With the Queen,41.54,39.02,9,"funk, jazz, fusion, jam, jam band, new orleans, jazz funk, rock, acid jazz, hip-hop",Tchoup-zilla Records,1.0,21.95,48.41
+Idle Heirs,Life is Violence,41.52,68.52,8,"metalcore, shoegaze, american, post-metal",Relapse Records,1.0,15.56,41.21
+Grandmas House,Anything For You,41.08,1.0,5,"female vocalist, post-punk, crank wave, riot grrrl, punk rock, garage punk, punk, indie rock, post punk, bristol",Duchess Box Records,1.0,28.19,73.1
+Trousdale,Growing Pains,40.74,5.66,12,"female vocalist, indie pop, folk, acoustic, pop, indie, usa, pop rock, indie folk, los angeles",Independent Co.,8.6,58.95,51.67
+HONEYMOAN,Pink Hell,40.66,1.0,11,"indie pop, south african, south africa, indie, rock, alternative, indie rock, funk, shoegaze",HONEYMOAN,1.0,39.27,84.45
+Briain,Cognitive Dissonance,40.41,81.21,11,"electro, idm, breakbeat",Art-E-Fax,1.0,56.97,66.53
+Eyedress,Stoner,39.7,7.88,21,"female vocalist, electronic, experimental, indie, psychedelic, pop, lo-fi, philippines, indie pop, post-punk",RCA Records Label,6.61,55.27,65.56
+Berner,Carbon,39.46,1.0,6,"rap, hyphy, hip-hop, hip hop, bay area, gangsta rap, berner, california, west coast, san francisco",Bern One Entertainment,4.33,39.77,40.81
+Teen Mortgage,Devil Ultrasonic Dream,38.96,25.58,11,"garage punk, punk rock, egg punk, punk, garage rock, heavy punk, crank wave, rock, surf punk, duo",Roadrunner Records,5.97,48.49,50.45
+The Wrecks,INSIDE :,37.95,14.3,6,"female vocalist, rock, indie rock, alternative, pop rock, pop punk, punk, usa, american, pop",Lava / Republic Records,7.99,39.77,58.15
+MARK,The Firstfruit - The 1st Album,37.18,3.91,13,"korean, rap, k-pop, kpop, aoty, nct, mark da isa, dreamies da liz",SM Entertainment,1.0,57.26,39.7
+Nell Smith,Anxious,36.87,5.75,10,"female vocalist, indie, singer-songwriter, psychedelic pop, canadian, psychedelic, neo-psychedelia, discweekly",Bella Union,1.0,44.6,67.56
+Kuunatic,Wheels of Ömon,34.17,61.87,8,"psychedelic, japan, japanese, experimental, tribal, psychedelic rock, indie, rock, avantgarde, dreampop",Glitterbeat Records,1.0,19.76,47.17
+Adja,Golden Retrieve Her,32.61,1.0,11,"techno, electronic, minimal, techhouse, minimal techno, minimal techno artists, pokerflat, acid, tech, boogie woogie",SDBAN ULTRA,1.0,45.76,57.99
+"Air, Vegyn",Blue Moon Safari,27.79,1.0,10,"electronic, ambient, experimental, idm, glitch hop, instrumental hip hop, british, downtempo, uk, trap",Parlophone (France),1.0,29.41,60.41
+The Mars Volta,Lucro sucio; Los ojos del vacio,27.54,1.0,18,"progressive rock, experimental, rock, alternative, progressive, alternative rock, indie, psychedelic, experimental rock, psychedelic rock",Clouds Hill,1.0,8.18,30.22
+Clutter,Loves You,23.55,1.0,6,"ambient, experimental, djent, electronic, progressive metal, soundscape, glitch, pixies palace, cinematic, avant-garde",PNKSLM Recordings,1.0,41.05,46.52
