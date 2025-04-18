@@ -1,0 +1,51 @@
+Artist,Album Name,avg_score,confidence_score,track_count,Genres,Label,Artist_Centrality,Mood_Score,Energy_Profile
+Beirut,A Study of Losses,100.0,76.08,36,"folk, indie, indie folk | folk, indie, indie folk, singer-songwriter, gypsy, balkan, alternative, american, indie rock, experimental",Pompeii Records,18.55,9.11,27.0
+"August Fanon, Blu",Forty,100.0,97.06,33,"hip-hop, rap, hip hop, chillout, underground hip-hop, california, underground, west coast, blu, jazz hop",Nature Sounds,27.35,56.8,43.01
+"Julien Baker, TORRES",Send A Prayer My Way,100.0,60.86,48,"emo, folk, slowcore, singer-songwriter, indie folk, indie, acoustic, dream pop | slowcore, indie folk, dream pop, digital, indie, female vocalist, acoustic, indie rock | female vocalist, indie, singer-songwriter, indie folk, folk, acoustic, indie rock, slowcore, alternative rock, emo",Matador,19.09,36.71,37.69
+"Justin Robinson, Rhiannon Giddens",Brown's Dream,99.92,47.76,28,"female vocalist, folk, country | female vocalist, folk, country, blues, americana, american, banjo, bluegrass, singer-songwriter, soul",Nonesuch,26.2,56.18,62.31
+Chip,Grime Scene Saviour,99.56,84.77,12,"grime, rap, hip-hop, hip hop, british, uk, london, electronic, downtempo",Cash Motto Ltd,1.0,50.02,74.28
+The Convenience,Like Cartoon Vampires,99.49,44.57,13,"indie rock, punk, hardcore, indie pop",Winspear,1.0,60.12,52.89
+Gentle Leader XIV,Joke in the Shadow,97.42,82.5,10,"female vocalist, dream pop, coldwave, electronic, lo-fi, new wave, synth pop, darkwave",Feel It Records,1.0,49.9,55.12
+Adrian Younge,Adrian Younge presents Something About April III,96.82,78.15,9,"soul, funk, soundtrack, blaxploitation, black dynamite, trip-hop lounge, jazz, instrumental, usa, hip-hop",Linear Labs,1.0,43.9,40.08
+Wiz Khalifa,Kush + Orange Juice 2,96.44,42.51,69,"hip-hop, rap, underground hip-hop, hip hop, pittsburgh, wiz khalifa, american, east coast rap, pennsylvania, stoner rap | dope, beast, hip-hop, rap, underground hip-hop",BMG Rights Management (US) LLC,30.28,59.07,33.89
+Taylor Rae,The Void,96.16,60.33,10,"hip-hop, pop, country, rap",Missing Piece Records,1.0,20.96,63.54
+Fotoform,Grief is a Garden (Forever in Bloom),95.88,72.92,9,"post-punk, shoegaze, dream pop, new wave, dream rock",Dismal Nitch,1.0,46.05,61.08
+"Kingdom Orchestra, Stewart Copeland, Troy Miller",Stewart Copeland: Wild Concerto,93.94,63.42,12,"soundtrack, instrumental, new wave, american, video game music, rock, the police, drums, drummer, usa",Platoon,1.0,50.6,42.45
+LEGADO 7,L7X,89.2,38.91,15,"usa, latin, california, corridos, regional mexicano, corridos tumbados",Sony Music Latin/Columbia/Lumbre Music,1.0,68.21,52.02
+"Little Barrie, Malcolm Catto",Electric War,81.72,33.91,8,"indie, indie rock, rock, british, funk, blues, alternative, blues rock, uk, soul",Easy Eye Sound,1.0,52.83,56.39
+Surfer Girl,Sunset,81.61,17.77,14,"reggae, usa, reggae rock, reggae fusion",Ineffable Records,1.0,30.01,83.79
+Sinners Movie,Sinners (Original Motion Picture Soundtrack),69.56,1.0,23,"blues, funk, pop, new orleans, american, male vocalists, rhythm and blues, acoustic blues, bobby rush | rap, trap, hip-hop | female vocalist, folk, country, blues, americana, american, banjo, bluegrass, singer-songwriter, soul",Masterworks,1.0,57.92,44.26
+Michael Marcagi,Midwest Kid,65.13,3.06,5,"alternative, indie, folk, acoustic, singer-songwriter, americana, country, usa, bluegrass, indie folk",Warner Records,6.03,30.09,69.33
+Mozzy,INTRUSIVE THOUGHTS,59.9,1.0,18,"rap, hip hop, hip-hop, sacramento, california, trap, american, gangsta rap, oak park, king billionheir",Mozzy Records / EMPIRE,1.0,59.82,48.64
+Sawyer Hill,Heartbreak Hysteria,57.45,1.0,7,"rock, indie rock, indie, alternative, punk, hard rock, american, garage rock, blues rock, post-grunge",Sawyer Hill,1.0,53.95,66.36
+Westside Gunn,HEELS HAVE EYES,57.26,1.0,5,"rap, hip-hop, hip hop, boom bap, gangsta rap, new york, hardcore hip hop, drumless, buffalo",Griselda Records,9.55,83.51,78.45
+Witch Post,Beast,56.53,1.0,6,"indie pop, indie rock, rock, alternative, alternative rock, noise pop, garage rock, garage pop",Witch Post,1.0,45.31,55.46
+Cumulus,We've Got It All,55.17,1.0,11,"finnish, folk, pop, rock, seattle, washington, indie pop, indie rock, progressive rock",Share It Music,1.0,44.42,57.85
+Sarah Siskind,Simplify,55.01,1.0,12,"female vocalist, singer-songwriter, folk, acoustic, indie, nashville, country, alternative, usa, guitar",Modern Appalachia Records,1.0,51.05,38.24
+Millyz,Blanco 7,52.69,1.0,20,"rap, hip-hop, hip hop, underground hip-hop, massachusetts",Millyz,1.0,42.87,40.61
+Rindert Lammers,Thank You Kirin Kiki,51.74,1.0,5,try,Western Vinyl,1.0,5.6,48.11
+"Kinsella & Pulse, LLC",Open ing Night,49.68,1.0,10,indie dance,Kill Rock Stars,1.0,51.3,52.03
+The Pale White,The Big Sad,49.31,1.0,13,"indie rock, british, britpop, rock, pop, indie pop, uk, pop rock, england, blues rock",End Of The Wall Recordings,1.0,20.38,84.72
+Tunde Adebimpe,Thee Black Boltz,48.18,1.0,11,"experimental, indie rock, usa",Sub Pop Records,5.28,69.33,60.73
+Mark de Clive-Lowe,past present (tone poems across time),47.48,1.0,11,"uutta jazzia, my-love, alternative lounge, lounge-tech, lounge uptempo, epic lounge, serve chilled, jazzy flavoured, acoustic groove",Impressive Collective / BBE Music,1.0,12.57,37.8
+Zeitgeist Freedom Energy Exchange,INSPIRE // RADICALISE,47.2,2.43,18,"jazz, funk, lounge, australian, jazz-funk, jazz funk, nu-jazz, beats, australia",Energy Exchange Records,1.0,60.69,56.6
+Avery Friedman,New Thing,46.54,1.0,8,"female vocalist, indie, alternative, indie rock, singer-songwriter",Audio Antihero,4.56,17.46,47.98
+Beddy Rays,Do What Ya Wanna,45.16,1.0,11,"punk, australian, australia, alt rock",Beddy Rays,5.35,24.51,83.99
+"Pinch, Trim",No Caller ID,44.9,1.0,5,"grime, uk, dubstep, roll deep, rap, hip-hop, hip hop, electronic, british, uk hip-hop",Tectonic,1.0,42.46,60.87
+"AKTHESAVIOR, Issa Gold, The Underachievers",Homecoming,44.57,1.0,9,"hip-hop, rap, beast coast, new york, hip hop, underground hip-hop, cloud rap, underground rap, brooklyn, american",SLANG X Influence,9.92,58.45,68.57
+Iron Lung,Adapting // Crawling,44.28,69.89,18,"powerviolence, grindcore, hardcore, power violence, thrash, hardcore punk, punk, american, grind, noise",Iron Lung Records,1.0,26.17,47.62
+Rachel Reis,Divina Casca,43.83,5.57,15,"pop, brazil, brasil, mpb, brazilian, pop brasil, pop brasileiro, pop baiano | female vocalist, folk, singer-songwriter, acoustic, americana, acoustic blues, indie, brazilian, chillout, female",Rachel Reis,1.0,33.65,92.02
+MIEN,MIIEN,43.82,63.83,10,"psychedelic rock, rock, canada, psychedelic, supergroup, male vocalists, neo-psychedelic, vu en concert, kinda boring",Fuzz Club,1.0,55.06,75.76
+Hieroglyphic Being,Dance Music 4 Bad People,42.26,73.74,8,"techno, house, experimental, minimal, electronic, raw house, chicago, usa, tech house, chicago house",Smalltown Supersound,1.0,60.93,59.86
+Quade,The Foel Tower,40.65,53.13,6,"experimental, folk, hard rock, post-punk, glam, electronic, vocal, rock, british, ambient",AD 93,1.0,6.44,35.91
+Mamuthones,From Word To Flesh,39.0,35.91,7,"psychedelic rock, neo-psychedelia, space rock, experimental, experimental rock, italian, psych rock, italy, beyondwithin",Rocket Recordings,1.0,16.91,60.97
+"Jess Sah Bi, Peter One",Our Garden Needs Its Flowers,38.43,17.98,8,"folk, ivory coast",Awesome Tapes From Africa,1.0,48.33,39.32
+Divide And Dissolve,Insatiable,37.67,1.0,10,"doom metal, drone, sludge, experimental, doom, australia, australian, drone metal, saxophone, alternative metal",Bella Union,1.0,6.77,31.38
+Scrounge,Almost Like You Could,36.16,1.0,10,"post-punk, noise, punk, indie rock, uk, loud, diy, two-piece",Ba Da Bing!,1.0,46.88,76.22
+"Chaparelle, Jesse Woods, Zella Day",Western Pleasure,33.07,1.0,11,country,Mom+Pop,1.0,33.61,41.35
+Sieren,Linked,32.98,74.47,5,"chillout, electronic, downtempo, ambient, downbeat, dubstep, idm, germany, breaks, bielefeld",Friends Of Friends,1.0,42.29,61.01
+Lucy Railton,Blue Veil,32.03,1.0,7,"ambient, noise, experimental, electroacoustic, modern classical, dark ambient, electronic, classical, cello, instrumental",Ideologic Organ,1.0,1.33,28.63
+Gryphon Rue,I Keep My Diamond Necklace in a Pond of Sparkling Water,31.63,1.0,7,"noise, electronic, experimental, avant-garde, melodic noise, try",No Label,1.0,6.47,26.74
+quickly,I Heard That Noise,31.12,1.0,11,"lo-fi, lo-fi beats",Ghostly International,1.0,40.72,54.33
+LDS,power of 2,29.53,1.0,7,"dub techno, techno, ambient, psytrance, trance, dub, uk, house, idm, breaks",Tresor Records,1.0,54.36,72.26
+Melvins,Thunderball,28.02,1.0,5,"sludge, grunge, stoner rock, rock, metal, sludge metal, experimental, alternative, doom metal, stoner",Ipecac Recordings,1.0,42.41,44.49
