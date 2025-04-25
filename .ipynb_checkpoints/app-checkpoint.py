@@ -6,11 +6,14 @@ from datetime import datetime
 import streamlit.components.v1 as components
 import glob
 import os
+import shutil
 import requests
+from PIL import Image
+from io import BytesIO
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 from typing import Dict
 import networkx as nx 
-import numpy as np
 
 # Check if App is Running Locally or on Streamlit's Servers
 def is_running_on_streamlit():
@@ -18,28 +21,6 @@ def is_running_on_streamlit():
 
 # Use this flag to control feedback buttons
 IS_LOCAL = not is_running_on_streamlit()
-
-def extract_date_from_filename(file_path):
-    """Extract date from filename in format MM-DD-YY"""
-    filename = os.path.basename(file_path)
-    date_str = filename.split('_')[0]
-    try:
-        date_obj = datetime.strptime(date_str, '%m-%d-%y')
-        return date_obj.strftime('%B %d, %Y')
-    except ValueError:
-        return "Unknown Date"
-
-def show_placeholder_art():
-    """Display placeholder album art"""
-    st.markdown(
-        """
-        <div style="display: flex; justify-content: center; align-items: center; 
-                  height: 300px; background-color: #f0f0f0; border-radius: 10px;">
-            <span style="font-size: 48px;">🎵</span>
-        </div>
-        """, 
-        unsafe_allow_html=True
-    )
 
 @st.cache_data
 def load_nuked_albums():
@@ -171,6 +152,8 @@ st.markdown("""
         margin-top: 10px;
     }
 
+
+
     .archive-selector {
         margin-bottom: 20px;
         padding: 10px;
@@ -194,32 +177,6 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data
-def load_predictions(file_path=None):
-    """Load predictions with built-in cover art and Spotify links"""
-    if file_path is None:
-        prediction_files = glob.glob('predictions/*_Album_Recommendations.csv')
-        file_path = max(prediction_files) if prediction_files else None
-    
-    if not file_path:
-        st.error("No prediction files found!")
-        return None
-
-    df = pd.read_csv(file_path)
-    
-    # Validate required columns
-    required_cols = ['Artist', 'Album Name', 'avg_score', 
-                    'Album Art URL', 'Spotify URL']
-    missing = [col for col in required_cols if col not in df.columns]
-    if missing:
-        st.error(f"Prediction file missing columns: {', '.join(missing)}")
-        return None
-    
-    # Clean data
-    df['Album Art URL'] = df['Album Art URL'].replace('nan', np.nan)
-    df['Spotify URL'] = df['Spotify URL'].replace('nan', np.nan)
-    
-    return df, extract_date_from_filename(file_path)
 
 @st.cache_data
 def get_all_prediction_files():
@@ -246,6 +203,37 @@ def get_all_prediction_files():
     # Sort by date (newest first)
     file_dates.sort(key=lambda x: x[1], reverse=True)
     return file_dates
+
+@st.cache_data
+def load_predictions(file_path=None):
+    """
+    Load the predictions data from a specific file or the latest file if none specified.
+    """
+    if file_path is None:
+        prediction_files = glob.glob('predictions/*_Album_Recommendations.csv')
+        if not prediction_files:
+            st.error("No prediction files found!")
+            return None
+        
+        file_path = max(prediction_files)
+    
+    predictions_df = pd.read_csv(file_path)
+    
+    # Ensure 'playlist_origin' column exists (silently add if missing)
+    if 'playlist_origin' not in predictions_df.columns:
+        predictions_df['playlist_origin'] = 'unknown'  # Default value
+    
+    # Ensure 'Artist Name(s)' column exists (silently add if missing)
+    if 'Artist Name(s)' not in predictions_df.columns:
+        predictions_df['Artist Name(s)'] = 'Unknown Artist'  # Default value
+    
+    # Remove duplicate albums if any
+    predictions_df = predictions_df.drop_duplicates(subset=['Artist', 'Album Name'], keep='first')
+    
+    date_str = os.path.basename(file_path).split('_')[0]
+    analysis_date = datetime.strptime(date_str, '%m-%d-%y').strftime('%Y-%m-%d')
+    
+    return predictions_df, analysis_date
 
 @st.cache_data
 def load_album_covers():
@@ -287,6 +275,67 @@ def load_training_data():
     return df[df['playlist_origin'] != 'df_nmf'].copy()
 
 # Add feedback functions
+def save_feedback(album_name, artist, feedback):
+    feedback_file = 'feedback/feedback.csv'
+    if not os.path.exists('feedback'):
+        os.makedirs('feedback')
+    
+    # Create a dataframe with the new feedback
+    new_feedback = pd.DataFrame({
+        'Album Name': [album_name],
+        'Artist': [artist],
+        'Feedback': [feedback]
+    })
+
+    # Load existing feedback if file exists
+    if os.path.exists(feedback_file):
+        try:
+            # Use proper quoting and escape characters when reading
+            existing_feedback = pd.read_csv(feedback_file, quoting=1)  # QUOTE_ALL
+            # Combine with new feedback
+            combined_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
+        except Exception as e:
+            st.warning(f"Error reading existing feedback: {e}. Creating new file.")
+            # If reading fails, start fresh with just the new feedback
+            combined_feedback = new_feedback
+    else:
+        combined_feedback = new_feedback
+    
+    # Save with proper quoting to handle commas in fields
+    combined_feedback.to_csv(feedback_file, index=False, quoting=1)  # QUOTE_ALL
+    
+    # Clear cache after saving feedback
+    st.cache_data.clear()
+
+def load_feedback():
+    feedback_file = 'feedback/feedback.csv'
+    if os.path.exists(feedback_file):
+        try:
+            # Use quoting=1 (QUOTE_ALL) to properly handle commas in fields
+            return pd.read_csv(feedback_file, quoting=1)
+        except Exception as e:
+            st.warning(f"Error loading feedback data: {e}")
+            # Try to recover the file
+            try:
+                # Attempt to read with different options
+                df = pd.read_csv(feedback_file, quoting=1, error_bad_lines=False) 
+                st.info("Partially recovered feedback data")
+                return df
+            except:
+                # If all recovery attempts fail, provide an empty DataFrame as fallback
+                st.error("Could not recover feedback data. Starting with fresh feedback file.")
+                # Backup the problematic file
+                if os.path.exists(feedback_file):
+                    backup_file = feedback_file + ".backup." + datetime.now().strftime("%Y%m%d%H%M%S")
+                    try:
+                        os.rename(feedback_file, backup_file)
+                        st.info(f"Backed up problematic feedback file to {backup_file}")
+                    except:
+                        pass
+                return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
+    return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
+
+# Updated feedback functions
 def save_feedback(album_name, artist, feedback, review=None):
     feedback_file = 'feedback/feedback.csv'
     if not os.path.exists('feedback'):
@@ -350,7 +399,7 @@ def save_public_feedback(album_name, artist, feedback, username="Anonymous", rev
             # Combine with new feedback
             combined_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
         except Exception as e:
-            st.warning(f"Error reading public feedback: {e}. Creating new file.")
+            st.warning(f"Error reading existing public feedback: {e}. Creating new file.")
             # If reading fails, start fresh with just the new feedback
             combined_feedback = new_feedback
     else:
@@ -362,6 +411,7 @@ def save_public_feedback(album_name, artist, feedback, username="Anonymous", rev
     # Clear cache after saving feedback
     st.cache_data.clear()
 
+# Updated load feedback functions
 def load_feedback():
     feedback_file = 'feedback/feedback.csv'
     if os.path.exists(feedback_file):
@@ -463,49 +513,73 @@ def get_recent_public_feedback(album_name, artist, limit=3):
     
     return recent_feedback
 
-def validate_prediction_file(df):
-    """Check data quality before display"""
-    errors = []
+# The display_album_predictions function
+def display_album_predictions(filtered_data, album_covers_df, similar_artists_df):
+    try:
+        album_links_df = load_album_links()
+    except Exception as e:
+        st.error(f"Error loading album links: {e}")
+        album_links_df = pd.DataFrame()
     
-    # Check URL formats
-    art_urls = df['Album Art URL'].dropna()
-    spotify_urls = df['Spotify URL'].dropna()
+    try:
+        merged_data = filtered_data.merge(
+            album_covers_df[['Artist', 'Album Name', 'Album Art']], 
+            on=['Artist', 'Album Name'],
+            how='left'
+        )
+        
+        if not album_links_df.empty:
+            merged_data = merged_data.merge(
+                album_links_df[['Album Name', 'Artist Name(s)', 'Spotify URL']],
+                left_on=['Album Name', 'Artist'],
+                right_on=['Album Name', 'Artist Name(s)'],
+                how='left'
+            )
+    except Exception as e:
+        st.error(f"Error merging data: {e}")
+        merged_data = filtered_data
     
-    if not all(art_urls.str.startswith(('http://', 'https://'))):
-        errors.append("Some cover art URLs are malformed")
+    filtered_albums = merged_data
     
-    if not all(spotify_urls.str.contains('spotify.com')):
-        errors.append("Some Spotify URLs are invalid")
-    
-    return errors if errors else None
-
-def display_album_predictions(filtered_data):
-    """Render album cards using consolidated data"""
-    for idx, row in filtered_data.iterrows():
+    for idx, row in filtered_albums.iterrows():
         with st.container():
+            st.markdown('<div class="album-container">', unsafe_allow_html=True)
             cols = st.columns([2, 4, 1, 1])
             
-            # Column 1: Album Art
             with cols[0]:
-                if pd.notna(row['Album Art URL']):
-                    st.image(row['Album Art URL'], width=300)
+                if 'Album Art' in row and pd.notna(row['Album Art']):
+                    st.image(row['Album Art'], width=300, use_column_width="always")
                 else:
-                    show_placeholder_art()
+                    st.markdown(
+                        """
+                        <div style="display: flex; justify-content: center; align-items: center; 
+                                  height: 300px; background-color: #f0f0f0; border-radius: 10px;">
+                            <span style="font-size: 48px;">🎵</span>
+                        </div>
+                        """, 
+                        unsafe_allow_html=True
+                    )
             
-            # Column 2: Album Info
             with cols[1]:
-                st.markdown(f"**{row['Artist']} - {row['Album Name']}**")
+                st.markdown(f'<div class="album-title" style="font-size: 1.8rem; font-weight: 600; margin-bottom: 16px;">{row["Artist"]} - {row["Album Name"]}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Genre:</strong> {row["Genres"]}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Label:</strong> {row["Label"]}</div>', unsafe_allow_html=True)
                 
-                # Spotify link
-                if pd.notna(row['Spotify URL']):
+                similar_artists = similar_artists_df[
+                    similar_artists_df['Artist'] == row['Artist']
+                ]
+                
+                if not similar_artists.empty:
+                    similar_list = similar_artists.iloc[0]['Similar Artists']
+                    st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Similar Artists:</strong> {similar_list}</div>', unsafe_allow_html=True)
+                
+                if 'Spotify URL' in row and pd.notna(row['Spotify URL']):
                     spotify_url = row['Spotify URL']
-                    if not spotify_url.startswith('http'):
-                        spotify_url = f'https://{spotify_url}'
-                    st.markdown(f"[▶ Play on Spotify]({spotify_url})")
-                
-                # Genre and label information
-                st.markdown(f"**Genre:** {row['Genres']}")
-                st.markdown(f"**Label:** {row['Label']}")
+                    st.markdown(f'''
+                        <a href="https://{spotify_url}" target="_blank" class="spotify-button">
+                            ▶ Play on Spotify
+                        </a>
+                    ''', unsafe_allow_html=True) 
                 
                 # Public rating section with username input
                 st.markdown('<div class="feedback-container">', unsafe_allow_html=True)
@@ -515,48 +589,116 @@ def display_album_predictions(filtered_data):
                 username = st.text_input("Your name (optional):", key=f"username_input_{idx}", value="")
                 username = username.strip() if username else "Anonymous"
 
+                # Load existing feedback to pre-populate the review field
+                feedback_df = load_feedback()
+                existing_feedback = feedback_df[
+                    (feedback_df['Album Name'] == row['Album Name']) & 
+                    (feedback_df['Artist'] == row['Artist'])
+                ]
+                
                 # Create a unique key using album name and artist
                 unique_key = f"{row['Album Name']}_{row['Artist']}"
 
+                # Pre-populate the review field if feedback exists
+                # But set value to empty string to prevent persistence
+                existing_review = ""
+                if not existing_feedback.empty:
+                    existing_review = existing_feedback.iloc[0].get('Review', '')
+                    # We still load it to display elsewhere, but don't use it in the text area
+
                 # Add review input field with empty value to prevent persistence
                 review = st.text_area("Mini review (optional):", 
-                                    value="", 
-                                    key=f"review_input_{unique_key}", 
-                                    max_chars=200, 
-                                    height=80)
+                                     value="", 
+                                     key=f"review_input_{unique_key}", 
+                                     max_chars=200, 
+                                     height=80)
+
 
                 # Create fixed-width columns for buttons
                 button_cols = st.columns(3)
+
+                # Create a unique key using album name and artist
+                unique_key = f"{row['Album Name']}_{row['Artist']}"
 
                 # Like Button
                 with button_cols[0]:
                     if st.button('👍 Like', key=f"public_like_{unique_key}", use_container_width=True):
                         if username == "Mike S":
-                            save_feedback(row['Album Name'], row['Artist'], 'like', review)
+                            # Load existing feedback to check if a review already exists
+                            feedback_df = load_feedback()
+                            existing_feedback = feedback_df[
+                                (feedback_df['Album Name'] == row['Album Name']) & 
+                                (feedback_df['Artist'] == row['Artist'])
+                            ]
+                            
+                            # Preserve existing review if it exists
+                            existing_review = ""
+                            if not existing_feedback.empty:
+                                existing_review = existing_feedback.iloc[0].get('Review', '')
+                            
+                            # Save feedback with the new review (if provided) or the existing review
+                            save_feedback(row['Album Name'], row['Artist'], 'like', review or existing_review)
+                            # Display as just "Mike"
                             username = "Mike"
                         else:
                             save_public_feedback(row['Album Name'], row['Artist'], 'like', username, review)
+                        
+                        # Just rerun - the review will be cleared because we set value=""
                         st.rerun()
 
                 # Mid Button
                 with button_cols[1]:
                     if st.button('😐 Mid', key=f"public_mid_{unique_key}", use_container_width=True):
                         if username == "Mike S":
-                            save_feedback(row['Album Name'], row['Artist'], 'mid', review)
+                            # Load existing feedback to check if a review already exists
+                            feedback_df = load_feedback()
+                            existing_feedback = feedback_df[
+                                (feedback_df['Album Name'] == row['Album Name']) & 
+                                (feedback_df['Artist'] == row['Artist'])
+                            ]
+                            
+                            # Preserve existing review if it exists
+                            existing_review = ""
+                            if not existing_feedback.empty:
+                                existing_review = existing_feedback.iloc[0].get('Review', '')
+                            
+                            # Save feedback with the new review (if provided) or the existing review
+                            save_feedback(row['Album Name'], row['Artist'], 'mid', review or existing_review)
+                            # Display as just "Mike"
                             username = "Mike"
                         else:
                             save_public_feedback(row['Album Name'], row['Artist'], 'mid', username, review)
+                        
+                        # Just rerun - the review will be cleared because we set value=""
                         st.rerun()
 
                 # Dislike Button
                 with button_cols[2]:
                     if st.button('👎 Dislike', key=f"public_dislike_{unique_key}", use_container_width=True):
                         if username == "Mike S":
-                            save_feedback(row['Album Name'], row['Artist'], 'dislike', review)
+                            # Load existing feedback to check if a review already exists
+                            feedback_df = load_feedback()
+                            existing_feedback = feedback_df[
+                                (feedback_df['Album Name'] == row['Album Name']) & 
+                                (feedback_df['Artist'] == row['Artist'])
+                            ]
+                            
+                            # Preserve existing review if it exists
+                            existing_review = ""
+                            if not existing_feedback.empty:
+                                existing_review = existing_feedback.iloc[0].get('Review', '')
+                            
+                            # Save feedback with the new review (if provided) or the existing review
+                            save_feedback(row['Album Name'], row['Artist'], 'dislike', review or existing_review)
+                            # Display as just "Mike"
                             username = "Mike"
                         else:
                             save_public_feedback(row['Album Name'], row['Artist'], 'dislike', username, review)
+                        
+                        # Just rerun - the review will be cleared because we set value=""
                         st.rerun()
+
+
 
                 st.markdown('</div>', unsafe_allow_html=True)  # Close the feedback-container div
                 
@@ -576,7 +718,7 @@ def display_album_predictions(filtered_data):
                     st.markdown(f'<div class="public-rating-stats">Total: {public_stats["like"]} 👍 | {public_stats["mid"]} 😐 | {public_stats["dislike"]} 👎</div>', unsafe_allow_html=True)
                     
                     # Display recent reviews
-                    if 'Review' in recent_feedback.columns:
+                    if 'Review' in recent_feedback.columns:  # Check if the 'Review' column exists
                         reviews_to_show = recent_feedback[recent_feedback['Review'].notna() & (recent_feedback['Review'] != "")]
                         if not reviews_to_show.empty:
                             st.markdown('<div class="recent-reviews" style="margin-top: 10px;">', unsafe_allow_html=True)
@@ -586,6 +728,8 @@ def display_album_predictions(filtered_data):
                             st.markdown('</div>', unsafe_allow_html=True)
                 else:
                     st.markdown('<div class="public-rating-stats">No ratings yet - be the first!</div>', unsafe_allow_html=True)
+                
+                st.markdown('</div>', unsafe_allow_html=True)
             
             with cols[2]:
                 st.markdown('<div class="metric-container">', unsafe_allow_html=True)
@@ -611,40 +755,13 @@ def display_album_predictions(filtered_data):
                     elif feedback == 'dislike':
                         st.markdown('👎 Mike didn\'t like it')
                     
+                    # Display Mike's review if it exists
                     if review_text and not pd.isna(review_text):
                         st.markdown(f'<div style="font-style: italic; margin-top: 5px;">"{review_text}"</div>', unsafe_allow_html=True)
                 else:
                     st.markdown('😶 Mike hasn\'t listened/rated this album.')
-
-def album_fixer_page():
-    st.title("🛠️ Album Fixer")
-    
-    # Load the current prediction file
-    predictions_data = load_predictions()
-    if predictions_data is None:
-        st.error("Could not load prediction data.")
-        return
-    
-    df, _ = predictions_data
-    
-    with st.expander("⚡ Quick Fixes"):
-        # Add direct editing of URLs
-        selected_idx = st.selectbox("Select album to fix", df.index,
-                                  format_func=lambda x: f"{df.loc[x]['Artist']} - {df.loc[x]['Album Name']}")
-        
-        col1, col2 = st.columns(2)
-        with col1:
-            new_art = st.text_input("New Cover URL", df.loc[selected_idx, 'Album Art URL'])
-        with col2:
-            new_spotify = st.text_input("New Spotify URL", df.loc[selected_idx, 'Spotify URL'])
-        
-        if st.button("Save Changes"):
-            df.loc[selected_idx, 'Album Art URL'] = new_art
-            df.loc[selected_idx, 'Spotify URL'] = new_spotify
-            df.to_csv(glob.glob('predictions/*_Album_Recommendations.csv')[0], index=False)
-            st.success("Updated!")
-            st.cache_data.clear()
-            st.rerun()
+                
+            st.markdown('</div>', unsafe_allow_html=True)
 
 def about_me_page():
     st.title("# About Me")
@@ -663,6 +780,592 @@ def about_me_page():
     
     st.image("graphics/mike.jpeg", width=400)
     st.caption("Me on the Milwaukee Riverwalk, wearing one of my 50+ bowties.")
+
+def album_fixer_page():
+    st.title("🛠️ Album Fixer")
+    
+    # Create tabs for different functions
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+        "Add Missing Album Artwork", 
+        "Fix Album Covers with Wrong Image", 
+        "Fix Spotify Links", 
+        "Nuke Albums", 
+        "Manage Anonymous Reviews",
+        "Data Backup & Restore"
+    ])
+    
+    with tab1:
+        st.subheader("Manage Missing Album Artwork")
+        
+        # Load the current album covers data and predictions data
+        album_covers_df = load_album_covers()
+        predictions_data = load_predictions()
+        
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
+        
+        df, _ = predictions_data
+        all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
+        
+        # Identify albums missing artwork
+        merged_df = all_albums_df.merge(
+            album_covers_df,
+            left_on=['Artist', 'Album Name'],
+            right_on=['Artist', 'Album Name'],
+            how='left'
+        )
+        
+        missing_artwork = merged_df[merged_df['Album Art'].isna()].copy()
+        
+        # Show statistics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Albums", len(all_albums_df))
+        with col2:
+            st.metric("Missing Artwork", len(missing_artwork))
+        
+        if len(missing_artwork) == 0:
+            st.success("All albums have artwork! 🎉")
+        else:
+            # Search functionality
+            st.subheader("Search Albums")
+            search_query = st.text_input("Search by artist or album name:", key="artwork_search")
+            
+            # Quick search buttons
+            quick_search_terms = ['Live', 'Deluxe', 'Reissue']
+            st.write("Quick searches:")
+            cols = st.columns(len(quick_search_terms))
+            for i, term in enumerate(quick_search_terms):
+                with cols[i]:
+                    if st.button(term, key=f"quick_search_{term}"):
+                        search_query = term
+            
+            # Filter albums based on search
+            if search_query:
+                filtered_missing = missing_artwork[
+                    missing_artwork['Artist'].str.contains(search_query, case=False) |
+                    missing_artwork['Album Name'].str.contains(search_query, case=False)
+                ]
+            else:
+                filtered_missing = missing_artwork
+            
+            # Display filtered results
+            st.subheader(f"Albums Missing Artwork ({len(filtered_missing)})")
+            
+            for _, row in filtered_missing.iterrows():
+                with st.container():
+                    st.markdown("---")
+                    cols = st.columns([2, 3, 1])
+                    
+                    with cols[0]:
+                        st.write(f"**Artist:** {row['Artist']}")
+                        st.write(f"**Album:** {row['Album Name']}")
+                    
+                    with cols[1]:
+                        url = st.text_input(
+                            "Image URL:",
+                            key=f"url_{row['Artist']}_{row['Album Name']}"
+                        )
+                        st.caption("Right-click image in Google and copy image address")
+                    
+                    with cols[2]:
+                        if url:
+                            try:
+                                st.image(url, width=100)
+                                if st.button("Save", key=f"save_{row['Artist']}_{row['Album Name']}"):
+                                    # Add new row to album_covers_df
+                                    new_row = {
+                                        'Artist': row['Artist'],
+                                        'Album Name': row['Album Name'],
+                                        'Album Art': url
+                                    }
+                                    album_covers_df = pd.concat([album_covers_df, pd.DataFrame([new_row])], ignore_index=True)
+                                    album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
+                                    st.success("Saved!")
+                                    st.cache_data.clear()
+                                    st.rerun()
+                            except:
+                                st.error("Invalid image URL")
+
+    with tab2:
+        st.subheader("Fix Album Covers with Wrong Image")
+        
+        # Load the current album covers data and predictions data
+        album_covers_df = load_album_covers()
+        predictions_data = load_predictions()
+        
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
+        
+        df, _ = predictions_data
+        all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
+        
+        # Merge with album covers to get all albums with covers
+        merged_df = all_albums_df.merge(
+            album_covers_df,
+            left_on=['Artist', 'Album Name'],
+            right_on=['Artist', 'Album Name'],
+            how='inner'
+        )
+        
+        albums_with_covers = merged_df.copy()
+        
+        # Show statistics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Albums", len(all_albums_df))
+        with col2:
+            st.metric("Albums with Artwork", len(albums_with_covers))
+        
+        if len(albums_with_covers) == 0:
+            st.warning("No albums with artwork found.")
+        else:
+            # Album selection
+            st.subheader("Select an album to update its cover")
+        
+            selected_album_idx = st.selectbox(
+                "Albums with artwork:",
+                options=range(len(albums_with_covers)),
+                format_func=lambda x: f"{albums_with_covers.iloc[x]['Artist']} - {albums_with_covers.iloc[x]['Album Name']}",
+                key="fix_artwork_selector"
+            )
+            
+            if selected_album_idx is not None:
+                selected_album = albums_with_covers.iloc[selected_album_idx]
+                artist = selected_album['Artist']
+                album = selected_album['Album Name']
+                current_cover_url = selected_album['Album Art']
+                
+                st.write(f"**Selected:** {artist} - {album}")
+                
+                # Display current cover
+                st.subheader("Current Album Cover")
+                try:
+                    st.image(current_cover_url, caption=f"Current cover for {artist} - {album}", width=300)
+                except Exception as e:
+                    st.error(f"Failed to load current image: {e}")
+                
+                # Direct URL input for new cover
+                st.subheader("Enter New Album Cover Image URL")
+                new_url = st.text_input("New Image URL:", 
+                                      value="",
+                                      key="fix_artwork_url")
+                
+                # Helper text
+                st.caption("Tip: Search for the correct album cover on Google Images, right-click on an image and select 'Copy image address'")
+                
+                # Preview the new URL image if provided
+                if new_url:
+                    st.subheader("New Album Cover Preview")
+                    try:
+                        st.image(new_url, caption=f"New cover for {artist} - {album}", width=300)
+                    except Exception as e:
+                        st.error(f"Failed to load image from URL: {e}")
+                
+                # Save the new URL
+                if new_url and st.button("Update Album Cover", key="update_artwork"):
+                    # Update the existing entry
+                    album_covers_df.loc[(album_covers_df['Artist'] == artist) & 
+                                      (album_covers_df['Album Name'] == album), 'Album Art'] = new_url
+                    
+                    # Save the updated dataframe
+                    try:
+                        album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
+                        st.success(f"Updated album art URL for {artist} - {album}")
+                        
+                        # Clear cache to reflect the update
+                        st.cache_data.clear()
+                        st.rerun()
+                    except Exception as e:
+                        st.error(f"Failed to save: {e}")
+
+    with tab3:
+        st.subheader("Fix Spotify Links")
+        
+        # Load the current album links data and predictions data
+        album_links_df = load_album_links()
+        predictions_data = load_predictions()
+        
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
+        
+        df, _ = predictions_data
+        all_albums_df = df[['Artist', 'Album Name']].drop_duplicates()
+        
+        # Rename Artist column to match album_links_df
+        all_albums_df = all_albums_df.rename(columns={'Artist': 'Artist Name(s)'})
+        
+        # Identify albums missing Spotify links
+        merged_df = all_albums_df.merge(
+            album_links_df,
+            left_on=['Album Name', 'Artist Name(s)'],
+            right_on=['Album Name', 'Artist Name(s)'],
+            how='left'
+        )
+        
+        missing_links = merged_df[merged_df['Spotify URL'].isna()].copy()
+        
+        # Show statistics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Albums", len(all_albums_df))
+        with col2:
+            st.metric("Missing Spotify Links", len(missing_links))
+        
+        if len(missing_links) == 0:
+            st.success("All albums have Spotify links! 🎉")
+        else:
+            # Search functionality
+            st.subheader("Search Albums")
+            search_query = st.text_input("Search by artist or album name:", key="spotify_search")
+            
+            # Quick search buttons
+            quick_search_terms = ['Live', 'Deluxe', 'Reissue']
+            st.write("Quick searches:")
+            cols = st.columns(len(quick_search_terms))
+            for i, term in enumerate(quick_search_terms):
+                with cols[i]:
+                    if st.button(term, key=f"spotify_quick_search_{term}"):
+                        search_query = term
+            
+            # Filter albums based on search
+            if search_query:
+                filtered_missing = missing_links[
+                    missing_links['Artist Name(s)'].str.contains(search_query, case=False) |
+                    missing_links['Album Name'].str.contains(search_query, case=False)
+                ]
+            else:
+                filtered_missing = missing_links
+            
+            # Display filtered results
+            st.subheader(f"Albums Missing Spotify Links ({len(filtered_missing)})")
+            
+            for _, row in filtered_missing.iterrows():
+                with st.container():
+                    st.markdown("---")
+                    cols = st.columns([2, 3, 1])
+                    
+                    with cols[0]:
+                        st.write(f"**Artist:** {row['Artist Name(s)']}")
+                        st.write(f"**Album:** {row['Album Name']}")
+                    
+                    with cols[1]:
+                        url = st.text_input(
+                            "Spotify URL:",
+                            key=f"spotify_url_{row['Artist Name(s)']}_{row['Album Name']}",
+                            help="Paste full Spotify URL (e.g., https://open.spotify.com/album/...)"
+                        )
+                        if st.button("🔍 Search on Spotify", key=f"spotify_search_{row['Artist Name(s)']}_{row['Album Name']}"):
+                            search_url = f"https://open.spotify.com/search/{row['Artist Name(s)']}%20{row['Album Name']}"
+                            st.markdown(f'<a href="{search_url}" target="_blank">Open Spotify Search</a>', unsafe_allow_html=True)
+                    
+                    with cols[2]:
+                        if url:
+                            if st.button("Save", key=f"save_spotify_{row['Artist Name(s)']}_{row['Album Name']}"):
+                                # Create a new row for the dataframe
+                                new_row = {
+                                    'Album Name': row['Album Name'],
+                                    'Artist Name(s)': row['Artist Name(s)'],
+                                    'Spotify URL': url.replace('https://', '')  # Remove https:// prefix
+                                }
+                                
+                                # Check if this artist/album already exists
+                                existing_index = album_links_df[
+                                    (album_links_df['Artist Name(s)'] == row['Artist Name(s)']) & 
+                                    (album_links_df['Album Name'] == row['Album Name'])
+                                ].index
+                                
+                                if not existing_index.empty:
+                                    # Update existing entry
+                                    album_links_df.loc[existing_index, 'Spotify URL'] = new_row['Spotify URL']
+                                else:
+                                    # Add new entry
+                                    album_links_df = pd.concat([album_links_df, pd.DataFrame([new_row])], ignore_index=True)
+                                
+                                # Save the updated dataframe
+                                try:
+                                    album_links_df.to_csv('data/nmf_album_links.csv', index=False)
+                                    st.success("Saved!")
+                                    st.cache_data.clear()
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Failed to save: {e}")
+
+    with tab4:
+        st.subheader("Nuke Albums")
+        
+        # Load the current predictions data
+        predictions_data = load_predictions()
+        if predictions_data is None:
+            st.error("Could not load prediction data. Please check the predictions folder.")
+            return
+        
+        df, _ = predictions_data
+        
+        # Load or create the nuked albums CSV
+        nuked_albums_file = 'data/nuked_albums.csv'
+        if os.path.exists(nuked_albums_file):
+            nuked_albums_df = pd.read_csv(nuked_albums_file)
+        else:
+            nuked_albums_df = pd.DataFrame(columns=['Artist', 'Album Name', 'Reason'])
+        
+        # Initialize session state for nuked albums if not already set
+        if 'nuked_albums' not in st.session_state:
+            st.session_state.nuked_albums = nuked_albums_df.to_dict('records')
+        
+        # Show statistics
+        col1, col2 = st.columns(2)
+        with col1:
+            st.metric("Total Albums", len(df))
+        with col2:
+            st.metric("Nuked Albums", len(st.session_state.nuked_albums))
+        
+        # Suggest albums for nuking based on keywords
+        st.subheader("Suggestions for Nuking")
+        keywords = ["Live", "Deluxe", "Reissue", "Anniversary"]
+        suggested_albums = df[
+            df['Album Name'].str.contains('|'.join(keywords), case=False, regex=True)
+        ]
+        
+        if not suggested_albums.empty:
+            st.write("Albums with keywords like 'Live', 'Deluxe', 'Reissue', or 'Anniversary':")
+            for idx, row in suggested_albums.iterrows():
+                # Check if the album has already been nuked
+                already_nuked = any(
+                    (nuked['Artist'] == row['Artist']) and (nuked['Album Name'] == row['Album Name'])
+                    for nuked in st.session_state.nuked_albums
+                )
+                
+                # Only show the button if the album hasn't been nuked
+                if not already_nuked:
+                    if st.button(f"Nuke {row['Artist']} - {row['Album Name']}", key=f"suggested_nuke_{idx}"):
+                        # Add to nuked albums
+                        new_nuke = {
+                            'Artist': row['Artist'],
+                            'Album Name': row['Album Name'],
+                            'Reason': "Keyword match"
+                        }
+                        st.session_state.nuked_albums.append(new_nuke)
+                        nuked_albums_df = pd.DataFrame(st.session_state.nuked_albums)
+                        nuked_albums_df.to_csv(nuked_albums_file, index=False)
+                        st.success(f"Nuked {row['Artist']} - {row['Album Name']}")
+                        st.rerun()  # Refresh the page to update the UI
+                else:
+                    st.write(f"✅ {row['Artist']} - {row['Album Name']} has already been nuked.")
+        else:
+            st.info("No albums found with keywords like 'Live', 'Deluxe', 'Reissue', or 'Anniversary'.")
+        
+        # Manual nuking
+        st.subheader("Manually Nuke an Album")
+        all_albums = df[['Artist', 'Album Name']].drop_duplicates()
+        selected_album_idx = st.selectbox(
+            "Select an album to nuke:",
+            options=range(len(all_albums)),
+            format_func=lambda x: f"{all_albums.iloc[x]['Artist']} - {all_albums.iloc[x]['Album Name']}"
+        )
+        
+        if selected_album_idx is not None:
+            selected_album = all_albums.iloc[selected_album_idx]
+            artist = selected_album['Artist']
+            album = selected_album['Album Name']
+            
+            st.write(f"**Selected:** {artist} - {album}")
+            
+            # Reason for nuking
+            reason = st.text_input("Reason for nuking (optional):", key=f"nuke_reason_{selected_album_idx}")
+            
+            if st.button("Nuke This Album", key=f"nuke_button_{selected_album_idx}"):
+                # Add to nuked albums
+                new_nuke = {
+                    'Artist': artist,
+                    'Album Name': album,
+                    'Reason': reason if reason else "Manual nuke"
+                }
+                st.session_state.nuked_albums.append(new_nuke)
+                nuked_albums_df = pd.DataFrame(st.session_state.nuked_albums)
+                nuked_albums_df.to_csv(nuked_albums_file, index=False)
+                st.success(f"Nuked {artist} - {album}")
+                st.rerun()
+        
+        # Show current nuked albums
+        st.subheader("Currently Nuked Albums")
+        if st.session_state.nuked_albums:
+            st.dataframe(pd.DataFrame(st.session_state.nuked_albums))
+        else:
+            st.info("No albums have been nuked yet.")
+
+    with tab5:
+        st.subheader("Manage Reviews")
+        
+        # Load public feedback
+        public_feedback_df = load_public_feedback()
+        
+        # Show statistics
+        col1, col2, col3, col4 = st.columns(4)
+        with col1:
+            st.metric("Total Reviews", len(public_feedback_df))
+        with col2:
+            st.metric("Anonymous Reviews", len(public_feedback_df[public_feedback_df['Username'] == "Anonymous"]))
+        with col3:
+            st.metric("Mike's Reviews", len(public_feedback_df[public_feedback_df['Username'] == "Mike"]))
+        with col4:
+            # Count reviews with usernames similar to Mike (case insensitive)
+            mike_like_reviews = public_feedback_df[
+                public_feedback_df['Username'].str.lower().str.contains('mike')
+            ]
+            st.metric("Mike-like Reviews", len(mike_like_reviews))
+        
+        if public_feedback_df.empty:
+            st.info("No reviews found!")
+        else:
+            # Add filter options
+            filter_options = ["All Reviews", "Anonymous Reviews Only", "Mike's Reviews Only", 
+                            "Mike-like Reviews", "Other Users' Reviews"]
+            filter_choice = st.radio("Filter reviews:", filter_options)
+            
+            # Apply filter
+            if filter_choice == "Anonymous Reviews Only":
+                filtered_reviews = public_feedback_df[public_feedback_df['Username'] == "Anonymous"].copy()
+            elif filter_choice == "Mike's Reviews Only":
+                filtered_reviews = public_feedback_df[public_feedback_df['Username'] == "Mike"].copy()
+            elif filter_choice == "Mike-like Reviews":
+                filtered_reviews = public_feedback_df[
+                    public_feedback_df['Username'].str.lower().str.contains('mike')
+                ].copy()
+            elif filter_choice == "Other Users' Reviews":
+                filtered_reviews = public_feedback_df[
+                    (~public_feedback_df['Username'].str.lower().str.contains('mike')) & 
+                    (public_feedback_df['Username'] != "Anonymous")
+                ].copy()
+            else:
+                filtered_reviews = public_feedback_df.copy()
+            
+            # Sort options
+            sort_options = ["Newest First", "Oldest First", "Album Name", "Artist Name"]
+            sort_choice = st.selectbox("Sort by:", sort_options)
+            
+            # Apply sorting
+            if sort_choice == "Newest First":
+                filtered_reviews['Timestamp'] = pd.to_datetime(filtered_reviews['Timestamp'])
+                filtered_reviews = filtered_reviews.sort_values('Timestamp', ascending=False)
+            elif sort_choice == "Oldest First":
+                filtered_reviews['Timestamp'] = pd.to_datetime(filtered_reviews['Timestamp'])
+                filtered_reviews = filtered_reviews.sort_values('Timestamp', ascending=True)
+            elif sort_choice == "Album Name":
+                filtered_reviews = filtered_reviews.sort_values('Album Name')
+            elif sort_choice == "Artist Name":
+                filtered_reviews = filtered_reviews.sort_values('Artist')
+            
+            # Display reviews with delete buttons
+            st.subheader(f"Reviews ({len(filtered_reviews)})")
+            
+            for idx, row in filtered_reviews.iterrows():
+                with st.container():
+                    cols = st.columns([3, 1, 1])
+                    
+                    with cols[0]:
+                        feedback_emoji = "👍" if row['Feedback'] == 'like' else "😐" if row['Feedback'] == 'mid' else "👎"
+                        review_text = f"\"{row['Review']}\"" if row['Review'] and not pd.isna(row['Review']) else "No review text"
+                        st.write(f"**{row['Artist']} - {row['Album Name']}** {feedback_emoji}")
+                        st.write(f"User: **{row['Username']}** | Date: {row['Timestamp']}")
+                        st.write(review_text)
+                    
+                    with cols[2]:
+                        if st.button("Delete", key=f"delete_review_{idx}"):
+                            # Remove this review
+                            public_feedback_df = public_feedback_df.drop(idx)
+                            
+                            # Save the updated dataframe
+                            public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                            st.success(f"Deleted review for {row['Artist']} - {row['Album Name']} by {row['Username']}")
+                            
+                            # Clear cache and rerun
+                            st.cache_data.clear()
+                            st.rerun()
+            
+            # Add bulk delete options
+            st.subheader("Bulk Delete Options")
+            bulk_options = st.columns(4)
+            
+            with bulk_options[0]:
+                if st.button("Delete All Anonymous Reviews"):
+                    # Remove all anonymous reviews
+                    public_feedback_df = public_feedback_df[public_feedback_df['Username'] != "Anonymous"]
+                    
+                    # Save the updated dataframe
+                    public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                    st.success(f"Deleted all anonymous reviews")
+                    
+                    # Clear cache and rerun
+                    st.cache_data.clear()
+                    st.rerun()
+            
+            with bulk_options[1]:
+                if st.button("Delete All Mike-like Reviews"):
+                    # Count before deletion
+                    count_before = len(public_feedback_df)
+                    
+                    # Remove all reviews with usernames containing 'mike' (case insensitive)
+                    public_feedback_df = public_feedback_df[
+                        ~public_feedback_df['Username'].str.lower().str.contains('mike')
+                    ]
+                    
+                    # Count after deletion
+                    count_deleted = count_before - len(public_feedback_df)
+                    
+                    # Save the updated dataframe
+                    public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                    st.success(f"Deleted {count_deleted} Mike-like reviews")
+                    
+                    # Clear cache and rerun
+                    st.cache_data.clear()
+                    st.rerun()
+            
+            with bulk_options[2]:
+                if st.button("Delete All Displayed Reviews"):
+                    # Get the indices of the filtered reviews
+                    indices_to_delete = filtered_reviews.index
+                    
+                    # Remove these reviews
+                    public_feedback_df = public_feedback_df.drop(indices_to_delete)
+                    
+                    # Save the updated dataframe
+                    public_feedback_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                    st.success(f"Deleted {len(indices_to_delete)} displayed reviews")
+                    
+                    # Clear cache and rerun
+                    st.cache_data.clear()
+                    st.rerun()
+            
+            with bulk_options[3]:
+                if st.button("Delete All Reviews", key="delete_all_reviews"):
+                    # Confirm deletion with a warning
+                    st.warning("⚠️ This will delete ALL reviews! Are you sure?")
+                    if st.button("Yes, Delete ALL Reviews", key="confirm_delete_all"):
+                        # Create empty dataframe with same columns
+                        empty_df = pd.DataFrame(columns=public_feedback_df.columns)
+                        
+                        # Save the empty dataframe
+                        empty_df.to_csv('feedback/public_feedback.csv', index=False, quoting=1)
+                        st.success(f"Deleted all {len(public_feedback_df)} reviews")
+                        
+                        # Clear cache and rerun
+                        st.cache_data.clear()
+                        st.rerun()
+
+    with tab6:
+        # Import the data_backup_restore module
+        try:
+            from data_backup_restore import data_backup_restore_tab
+            # Call the function to render the tab content
+            data_backup_restore_tab()
+        except ImportError:
+            st.error("Could not load data_backup_restore module. Make sure data_backup_restore.py is in your project directory.")
+        except Exception as e:
+            st.error(f"Error loading Data Backup & Restore tab: {e}")
 
 def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")
@@ -916,15 +1619,14 @@ def main():
         
         # Load the selected predictions file
         predictions_data = load_predictions(selected_file)
+        album_covers_df = load_album_covers()
+        similar_artists_df = load_similar_artists()
+        
         if predictions_data is None:
             st.error("Could not load prediction data. Please check the predictions folder.")
             return
         
         df, analysis_date = predictions_data
-        
-        # Validate data
-        if errors := validate_prediction_file(df):
-            st.error("Data issues found: " + "; ".join(errors))
         
         # Load nuked albums
         nuked_albums_df = load_nuked_albums()
@@ -974,6 +1676,8 @@ def main():
             options=sorted(filtered_genres),
             default=[]
         )
+
+
         
         if genres:
             filtered_data = df[
@@ -983,7 +1687,7 @@ def main():
             filtered_data = df
         
         filtered_data = filtered_data.sort_values('avg_score', ascending=False)
-        display_album_predictions(filtered_data)
+        display_album_predictions(filtered_data, album_covers_df, similar_artists_df)
         
         # Archive navigation at the bottom of the page
         if len(file_dates) > 1:

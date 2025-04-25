@@ -828,70 +828,65 @@ def album_fixer_page():
         if len(missing_artwork) == 0:
             st.success("All albums have artwork! 🎉")
         else:
-            # Album selection
-            st.subheader("Select an album to update")
-        
-            selected_album_idx = st.selectbox(
-                "Albums missing artwork:",
-                options=range(len(missing_artwork)),
-                format_func=lambda x: f"{missing_artwork.iloc[x]['Artist']} - {missing_artwork.iloc[x]['Album Name']}",
-                key="missing_artwork_selector"
-            )
+            # Search functionality
+            st.subheader("Search Albums")
+            search_query = st.text_input("Search by artist or album name:", key="artwork_search")
             
-            if selected_album_idx is not None:
-                selected_album = missing_artwork.iloc[selected_album_idx]
-                artist = selected_album['Artist']
-                album = selected_album['Album Name']
-                
-                st.write(f"**Selected:** {artist} - {album}")
-                
-                # Direct URL input
-                st.subheader("Enter Album Cover Image URL")
-                direct_url = st.text_input("Image URL:", 
-                                          value=st.session_state.get(f"{artist}_{album}_url", ""),
-                                          key="missing_artwork_url")
-                
-                # Helper text
-                st.caption("Tip: Search for the album cover on Google Images, right-click on an image and select 'Copy image address'")
-                
-                # Preview the URL image if provided
-                if direct_url:
-                    try:
-                        st.image(direct_url, caption=f"{artist} - {album}", width=300)
-                    except Exception as e:
-                        st.error(f"Failed to load image from URL: {e}")
-                
-                # Save the direct URL
-                if direct_url and st.button("Save URL", key="save_missing_artwork"):
-                    # Create a new row for the dataframe
-                    new_row = {
-                        'Artist': artist,
-                        'Album Name': album,
-                        'Album Art': direct_url
-                    }
+            # Quick search buttons
+            quick_search_terms = ['Live', 'Deluxe', 'Reissue']
+            st.write("Quick searches:")
+            cols = st.columns(len(quick_search_terms))
+            for i, term in enumerate(quick_search_terms):
+                with cols[i]:
+                    if st.button(term, key=f"quick_search_{term}"):
+                        search_query = term
+            
+            # Filter albums based on search
+            if search_query:
+                filtered_missing = missing_artwork[
+                    missing_artwork['Artist'].str.contains(search_query, case=False) |
+                    missing_artwork['Album Name'].str.contains(search_query, case=False)
+                ]
+            else:
+                filtered_missing = missing_artwork
+            
+            # Display filtered results
+            st.subheader(f"Albums Missing Artwork ({len(filtered_missing)})")
+            
+            for _, row in filtered_missing.iterrows():
+                with st.container():
+                    st.markdown("---")
+                    cols = st.columns([2, 3, 1])
                     
-                    # Check if this artist/album already exists
-                    existing = album_covers_df[(album_covers_df['Artist'] == artist) & 
-                                             (album_covers_df['Album Name'] == album)]
+                    with cols[0]:
+                        st.write(f"**Artist:** {row['Artist']}")
+                        st.write(f"**Album:** {row['Album Name']}")
                     
-                    if not existing.empty:
-                        # Update existing entry
-                        album_covers_df.loc[(album_covers_df['Artist'] == artist) & 
-                                          (album_covers_df['Album Name'] == album), 'Album Art'] = direct_url
-                    else:
-                        # Add new entry
-                        album_covers_df = pd.concat([album_covers_df, pd.DataFrame([new_row])], ignore_index=True)
+                    with cols[1]:
+                        url = st.text_input(
+                            "Image URL:",
+                            key=f"url_{row['Artist']}_{row['Album Name']}"
+                        )
+                        st.caption("Right-click image in Google and copy image address")
                     
-                    # Save the updated dataframe
-                    try:
-                        album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
-                        st.success(f"Saved album art URL for {artist} - {album}")
-                        
-                        # Clear cache to reflect the update
-                        st.cache_data.clear()
-                        st.rerun()
-                    except Exception as e:
-                        st.error(f"Failed to save: {e}")
+                    with cols[2]:
+                        if url:
+                            try:
+                                st.image(url, width=100)
+                                if st.button("Save", key=f"save_{row['Artist']}_{row['Album Name']}"):
+                                    # Add new row to album_covers_df
+                                    new_row = {
+                                        'Artist': row['Artist'],
+                                        'Album Name': row['Album Name'],
+                                        'Album Art': url
+                                    }
+                                    album_covers_df = pd.concat([album_covers_df, pd.DataFrame([new_row])], ignore_index=True)
+                                    album_covers_df.to_csv('data/nmf_album_covers.csv', index=False)
+                                    st.success("Saved!")
+                                    st.cache_data.clear()
+                                    st.rerun()
+                            except:
+                                st.error("Invalid image URL")
 
     with tab2:
         st.subheader("Fix Album Covers with Wrong Image")
@@ -986,7 +981,6 @@ def album_fixer_page():
                     except Exception as e:
                         st.error(f"Failed to save: {e}")
 
-    
     with tab3:
         st.subheader("Fix Spotify Links")
         
@@ -1023,75 +1017,83 @@ def album_fixer_page():
         
         if len(missing_links) == 0:
             st.success("All albums have Spotify links! 🎉")
-            return
+        else:
+            # Search functionality
+            st.subheader("Search Albums")
+            search_query = st.text_input("Search by artist or album name:", key="spotify_search")
             
-        # Album selection
-        st.subheader("Select an album to update")
-        
-        selected_album_idx = st.selectbox(
-            "Albums missing Spotify links:",
-            options=range(len(missing_links)),
-            format_func=lambda x: f"{missing_links.iloc[x]['Artist Name(s)']} - {missing_links.iloc[x]['Album Name']}"
-        )
-        
-        if selected_album_idx is not None:
-            selected_album = missing_links.iloc[selected_album_idx]
-            artist = selected_album['Artist Name(s)']
-            album = selected_album['Album Name']
+            # Quick search buttons
+            quick_search_terms = ['Live', 'Deluxe', 'Reissue']
+            st.write("Quick searches:")
+            cols = st.columns(len(quick_search_terms))
+            for i, term in enumerate(quick_search_terms):
+                with cols[i]:
+                    if st.button(term, key=f"spotify_quick_search_{term}"):
+                        search_query = term
             
-            st.write(f"**Selected:** {artist} - {album}")
+            # Filter albums based on search
+            if search_query:
+                filtered_missing = missing_links[
+                    missing_links['Artist Name(s)'].str.contains(search_query, case=False) |
+                    missing_links['Album Name'].str.contains(search_query, case=False)
+                ]
+            else:
+                filtered_missing = missing_links
             
-            # Direct URL input
-            st.subheader("Enter Spotify URL")
-            direct_url = st.text_input("Spotify URL:", 
-                                      value=st.session_state.get(f"{artist}_{album}_spotify_url", ""))
-
-            # Helper text
-            st.caption("Tip: Search for the album on Spotify, click 'Share', then 'Copy Link'. Paste the full URL here (e.g., https://open.spotify.com/...).") 
-
-            # Format the URL if needed
-            if direct_url:
-                # Remove 'https://' or 'http://' if present
-                if direct_url.startswith('https://'):
-                    direct_url = direct_url.replace('https://', '', 1)  # Remove only the first occurrence
-                    st.info("Removed 'https://' prefix from URL")
-                elif direct_url.startswith('http://'):
-                    direct_url = direct_url.replace('http://', '', 1)  # Remove only the first occurrence
-                    st.info("Removed 'http://' prefix from URL")
+            # Display filtered results
+            st.subheader(f"Albums Missing Spotify Links ({len(filtered_missing)})")
             
-            # Save the direct URL
-            if direct_url and st.button("Save URL"):
-                # Create a new row for the dataframe
-                new_row = {
-                    'Album Name': album,
-                    'Artist Name(s)': artist,
-                    'Spotify URL': direct_url
-                }
-                
-                # Check if this artist/album already exists
-                existing_index = album_links_df[
-                    (album_links_df['Artist Name(s)'] == artist) & 
-                    (album_links_df['Album Name'] == album)
-                ].index
-                
-                if not existing_index.empty:
-                    # Update existing entry
-                    album_links_df.loc[existing_index, 'Spotify URL'] = direct_url
-                else:
-                    # Add new entry
-                    album_links_df = pd.concat([album_links_df, pd.DataFrame([new_row])], ignore_index=True)
-                
-                # Save the updated dataframe
-                try:
-                    album_links_df.to_csv('data/nmf_album_links.csv', index=False)
-                    st.success(f"Saved Spotify URL for {artist} - {album}")
+            for _, row in filtered_missing.iterrows():
+                with st.container():
+                    st.markdown("---")
+                    cols = st.columns([2, 3, 1])
                     
-                    # Clear cache to reflect the update
-                    st.cache_data.clear()
-                    st.rerun()
-                except Exception as e:
-                    st.error(f"Failed to save: {e}")
-    
+                    with cols[0]:
+                        st.write(f"**Artist:** {row['Artist Name(s)']}")
+                        st.write(f"**Album:** {row['Album Name']}")
+                    
+                    with cols[1]:
+                        url = st.text_input(
+                            "Spotify URL:",
+                            key=f"spotify_url_{row['Artist Name(s)']}_{row['Album Name']}",
+                            help="Paste full Spotify URL (e.g., https://open.spotify.com/album/...)"
+                        )
+                        if st.button("🔍 Search on Spotify", key=f"spotify_search_{row['Artist Name(s)']}_{row['Album Name']}"):
+                            search_url = f"https://open.spotify.com/search/{row['Artist Name(s)']}%20{row['Album Name']}"
+                            st.markdown(f'<a href="{search_url}" target="_blank">Open Spotify Search</a>', unsafe_allow_html=True)
+                    
+                    with cols[2]:
+                        if url:
+                            if st.button("Save", key=f"save_spotify_{row['Artist Name(s)']}_{row['Album Name']}"):
+                                # Create a new row for the dataframe
+                                new_row = {
+                                    'Album Name': row['Album Name'],
+                                    'Artist Name(s)': row['Artist Name(s)'],
+                                    'Spotify URL': url.replace('https://', '')  # Remove https:// prefix
+                                }
+                                
+                                # Check if this artist/album already exists
+                                existing_index = album_links_df[
+                                    (album_links_df['Artist Name(s)'] == row['Artist Name(s)']) & 
+                                    (album_links_df['Album Name'] == row['Album Name'])
+                                ].index
+                                
+                                if not existing_index.empty:
+                                    # Update existing entry
+                                    album_links_df.loc[existing_index, 'Spotify URL'] = new_row['Spotify URL']
+                                else:
+                                    # Add new entry
+                                    album_links_df = pd.concat([album_links_df, pd.DataFrame([new_row])], ignore_index=True)
+                                
+                                # Save the updated dataframe
+                                try:
+                                    album_links_df.to_csv('data/nmf_album_links.csv', index=False)
+                                    st.success("Saved!")
+                                    st.cache_data.clear()
+                                    st.rerun()
+                                except Exception as e:
+                                    st.error(f"Failed to save: {e}")
+
     with tab4:
         st.subheader("Nuke Albums")
         
