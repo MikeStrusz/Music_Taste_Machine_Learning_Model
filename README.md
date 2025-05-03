@@ -19,11 +19,11 @@ This project is a machine learning model designed to predict my music taste base
 ## Project Overview
 
 Hi, I'm Mike Strusz! 👋  
-I'm a Data Analyst based in Milwaukee, passionate about solving real-world problems through data-driven insights. With a strong background in data analysis, visualization, and machine learning, I’m always expanding my skills to stay at the forefront of the field.
+I'm a Data Analyst based in Milwaukee, passionate about solving real-world problems through data-driven insights. With a strong background in data analysis, visualization, and machine learning, I'm always expanding my skills to stay at the forefront of the field.
 
 Before transitioning into data analytics, I spent over a decade as a teacher, where I developed a passion for making learning engaging and accessible. This experience has shaped my approach to data: breaking down complex concepts into understandable and actionable insights.
 
-This project is, if I’m being honest, something I initially wanted for my own use. As an avid listener of contemporary music, I love evaluating and experiencing today’s best music, often attending concerts to immerse myself in the artistry. But beyond my personal interest, this project became a fascinating exploration of how machine learning can use past behavior to predict future preferences. It’s not about tracking listeners; it’s about understanding patterns and applying them to create better, more personalized experiences. This approach has broad applications, from music to e-commerce to customer segmentation, and it’s a powerful tool for any business looking to anticipate and meet customer needs.
+This project is, if I'm being honest, something I initially wanted for my own use. As an avid listener of contemporary music, I love evaluating and experiencing today's best music, often attending concerts to immerse myself in the artistry. But beyond my personal interest, this project became a fascinating exploration of how machine learning can use past behavior to predict future preferences. It's not about tracking listeners; it's about understanding patterns and applying them to create better, more personalized experiences. This approach has broad applications, from music to e-commerce to customer segmentation, and it's a powerful tool for any business looking to anticipate and meet customer needs.
 
 The goal of this project is to predict my music preferences and recommend new albums from Spotify's "New Music Friday" playlist. The model uses a combination of regression techniques, network analysis, and feature engineering to make personalized recommendations. Key features include:
 
@@ -91,3 +91,55 @@ The model uses the following features to make predictions:
    ```bash
    git clone https://github.com/yourusername/music-taste-prediction.git
    cd music-taste-prediction
+```
+
+# NMFApp
+
+This Android app connects to a user's Spotify account and provides feedback on the most recent batch of New Music Friday albums, including genre, similar artists, and a prediction for how likely they are to like it.
+
+## Setup Instructions
+
+1. **Prerequisites**:
+   - Ensure you have Node.js and npm installed on your system.
+   - Install the React Native CLI globally:
+     ```bash
+     npm install -g react-native-cli
+     ```
+
+2. **Installation**:
+   - Clone this repository.
+   - Navigate to the project directory:
+     ```bash
+     cd NMFApp
+     ```
+   - Install dependencies:
+     ```bash
+     npm install
+     ```
+
+3. **Running the App**:
+   - Start the Metro bundler:
+     ```bash
+     npx react-native start
+     ```
+   - In a new terminal, run the app on an Android emulator or device:
+     ```bash
+     npx react-native run-android
+     ```
+
+4. **Spotify Integration**:
+   - Ensure you have a Spotify Developer account and have set up an application to get the necessary credentials.
+   - Update the Spotify API credentials in the app configuration.
+
+5. **Making Changes**:
+   - Make your changes in the `src` directory.
+   - Test your changes on an emulator or device.
+
+6. **Contributing**:
+   - Fork the repository.
+   - Create a new branch for your feature.
+   - Submit a pull request with your changes.
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
