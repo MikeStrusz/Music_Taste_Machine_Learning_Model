@@ -3,7 +3,6 @@ name: Keep Streamlit Alive
 on:
   schedule:
     - cron: "0 */4 * * *"
-  workflow_dispatch:
 
 jobs:
   keepalive:
@@ -16,9 +15,6 @@ jobs:
         run: |
           git config user.name "Mike Strusz"
           git config user.email "MikeStrusz@users.noreply.github.com"
-          git commit --allow-empty -m "Keep Streamlit alive" || echo "No changes to commit"
-      
-      - name: Push changes
-        uses: ad-m/github-push-action@v0.6.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+          git pull origin main
+          git commit --allow-empty -m "Keep Streamlit alive"
+          git push origin main
