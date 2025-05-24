@@ -15,6 +15,6 @@ jobs:
         run: |
           git config user.name "Mike Strusz"
           git config user.email "MikeStrusz@users.noreply.github.com"
-          git pull origin main
+          git pull origin main --rebase --autostash
           git commit --allow-empty -m "Keep Streamlit alive"
           git push origin main
