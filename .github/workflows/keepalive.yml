@@ -10,11 +10,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Create empty commit
         run: |
-          git config user.name "Mike Strusz"
-          git config user.email "MikeStrusz@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
           git pull origin main --rebase --autostash
           git commit --allow-empty -m "Keep Streamlit alive"
-          git push origin main
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/MikeStrusz/Music_Taste_Machine_Learning_Model.git HEAD:main
