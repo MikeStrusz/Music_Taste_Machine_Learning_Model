@@ -11,21 +11,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
         with:
+          fetch-depth: 0
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Set up git
+      - name: Set up Git
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: Pull latest changes
+      - name: Pull, commit, and push
         run: |
           git pull origin main --rebase
-
-      - name: Create empty commit
-        run: |
           git commit --allow-empty -m "Keep Streamlit alive"
-
-      - name: Push changes
-        run: |
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/MikeStrusz/Music_Taste_Machine_Learning_Model.git HEAD:main
+          git push origin main
