@@ -1,0 +1,19 @@
+name: Keep Streamlit Alive
+
+on:
+  schedule:
+    - cron: "0 */4 * * *"
+
+jobs:
+  keepalive:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Create empty commit
+        run: |
+          git config user.name "KeepAlive Bot"
+          git config user.email "keepalive@example.com"
+          git commit --allow-empty -m "Keep Streamlit alive"
+          git push
