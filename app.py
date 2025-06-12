@@ -14,6 +14,53 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 from typing import Dict
 import networkx as nx 
+import sys
+import traceback
+
+# HuggingFace Spaces Compatibility Functions
+def ensure_directories_exist():
+    """
+    Ensure all required directories exist, creating them if necessary.
+    This is important for HuggingFace Spaces where directories might not be pre-created.
+    """
+    required_dirs = [
+        'data',
+        'predictions', 
+        'feedback',
+        'graphics'
+    ]
+    
+    for directory in required_dirs:
+        if not os.path.exists(directory):
+            try:
+                os.makedirs(directory, exist_ok=True)
+                print(f"Created directory: {directory}")
+            except Exception as e:
+                print(f"Error creating directory {directory}: {e}")
+
+def safe_load_csv(file_path, default_columns=None):
+    """
+    Safely load a CSV file with error handling.
+    Returns an empty DataFrame with default columns if the file doesn't exist or can't be read.
+    """
+    try:
+        if os.path.exists(file_path):
+            return pd.read_csv(file_path)
+        else:
+            st.warning(f"File not found: {file_path}")
+            if default_columns:
+                return pd.DataFrame(columns=default_columns)
+            return pd.DataFrame()
+    except Exception as e:
+        st.error(f"Error loading {file_path}: {e}")
+        if default_columns:
+            return pd.DataFrame(columns=default_columns)
+        return pd.DataFrame()
+
+# Initialize directories and error handling
+try:
+    # Ensure all required directories exist
+    ensure_directories_exist() 
 
 # Check if App is Running Locally or on Streamlit's Servers
 def is_running_on_streamlit():
@@ -28,9 +75,7 @@ def load_nuked_albums():
     Load the list of nuked albums from the CSV file.
     """
     nuked_albums_file = 'data/nuked_albums.csv'
-    if os.path.exists(nuked_albums_file):
-        return pd.read_csv(nuked_albums_file)
-    return pd.DataFrame(columns=['Artist', 'Album Name', 'Reason'])
+    return safe_load_csv(nuked_albums_file, ['Artist', 'Album Name', 'Reason'])
 
 st.set_page_config(
     page_title="New Music Friday Regression Model",
@@ -237,103 +282,88 @@ def load_predictions(file_path=None):
 
 @st.cache_data
 def load_album_covers():
-    try:
-        return pd.read_csv('data/nmf_album_covers.csv')
-    except Exception as e:
-        st.error(f"Error loading album covers data: {e}")
-        return pd.DataFrame(columns=['Artist', 'Album Name', 'Album Art'])
+    return safe_load_csv('data/nmf_album_covers.csv', ['Artist', 'Album Name', 'Album Art'])
 
 @st.cache_data
 def load_album_links():
-    try:
-        return pd.read_csv('data/nmf_album_links.csv')
-    except Exception as e:
-        st.error(f"Error loading album links data: {e}")
-        return pd.DataFrame(columns=['Album Name', 'Artist Name(s)', 'Spotify URL'])
+    return safe_load_csv('data/nmf_album_links.csv', ['Album Name', 'Artist Name(s)', 'Spotify URL'])
 
 @st.cache_data
 def load_similar_artists():
-    try:
-        return pd.read_csv('data/nmf_similar_artists.csv')
-    except Exception as e:
-        st.error(f"Error loading similar artists data: {e}")
-        return pd.DataFrame(columns=['Artist', 'Similar Artists'])
+    return safe_load_csv('data/nmf_similar_artists.csv', ['Artist', 'Similar Artists'])
 
 @st.cache_data
 def load_liked_similar():
     """
     Load the dataset of similar artists for liked artists.
     """
-    try:
-        return pd.read_csv('data/liked_artists_only_similar.csv')
-    except Exception as e:
-        st.error(f"Error loading liked similar artists data: {e}")
-        return pd.DataFrame(columns=['Artist', 'Similar Artists'])
+    return safe_load_csv('data/liked_artists_only_similar.csv', ['Artist', 'Similar Artists'])
 
 def load_training_data():
-    df = pd.read_csv('data/df_cleaned_pre_standardized.csv')
-    return df[df['playlist_origin'] != 'df_nmf'].copy()
+    df = safe_load_csv('data/df_cleaned_pre_standardized.csv')
+    if not df.empty and 'playlist_origin' in df.columns:
+        return df[df['playlist_origin'] != 'df_nmf'].copy()
+    return df
 
-# Add feedback functions
-def save_feedback(album_name, artist, feedback):
-    feedback_file = 'feedback/feedback.csv'
-    if not os.path.exists('feedback'):
-        os.makedirs('feedback')
+# Improved feedback functions with better error handling
+def save_feedback(album_name, artist, feedback, review=None):
+    """
+    Save user feedback on albums with improved error handling for HuggingFace Spaces.
+    """
+    feedback_dir = 'feedback'
+    feedback_file = os.path.join(feedback_dir, 'feedback.csv')
+    
+    # Ensure the feedback directory exists
+    if not os.path.exists(feedback_dir):
+        try:
+            os.makedirs(feedback_dir, exist_ok=True)
+        except Exception as e:
+            st.error(f"Error creating feedback directory: {e}")
+            return
     
     # Create a dataframe with the new feedback
     new_feedback = pd.DataFrame({
         'Album Name': [album_name],
         'Artist': [artist],
-        'Feedback': [feedback]
+        'Feedback': [feedback],
+        'Review': [review if review else ""]
     })
 
     # Load existing feedback if file exists
     if os.path.exists(feedback_file):
         try:
-            # Use proper quoting and escape characters when reading
-            existing_feedback = pd.read_csv(feedback_file, quoting=1)  # QUOTE_ALL
+            existing_feedback = pd.read_csv(feedback_file, quoting=1)
+            
+            # Remove existing feedback for this album and artist
+            existing_feedback = existing_feedback[
+                ~((existing_feedback['Album Name'] == album_name) & 
+                  (existing_feedback['Artist'] == artist))
+            ]
+            
             # Combine with new feedback
             combined_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
         except Exception as e:
             st.warning(f"Error reading existing feedback: {e}. Creating new file.")
-            # If reading fails, start fresh with just the new feedback
             combined_feedback = new_feedback
     else:
         combined_feedback = new_feedback
     
-    # Save with proper quoting to handle commas in fields
-    combined_feedback.to_csv(feedback_file, index=False, quoting=1)  # QUOTE_ALL
-    
-    # Clear cache after saving feedback
-    st.cache_data.clear()
+    try:
+        # Save with proper quoting to handle commas in fields
+        combined_feedback.to_csv(feedback_file, index=False, quoting=1)
+        
+        # Clear cache after saving feedback
+        st.cache_data.clear()
+    except Exception as e:
+        st.error(f"Error saving feedback: {e}")
 
 def load_feedback():
     feedback_file = 'feedback/feedback.csv'
-    if os.path.exists(feedback_file):
-        try:
-            # Use quoting=1 (QUOTE_ALL) to properly handle commas in fields
-            return pd.read_csv(feedback_file, quoting=1)
-        except Exception as e:
-            st.warning(f"Error loading feedback data: {e}")
-            # Try to recover the file
-            try:
-                # Attempt to read with different options
-                df = pd.read_csv(feedback_file, quoting=1, error_bad_lines=False) 
-                st.info("Partially recovered feedback data")
-                return df
-            except:
-                # If all recovery attempts fail, provide an empty DataFrame as fallback
-                st.error("Could not recover feedback data. Starting with fresh feedback file.")
-                # Backup the problematic file
-                if os.path.exists(feedback_file):
-                    backup_file = feedback_file + ".backup." + datetime.now().strftime("%Y%m%d%H%M%S")
-                    try:
-                        os.rename(feedback_file, backup_file)
-                        st.info(f"Backed up problematic feedback file to {backup_file}")
-                    except:
-                        pass
-                return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
-    return pd.DataFrame(columns=['Album Name', 'Artist', 'Feedback'])
+    return safe_load_csv(feedback_file, ['Album Name', 'Artist', 'Feedback', 'Review'])
+
+def load_public_feedback():
+    feedback_file = 'feedback/public_feedback.csv'
+    return safe_load_csv(feedback_file, ['Album Name', 'Artist', 'Feedback', 'Username', 'Timestamp', 'Review'])
 
 # Updated feedback functions
 def save_feedback(album_name, artist, feedback, review=None):
@@ -377,9 +407,16 @@ def save_feedback(album_name, artist, feedback, review=None):
     st.cache_data.clear()
 
 def save_public_feedback(album_name, artist, feedback, username="Anonymous", review=None):
-    feedback_file = 'feedback/public_feedback.csv'
-    if not os.path.exists('feedback'):
-        os.makedirs('feedback')
+    feedback_dir = 'feedback'
+    feedback_file = os.path.join(feedback_dir, 'public_feedback.csv')
+    
+    # Ensure the feedback directory exists
+    if not os.path.exists(feedback_dir):
+        try:
+            os.makedirs(feedback_dir, exist_ok=True)
+        except Exception as e:
+            st.error(f"Error creating feedback directory: {e}")
+            return
     
     # Create a dataframe with the new feedback
     new_feedback = pd.DataFrame({
@@ -394,22 +431,22 @@ def save_public_feedback(album_name, artist, feedback, username="Anonymous", rev
     # Load existing feedback if file exists
     if os.path.exists(feedback_file):
         try:
-            # Use proper quoting and escape characters when reading
-            existing_feedback = pd.read_csv(feedback_file, quoting=1)  # QUOTE_ALL
-            # Combine with new feedback
+            existing_feedback = pd.read_csv(feedback_file, quoting=1)
             combined_feedback = pd.concat([existing_feedback, new_feedback], ignore_index=True)
         except Exception as e:
             st.warning(f"Error reading existing public feedback: {e}. Creating new file.")
-            # If reading fails, start fresh with just the new feedback
             combined_feedback = new_feedback
     else:
         combined_feedback = new_feedback
     
-    # Save with proper quoting to handle commas in fields
-    combined_feedback.to_csv(feedback_file, index=False, quoting=1)  # QUOTE_ALL
-    
-    # Clear cache after saving feedback
-    st.cache_data.clear()
+    try:
+        # Save with proper quoting to handle commas in fields
+        combined_feedback.to_csv(feedback_file, index=False, quoting=1)
+        
+        # Clear cache after saving feedback
+        st.cache_data.clear()
+    except Exception as e:
+        st.error(f"Error saving public feedback: {e}")
 
 # Updated load feedback functions
 def load_feedback():
@@ -1773,10 +1810,20 @@ def main():
         dacus_game_page(G)
 
 if __name__ == "__main__":
-    # Initialize session state for archive navigation
-    if 'current_archive_index' not in st.session_state:
-        st.session_state.current_archive_index = 0
-    if 'show_all_archives' not in st.session_state:
-        st.session_state.show_all_archives = False
-        
-    main()
+    try:
+        # Initialize session state for archive navigation
+        if 'current_archive_index' not in st.session_state:
+            st.session_state.current_archive_index = 0
+        if 'show_all_archives' not in st.session_state:
+            st.session_state.show_all_archives = False
+            
+        main()
+    except Exception as e:
+        st.error("An error occurred during application execution:")
+        st.error(str(e))
+        st.code(traceback.format_exc())
+
+except Exception as e:
+    st.error("An error occurred during application startup:")
+    st.error(str(e))
+    st.code(traceback.format_exc())
