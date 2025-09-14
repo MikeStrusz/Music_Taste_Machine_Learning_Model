@@ -785,11 +785,10 @@ def album_fixer_page():
     st.title("🛠️ Album Fixer")
     
     # Create tabs for different functions
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
         "Add Missing Album Artwork", 
         "Fix Album Covers with Wrong Image", 
         "Fix Spotify Links", 
-        "Fix Artist/Genre/Similar Artists",
         "Nuke Albums", 
         "Manage Anonymous Reviews",
         "Data Backup & Restore"
@@ -1095,9 +1094,8 @@ def album_fixer_page():
                                 except Exception as e:
                                     st.error(f"Failed to save: {e}")
 
-    
     with tab4:
-        st.subheader("Fix Artist Names, Genres, and Similar Artists")
+        st.subheader("Nuke Albums")
         
         # Load the current predictions data
         predictions_data = load_predictions()
@@ -1107,137 +1105,98 @@ def album_fixer_page():
         
         df, _ = predictions_data
         
-        # Load similar artists data
-        similar_artists_df = load_similar_artists()
+        # Load or create the nuked albums CSV
+        nuked_albums_file = 'data/nuked_albums.csv'
+        if os.path.exists(nuked_albums_file):
+            nuked_albums_df = pd.read_csv(nuked_albums_file)
+        else:
+            nuked_albums_df = pd.DataFrame(columns=['Artist', 'Album Name', 'Reason'])
+        
+        # Initialize session state for nuked albums if not already set
+        if 'nuked_albums' not in st.session_state:
+            st.session_state.nuked_albums = nuked_albums_df.to_dict('records')
         
         # Show statistics
         col1, col2 = st.columns(2)
         with col1:
             st.metric("Total Albums", len(df))
         with col2:
-            st.metric("Artists with Similar Data", len(similar_artists_df))
+            st.metric("Nuked Albums", len(st.session_state.nuked_albums))
         
-        # Album selection
-        st.subheader("Select an album to fix")
+        # Suggest albums for nuking based on keywords
+        st.subheader("Suggestions for Nuking")
+        keywords = ["Live", "Deluxe", "Reissue", "Anniversary"]
+        suggested_albums = df[
+            df['Album Name'].str.contains('|'.join(keywords), case=False, regex=True)
+        ]
         
-        # Create a searchable dropdown
-        all_albums = df[['Artist', 'Album Name', 'Genres']].drop_duplicates()
-        album_options = [f"{row['Artist']} - {row['Album Name']}" for _, row in all_albums.iterrows()]
+        if not suggested_albums.empty:
+            st.write("Albums with keywords like 'Live', 'Deluxe', 'Reissue', or 'Anniversary':")
+            for idx, row in suggested_albums.iterrows():
+                # Check if the album has already been nuked
+                already_nuked = any(
+                    (nuked['Artist'] == row['Artist']) and (nuked['Album Name'] == row['Album Name'])
+                    for nuked in st.session_state.nuked_albums
+                )
+                
+                # Only show the button if the album hasn't been nuked
+                if not already_nuked:
+                    if st.button(f"Nuke {row['Artist']} - {row['Album Name']}", key=f"suggested_nuke_{idx}"):
+                        # Add to nuked albums
+                        new_nuke = {
+                            'Artist': row['Artist'],
+                            'Album Name': row['Album Name'],
+                            'Reason': "Keyword match"
+                        }
+                        st.session_state.nuked_albums.append(new_nuke)
+                        nuked_albums_df = pd.DataFrame(st.session_state.nuked_albums)
+                        nuked_albums_df.to_csv(nuked_albums_file, index=False)
+                        st.success(f"Nuked {row['Artist']} - {row['Album Name']}")
+                        st.rerun()  # Refresh the page to update the UI
+                else:
+                    st.write(f"✅ {row['Artist']} - {row['Album Name']} has already been nuked.")
+        else:
+            st.info("No albums found with keywords like 'Live', 'Deluxe', 'Reissue', or 'Anniversary'.")
         
-        selected_album_str = st.selectbox(
-            "Select album:",
-            options=album_options,
-            index=0,
-            key="fix_album_selector"
+        # Manual nuking
+        st.subheader("Manually Nuke an Album")
+        all_albums = df[['Artist', 'Album Name']].drop_duplicates()
+        selected_album_idx = st.selectbox(
+            "Select an album to nuke:",
+            options=range(len(all_albums)),
+            format_func=lambda x: f"{all_albums.iloc[x]['Artist']} - {all_albums.iloc[x]['Album Name']}"
         )
         
-        if selected_album_str:
-            # Extract artist and album from selection
-            artist, album_name = selected_album_str.split(" - ", 1)
+        if selected_album_idx is not None:
+            selected_album = all_albums.iloc[selected_album_idx]
+            artist = selected_album['Artist']
+            album = selected_album['Album Name']
             
-            # Get current data for this album
-            album_data = df[(df['Artist'] == artist) & (df['Album Name'] == album_name)].iloc[0]
-            current_genres = album_data['Genres']
+            st.write(f"**Selected:** {artist} - {album}")
             
-            # Get current similar artists if available
-            current_similar = ""
-            similar_entry = similar_artists_df[similar_artists_df['Artist'] == artist]
-            if not similar_entry.empty:
-                current_similar = similar_entry.iloc[0]['Similar Artists']
+            # Reason for nuking
+            reason = st.text_input("Reason for nuking (optional):", key=f"nuke_reason_{selected_album_idx}")
             
-            st.markdown("---")
-            st.subheader(f"Editing: {artist} - {album_name}")
-            
-            # Artist name correction
-            st.markdown("### Fix Artist Name")
-            new_artist = st.text_input(
-                "Correct Artist Name:",
-                value=artist,
-                key=f"fix_artist_{artist}_{album_name}"
-            )
-            
-            # Genre correction
-            st.markdown("### Fix Genres")
-            new_genres = st.text_input(
-                "Correct Genres (comma-separated):",
-                value=current_genres,
-                key=f"fix_genres_{artist}_{album_name}"
-            )
-            
-            # Similar artists correction
-            st.markdown("### Fix Similar Artists")
-            new_similar = st.text_input(
-                "Correct Similar Artists (comma-separated):",
-                value=current_similar,
-                key=f"fix_similar_{artist}_{album_name}"
-            )
-            
-            # Save button
-            if st.button("Save Corrections", key=f"save_corrections_{artist}_{album_name}"):
-                # Update predictions data
-                if new_artist != artist:
-                    # Update artist name in predictions
-                    df.loc[(df['Artist'] == artist) & (df['Album Name'] == album_name), 'Artist'] = new_artist
-                
-                if new_genres != current_genres:
-                    # Update genres in predictions
-                    df.loc[(df['Artist'] == artist) & (df['Album Name'] == album_name), 'Genres'] = new_genres
-                
-                # Save updated predictions
-                try:
-                    # Get the latest predictions file path
-                    file_dates = get_all_prediction_files()
-                    if file_dates:
-                        latest_file = file_dates[0][0]
-                        df.to_csv(latest_file, index=False)
-                        st.success("Updated predictions data!")
-                    else:
-                        st.error("Could not find predictions file to update")
-                except Exception as e:
-                    st.error(f"Error saving predictions: {e}")
-                
-                # Update similar artists data
-                if new_similar != current_similar:
-                    if not similar_entry.empty:
-                        # Update existing entry
-                        similar_artists_df.loc[similar_artists_df['Artist'] == artist, 'Similar Artists'] = new_similar
-                    else:
-                        # Add new entry
-                        new_similar_entry = pd.DataFrame({
-                            'Artist': [new_artist if new_artist != artist else artist],
-                            'Similar Artists': [new_similar]
-                        })
-                        similar_artists_df = pd.concat([similar_artists_df, new_similar_entry], ignore_index=True)
-                    
-                    # Save updated similar artists
-                    try:
-                        similar_artists_df.to_csv('data/nmf_similar_artists.csv', index=False)
-                        st.success("Updated similar artists data!")
-                    except Exception as e:
-                        st.error(f"Error saving similar artists: {e}")
-                
-                # Clear cache to reflect changes
-                st.cache_data.clear()
-                st.success("All corrections saved successfully!")
+            if st.button("Nuke This Album", key=f"nuke_button_{selected_album_idx}"):
+                # Add to nuked albums
+                new_nuke = {
+                    'Artist': artist,
+                    'Album Name': album,
+                    'Reason': reason if reason else "Manual nuke"
+                }
+                st.session_state.nuked_albums.append(new_nuke)
+                nuked_albums_df = pd.DataFrame(st.session_state.nuked_albums)
+                nuked_albums_df.to_csv(nuked_albums_file, index=False)
+                st.success(f"Nuked {artist} - {album}")
                 st.rerun()
-            
-            # Display current data for reference
-            st.markdown("---")
-            st.subheader("Current Data (for reference)")
-            
-            col1, col2 = st.columns(2)
-            with col1:
-                st.markdown("**Current Artist:**")
-                st.info(artist)
-                st.markdown("**Current Genres:**")
-                st.info(current_genres)
-            
-            with col2:
-                st.markdown("**Current Similar Artists:**")
-                if current_similar:
-                    st.info(current_similar)
-                else:
-                    st.warning("No similar artists data available")
+        
+        # Show current nuked albums
+        st.subheader("Currently Nuked Albums")
+        if st.session_state.nuked_albums:
+            st.dataframe(pd.DataFrame(st.session_state.nuked_albums))
+        else:
+            st.info("No albums have been nuked yet.")
+
     with tab5:
         st.subheader("Manage Reviews")
         
