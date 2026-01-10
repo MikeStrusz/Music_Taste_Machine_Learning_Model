@@ -10905,7 +10905,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [59]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [84]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># =======================================================================================</span>
@@ -11060,34 +11060,52 @@ and applies genres to all dataframes.</p>
 <span class="c1"># Clip to 100</span>
 <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'final_predicted_score'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'final_predicted_score'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 
-<span class="c1"># --- 4. ALBUM AGGREGATION ---</span>
+<span class="c1"># --- 4. ALBUM AGGREGATION (FIXED) ---</span>
 <span class="n">nmf_results</span> <span class="o">=</span> <span class="n">df_nmf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'Album Name'</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span>
     <span class="s1">'Artist Name(s)'</span><span class="p">:</span> <span class="s1">'first'</span><span class="p">,</span>
+    <span class="s1">'Genres'</span><span class="p">:</span> <span class="s1">'first'</span><span class="p">,</span>
+    <span class="s1">'Record Label'</span><span class="p">:</span> <span class="s1">'first'</span><span class="p">,</span>
     <span class="s1">'final_predicted_score'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'std'</span><span class="p">,</span> <span class="s1">'count'</span><span class="p">],</span>
     <span class="s1">'match_type'</span><span class="p">:</span> <span class="s1">'first'</span><span class="p">,</span>
     <span class="s1">'matched_to'</span><span class="p">:</span> <span class="s1">'first'</span>
 <span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
-<span class="n">nmf_results</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Score'</span><span class="p">,</span> <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Tracks'</span><span class="p">,</span> <span class="s1">'Match Type'</span><span class="p">,</span> <span class="s1">'Matched To'</span><span class="p">]</span>
-<span class="c1"># Consistency: Lower std dev is better (more consistent tracks)</span>
+<span class="c1"># Dynamically flatten the multi-index columns to avoid "Length Mismatch"</span>
+<span class="n">nmf_results</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Genres'</span><span class="p">,</span> <span class="s1">'Label'</span><span class="p">,</span> 
+    <span class="s1">'Score'</span><span class="p">,</span> <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Tracks'</span><span class="p">,</span> <span class="s1">'Match_Type'</span><span class="p">,</span> <span class="s1">'Matched_To'</span>
+<span class="p">]</span>
+
+<span class="c1"># Consistency: Lower std dev is better</span>
 <span class="n">nmf_results</span><span class="p">[</span><span class="s1">'Consistency'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmf_results</span><span class="p">[</span><span class="s1">'Consistency'</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># Filter for full albums (5+ tracks) and sort</span>
 <span class="n">final_recommendations</span> <span class="o">=</span> <span class="n">nmf_results</span><span class="p">[</span><span class="n">nmf_results</span><span class="p">[</span><span class="s1">'Tracks'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'Score'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">✅ 2026 NMF PREDICTIONS COMPLETE"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Top Recommendation: </span><span class="si">{</span><span class="n">final_recommendations</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'Album'</span><span class="p">]</span><span class="si">}</span><span class="s2"> by </span><span class="si">{</span><span class="n">final_recommendations</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'Artist'</span><span class="p">]</span><span class="si">}</span><span class="s2"> (Score: </span><span class="si">{</span><span class="n">final_recommendations</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'Score'</span><span class="p">]</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
+<span class="c1"># --- 5. EXPORT FOR STREAMLIT ---</span>
+<span class="n">export_df</span> <span class="o">=</span> <span class="n">final_recommendations</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># Rename columns to exactly what the app expects</span>
+<span class="n">export_df</span> <span class="o">=</span> <span class="n">export_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
+    <span class="s1">'Score'</span><span class="p">:</span> <span class="s1">'Predicted_Score'</span><span class="p">,</span>
+    <span class="s1">'Tracks'</span><span class="p">:</span> <span class="s1">'Track_Count'</span>
+<span class="p">})</span>
+
+<span class="c1"># Save to CSV</span>
+<span class="n">export_df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ SUCCESS: Exported </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">export_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums with all 'fun' data included!"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a654a1fb-6b7d-4a6f-abb7-b5e4aa785ae0">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a654a1fb-6b7d-4a6f-abb7-b5e4aa785ae0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [63]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [88]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># --- 5. SAVE RECOMMENDATIONS (2025 STYLE) ---</span>
@@ -11108,18 +11126,16 @@ and applies genres to all dataframes.</p>
 
 <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"predictions/</span><span class="si">{</span><span class="n">date_str</span><span class="si">}</span><span class="s2">_Album_Recommendations.csv"</span>
 
-<span class="c1"># Prepare the final dataframe for export</span>
-<span class="c1"># We'll include the key metrics you liked from last year</span>
 <span class="n">export_df</span> <span class="o">=</span> <span class="n">final_recommendations</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">export_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Predicted_Score'</span><span class="p">,</span> <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Track_Count'</span><span class="p">,</span> <span class="s1">'Match_Type'</span><span class="p">,</span> <span class="s1">'Matched_To'</span><span class="p">]</span>
+<span class="c1"># Ensure the order matches your new nmf_results columns</span>
+<span class="n">export_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Genres'</span><span class="p">,</span> <span class="s1">'Label'</span><span class="p">,</span> 
+    <span class="s1">'Predicted_Score'</span><span class="p">,</span> <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Track_Count'</span><span class="p">,</span> 
+    <span class="s1">'Match_Type'</span><span class="p">,</span> <span class="s1">'Matched_To'</span>
+<span class="p">]</span>
 
 <span class="c1"># Save to CSV</span>
 <span class="n">export_df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">💾 SUCCESS: Recommendations saved to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"-"</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Top 10 Albums for </span><span class="si">{</span><span class="n">date_str</span><span class="si">}</span><span class="s2">:"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">export_df</span><span class="p">[[</span><span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Predicted_Score'</span><span class="p">]]</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span><span class="o">.</span><span class="n">to_string</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -11141,7 +11157,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [67]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [90]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Folder where the predictions are saved</span>
@@ -11312,12 +11328,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e126d6b2-d2bb-4c08-bc71-a12a69115c31">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e126d6b2-d2bb-4c08-bc71-a12a69115c31">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [71]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_spotify_links</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -11481,12 +11497,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=78dd78cd-cf1f-41fc-9d5e-94bc1e6a70e1">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=78dd78cd-cf1f-41fc-9d5e-94bc1e6a70e1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [73]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Ensure the 'graphics/' directory exists</span>
@@ -11512,12 +11528,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=35a6ca61-099b-4cb8-9a4c-4f974977cc31">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=35a6ca61-099b-4cb8-9a4c-4f974977cc31">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [75]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Save clean HTML version (no outputs) to graphics folder</span>
@@ -11536,6 +11552,115 @@ and applies genres to all dataframes.</p>
         <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Clean HTML saved to: graphics/2026_Music_Taste_Data_Prep_CLEAN_New_Years4.html"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=be0faab6-013a-4692-819b-92c41fc0b84d">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [77]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">glob</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+
+<span class="k">def</span> <span class="nf">verify_app_data</span><span class="p">():</span>
+    <span class="n">required_directories</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'data'</span><span class="p">,</span>
+        <span class="s1">'predictions'</span><span class="p">,</span>
+        <span class="s1">'feedback'</span>
+    <span class="p">]</span>
+
+    <span class="n">required_data_files</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'data/nuked_albums.csv'</span><span class="p">,</span>
+        <span class="s1">'data/nmf_album_covers.csv'</span><span class="p">,</span>
+        <span class="s1">'data/nmf_album_links.csv'</span><span class="p">,</span>
+        <span class="s1">'data/nmf_similar_artists.csv'</span><span class="p">,</span>
+        <span class="s1">'data/liked_artists_only_similar.csv'</span><span class="p">,</span>
+        <span class="s1">'data/df_cleaned_pre_standardized.csv'</span>
+    <span class="p">]</span>
+
+    <span class="n">missing_items</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- Verifying Streamlit App Data Dependencies ---"</span><span class="p">)</span>
+
+    <span class="c1"># Check directories</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">required_directories</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
+            <span class="n">missing_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing directory: </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found directory: </span><span class="si">{</span><span class="n">d</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="c1"># Check specific data files</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">required_data_files</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
+            <span class="n">missing_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Missing data file: </span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found data file: </span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+    <span class="c1"># Check for at least one prediction file</span>
+    <span class="n">prediction_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">'predictions/*_Album_Recommendations.csv'</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">prediction_files</span><span class="p">:</span>
+        <span class="n">missing_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">"No prediction files found in 'predictions/' (e.g., 'predictions/MM-DD-YY_Album_Recommendations.csv')"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">prediction_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> prediction files in 'predictions/'"</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">missing_items</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- Verification FAILED ---"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">missing_items</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"ERROR: </span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Please ensure your Jupyter Notebook has been run to generate all necessary data files and directories."</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="c1"># Exit with an error code</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">--- Verification SUCCESS: All required data dependencies are present! ---"</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">'__main__'</span><span class="p">:</span>
+    <span class="n">verify_app_data</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=97b193dd-2e3f-4ccd-90b0-8f4a13e0009c">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [80]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># --- PRE-EXPORT VERIFICATION CELL ---</span>
+<span class="k">def</span> <span class="nf">verify_export_columns</span><span class="p">(</span><span class="n">df</span><span class="p">):</span>
+    <span class="c1"># These are the columns your Streamlit app expects based on your 2026 refactor</span>
+    <span class="n">required_columns</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s1">'Album'</span><span class="p">,</span> 
+        <span class="s1">'Artist'</span><span class="p">,</span> 
+        <span class="s1">'Predicted_Score'</span><span class="p">,</span> 
+        <span class="s1">'Consistency'</span><span class="p">,</span> 
+        <span class="s1">'Track_Count'</span><span class="p">,</span> 
+        <span class="s1">'Match_Type'</span><span class="p">,</span> 
+        <span class="s1">'Matched_To'</span>
+    <span class="p">]</span>
+    
+    <span class="n">missing</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">required_columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+    
+    <span class="k">if</span> <span class="n">missing</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"❌ ERROR: Missing critical columns!"</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">missing</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   - </span><span class="si">{</span><span class="n">col</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Fix your column names before exporting to avoid Streamlit errors."</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ SUCCESS: All critical columns are present. Ready for export!"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Columns: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="c1"># Run the check</span>
+<span class="n">verify_export_columns</span><span class="p">(</span><span class="n">export_df</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
