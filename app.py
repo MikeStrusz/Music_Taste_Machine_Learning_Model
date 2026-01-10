@@ -1,4 +1,8 @@
 import streamlit as st
+from verify_data import verify_app_data
+
+# Run data verification at the start
+verify_app_data()
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -223,12 +227,33 @@ def load_predictions(file_path=None):
     if 'playlist_origin' not in predictions_df.columns:
         predictions_df['playlist_origin'] = 'unknown'  # Default value
     
+    # Handle column name variations between years
+    # Map 'Album' to 'Album Name' if it exists
+    if 'Album' in predictions_df.columns and 'Album Name' not in predictions_df.columns:
+        predictions_df['Album Name'] = predictions_df['Album']
+    
     # Ensure 'Artist Name(s)' column exists (silently add if missing)
     if 'Artist Name(s)' not in predictions_df.columns:
-        predictions_df['Artist Name(s)'] = 'Unknown Artist'  # Default value
+        if 'Artist' in predictions_df.columns:
+            predictions_df['Artist Name(s)'] = predictions_df['Artist']
+        else:
+            predictions_df['Artist Name(s)'] = 'Unknown Artist'
+    
+    # Standardize 'Artist' column if missing
+    if 'Artist' not in predictions_df.columns and 'Artist Name(s)' in predictions_df.columns:
+        predictions_df['Artist'] = predictions_df['Artist Name(s)']
+
+    # Standardize 'Album Name' column if missing
+    if 'Album Name' not in predictions_df.columns and 'Album' in predictions_df.columns:
+        predictions_df['Album Name'] = predictions_df['Album']
     
     # Remove duplicate albums if any
-    predictions_df = predictions_df.drop_duplicates(subset=['Artist', 'Album Name'], keep='first')
+    subset_cols = []
+    if 'Artist' in predictions_df.columns: subset_cols.append('Artist')
+    if 'Album Name' in predictions_df.columns: subset_cols.append('Album Name')
+    
+    if subset_cols:
+        predictions_df = predictions_df.drop_duplicates(subset=subset_cols, keep='first')
     
     date_str = os.path.basename(file_path).split('_')[0]
     analysis_date = datetime.strptime(date_str, '%m-%d-%y').strftime('%Y-%m-%d')
