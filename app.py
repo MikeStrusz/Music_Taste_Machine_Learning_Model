@@ -223,29 +223,21 @@ def load_predictions(file_path=None):
     
     predictions_df = pd.read_csv(file_path)
     
+    # Standardize column names for the new model
+    if 'Album' in predictions_df.columns:
+        predictions_df['Album Name'] = predictions_df['Album']
+    
+    if 'Artist' in predictions_df.columns:
+        predictions_df['Artist Name(s)'] = predictions_df['Artist']
+    
+    # Map Predicted_Score to avg_score for backward compatibility if needed, 
+    # but we'll update the UI to use Predicted_Score
+    if 'Predicted_Score' in predictions_df.columns:
+        predictions_df['avg_score'] = predictions_df['Predicted_Score']
+    
     # Ensure 'playlist_origin' column exists (silently add if missing)
     if 'playlist_origin' not in predictions_df.columns:
         predictions_df['playlist_origin'] = 'unknown'  # Default value
-    
-    # Handle column name variations between years
-    # Map 'Album' to 'Album Name' if it exists
-    if 'Album' in predictions_df.columns and 'Album Name' not in predictions_df.columns:
-        predictions_df['Album Name'] = predictions_df['Album']
-    
-    # Ensure 'Artist Name(s)' column exists (silently add if missing)
-    if 'Artist Name(s)' not in predictions_df.columns:
-        if 'Artist' in predictions_df.columns:
-            predictions_df['Artist Name(s)'] = predictions_df['Artist']
-        else:
-            predictions_df['Artist Name(s)'] = 'Unknown Artist'
-    
-    # Standardize 'Artist' column if missing
-    if 'Artist' not in predictions_df.columns and 'Artist Name(s)' in predictions_df.columns:
-        predictions_df['Artist'] = predictions_df['Artist Name(s)']
-
-    # Standardize 'Album Name' column if missing
-    if 'Album Name' not in predictions_df.columns and 'Album' in predictions_df.columns:
-        predictions_df['Album Name'] = predictions_df['Album']
     
     # Remove duplicate albums if any
     subset_cols = []
@@ -590,6 +582,14 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Genre:</strong> {row["Genres"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Label:</strong> {row["Label"]}</div>', unsafe_allow_html=True)
                 
+                # Display new model columns
+                if 'Track_Count' in row:
+                    st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Tracks:</strong> {int(row["Track_Count"])}</div>', unsafe_allow_html=True)
+                
+                if 'Match_Type' in row and 'Matched_To' in row:
+                    match_info = f"{row['Match_Type'].replace('_', ' ').title()} ({row['Matched_To']})"
+                    st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Match:</strong> {match_info}</div>', unsafe_allow_html=True)
+
                 similar_artists = similar_artists_df[
                     similar_artists_df['Artist'] == row['Artist']
                 ]
@@ -758,7 +758,11 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
             
             with cols[2]:
                 st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                st.metric("Predicted Score", f"{row['avg_score']:.1f}")
+                score = row['Predicted_Score'] if 'Predicted_Score' in row else row['avg_score']
+                st.metric("Predicted Score", f"{score:.1f}")
+                
+                if 'Consistency' in row:
+                    st.metric("Consistency", f"{row['Consistency']:.2f}")
                 st.markdown('</div>', unsafe_allow_html=True)
             
             # Feedback section
@@ -1711,7 +1715,8 @@ def main():
         else:
             filtered_data = df
         
-        filtered_data = filtered_data.sort_values('avg_score', ascending=False)
+        sort_col = 'Predicted_Score' if 'Predicted_Score' in filtered_data.columns else 'avg_score'
+        filtered_data = filtered_data.sort_values(sort_col, ascending=False)
         display_album_predictions(filtered_data, album_covers_df, similar_artists_df)
         
         # Archive navigation at the bottom of the page
