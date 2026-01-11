@@ -10115,29 +10115,6 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a4a42f35-1d20-4204-b367-078d7f98bb16">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [52]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># After loading df_nmf, but before any processing:</span>
-<span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-
-<span class="c1"># Archive the original nmf.csv</span>
-<span class="n">archive_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
-<span class="n">archive_path</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"data/archived_nmf/</span><span class="si">{</span><span class="n">archive_date</span><span class="si">}</span><span class="s2">_nmf_original.csv"</span>
-<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">'data/archived_nmf'</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">df_nmf</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">archive_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"📁 Archived original NMF data to: </span><span class="si">{</span><span class="n">archive_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
 </div>
 <div class="jp-Cell jp-MarkdownCell jp-Notebook-cell" id="cell-id=55b7fcb4-3d9f-4119-985d-824a1e98eafc">
 <div class="jp-Cell-inputWrapper" tabindex="0">
@@ -10479,7 +10456,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [46]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [47]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === DISCOVERY MODEL: CLASSIFICATION FOR 85+ SCORES ===</span>
@@ -10511,7 +10488,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [47]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [49]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === FIXED: FEATURE COMPARISON ===</span>
@@ -10650,7 +10627,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [48]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [51]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === LET'S CHECK THE REAL ERROR METRICS ===</span>
@@ -10715,7 +10692,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [49]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [53]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === IMPLEMENT WEIGHTED TRAINING FOR 2026 RETOOLING ===</span>
@@ -10928,22 +10905,22 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [54]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [84]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># =======================================================================================</span>
-<span class="c1"># 🚀 THE DEFINITIVE 2026 NMF PREDICTION ENGINE v3.0 (FIXED VERSION)</span>
+<span class="c1"># 🚀 THE DEFINITIVE 2026 NMF PREDICTION ENGINE v3.0</span>
 <span class="c1"># =======================================================================================</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">sklearn.ensemble</span> <span class="kn">import</span> <span class="n">RandomForestRegressor</span>
 <span class="kn">from</span> <span class="nn">xgboost</span> <span class="kn">import</span> <span class="n">XGBRegressor</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>
-<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">make_scorer</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">cross_val_score</span>  <span class="c1"># Removed make_scorer from here</span>
+<span class="kn">from</span> <span class="nn">sklearn.metrics</span> <span class="kn">import</span> <span class="n">mean_squared_error</span><span class="p">,</span> <span class="n">make_scorer</span>  <span class="c1"># Added make_scorer here</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
 <span class="kn">from</span> <span class="nn">fuzzywuzzy</span> <span class="kn">import</span> <span class="n">process</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">import</span> <span class="nn">os</span>
+
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"🚀 EXECUTING THE DEFINITIVE 2026 PREDICTION PIPELINE"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
@@ -11083,8 +11060,7 @@ and applies genres to all dataframes.</p>
 <span class="c1"># Clip to 100</span>
 <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'final_predicted_score'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'final_predicted_score'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
 
-<span class="c1"># --- 4. ALBUM AGGREGATION ---</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"Aggregating album-level predictions..."</span><span class="p">)</span>
+<span class="c1"># --- 4. ALBUM AGGREGATION (FIXED) ---</span>
 <span class="n">nmf_results</span> <span class="o">=</span> <span class="n">df_nmf</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'Album Name'</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">({</span>
     <span class="s1">'Artist Name(s)'</span><span class="p">:</span> <span class="s1">'first'</span><span class="p">,</span>
     <span class="s1">'Genres'</span><span class="p">:</span> <span class="s1">'first'</span><span class="p">,</span>
@@ -11094,69 +11070,31 @@ and applies genres to all dataframes.</p>
     <span class="s1">'matched_to'</span><span class="p">:</span> <span class="s1">'first'</span>
 <span class="p">})</span><span class="o">.</span><span class="n">reset_index</span><span class="p">()</span>
 
-<span class="c1"># Flatten multi-index columns</span>
+<span class="c1"># Dynamically flatten the multi-index columns to avoid "Length Mismatch"</span>
 <span class="n">nmf_results</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Genres'</span><span class="p">,</span> <span class="s1">'Label'</span><span class="p">,</span> 
-    <span class="s1">'Score'</span><span class="p">,</span> <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Track_Count'</span><span class="p">,</span> <span class="s1">'Match_Type'</span><span class="p">,</span> <span class="s1">'Matched_To'</span>
+    <span class="s1">'Score'</span><span class="p">,</span> <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Tracks'</span><span class="p">,</span> <span class="s1">'Match_Type'</span><span class="p">,</span> <span class="s1">'Matched_To'</span>
 <span class="p">]</span>
 
 <span class="c1"># Consistency: Lower std dev is better</span>
 <span class="n">nmf_results</span><span class="p">[</span><span class="s1">'Consistency'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nmf_results</span><span class="p">[</span><span class="s1">'Consistency'</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
 <span class="c1"># Filter for full albums (5+ tracks) and sort</span>
-<span class="n">final_recommendations</span> <span class="o">=</span> <span class="n">nmf_results</span><span class="p">[</span><span class="n">nmf_results</span><span class="p">[</span><span class="s1">'Track_Count'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'Score'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">final_recommendations</span> <span class="o">=</span> <span class="n">nmf_results</span><span class="p">[</span><span class="n">nmf_results</span><span class="p">[</span><span class="s1">'Tracks'</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">5</span><span class="p">]</span><span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'Score'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Generated predictions for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">final_recommendations</span><span class="p">)</span><span class="si">}</span><span class="s2"> full albums"</span><span class="p">)</span>
-
-<span class="c1"># --- 5. CREATE FILENAME AND SAVE WITH GUT_SCORE ---</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">💾 Saving recommendations with gut_score column..."</span><span class="p">)</span>
-
-<span class="c1"># Create predictions directory if it doesn't exist</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">'predictions'</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">'predictions'</span><span class="p">)</span>
-
-<span class="c1"># Get the most common release date from NMF dataset</span>
-<span class="k">try</span><span class="p">:</span>
-    <span class="n">nmf_release_date</span> <span class="o">=</span> <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'Release Date'</span><span class="p">]</span><span class="o">.</span><span class="n">mode</span><span class="p">()</span><span class="o">.</span><span class="n">iloc</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="c1"># Format date as MM-DD-YY</span>
-    <span class="n">date_str</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">nmf_release_date</span><span class="p">,</span> <span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%m-</span><span class="si">%d</span><span class="s1">-%y'</span><span class="p">)</span>
-<span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Warning: Could not parse release date, using today's date instead. Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    <span class="n">date_str</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%m-</span><span class="si">%d</span><span class="s1">-%y'</span><span class="p">)</span>
-
-<span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"predictions/</span><span class="si">{</span><span class="n">date_str</span><span class="si">}</span><span class="s2">_Album_Recommendations.csv"</span>
-
-<span class="c1"># Create export dataframe with gut_score column</span>
+<span class="c1"># --- 5. EXPORT FOR STREAMLIT ---</span>
 <span class="n">export_df</span> <span class="o">=</span> <span class="n">final_recommendations</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
 
-<span class="c1"># Rename columns for consistency</span>
+<span class="c1"># Rename columns to exactly what the app expects</span>
 <span class="n">export_df</span> <span class="o">=</span> <span class="n">export_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
-    <span class="s1">'Score'</span><span class="p">:</span> <span class="s1">'Predicted_Score'</span>
+    <span class="s1">'Score'</span><span class="p">:</span> <span class="s1">'Predicted_Score'</span><span class="p">,</span>
+    <span class="s1">'Tracks'</span><span class="p">:</span> <span class="s1">'Track_Count'</span>
 <span class="p">})</span>
-
-<span class="c1"># Add gut_score column (empty for now, will be filled by Streamlit)</span>
-<span class="n">export_df</span><span class="p">[</span><span class="s1">'gut_score'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">export_df</span><span class="p">[</span><span class="s1">'gut_score_date'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">export_df</span><span class="p">[</span><span class="s1">'notes'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-<span class="c1"># Reorder columns for better readability</span>
-<span class="n">column_order</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Genres'</span><span class="p">,</span> <span class="s1">'Label'</span><span class="p">,</span> 
-    <span class="s1">'Predicted_Score'</span><span class="p">,</span> <span class="s1">'gut_score'</span><span class="p">,</span> <span class="s1">'Track_Count'</span><span class="p">,</span> 
-    <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Match_Type'</span><span class="p">,</span> <span class="s1">'Matched_To'</span><span class="p">,</span>
-    <span class="s1">'gut_score_date'</span><span class="p">,</span> <span class="s1">'notes'</span>
-<span class="p">]</span>
-
-<span class="c1"># Only include columns that exist</span>
-<span class="n">export_df</span> <span class="o">=</span> <span class="n">export_df</span><span class="p">[[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">column_order</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">export_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]]</span>
 
 <span class="c1"># Save to CSV</span>
 <span class="n">export_df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ SUCCESS: Saved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">export_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums to: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   - Added gut_score column for Streamlit input"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   - File ready for your weekend listening!"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ SUCCESS: Exported </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">export_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums with all 'fun' data included!"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -11167,20 +11105,15 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [88]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># --- 5. SAVE RECOMMENDATIONS (2025 STYLE) WITH GUT_SCORE ---</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># --- 5. SAVE RECOMMENDATIONS (2025 STYLE) ---</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 
 <span class="c1"># Create predictions directory if it doesn't exist</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">'predictions'</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">'predictions'</span><span class="p">)</span>
-
-<span class="c1"># Create feedback directory if it doesn't exist</span>
-<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="s1">'feedback'</span><span class="p">):</span>
-    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">'feedback'</span><span class="p">)</span>
 
 <span class="c1"># Get the most common release date from NMF dataset</span>
 <span class="k">try</span><span class="p">:</span>
@@ -11192,44 +11125,17 @@ and applies genres to all dataframes.</p>
     <span class="n">date_str</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%m-</span><span class="si">%d</span><span class="s1">-%y'</span><span class="p">)</span>
 
 <span class="n">filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"predictions/</span><span class="si">{</span><span class="n">date_str</span><span class="si">}</span><span class="s2">_Album_Recommendations.csv"</span>
-<span class="n">feedback_filename</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"feedback/</span><span class="si">{</span><span class="n">date_str</span><span class="si">}</span><span class="s2">_gut_scores.csv"</span>
 
-<span class="c1"># --- CREATE EXPORT DATAFRAME WITH GUT_SCORE COLUMN ---</span>
 <span class="n">export_df</span> <span class="o">=</span> <span class="n">final_recommendations</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-
-<span class="c1"># Ensure consistent column names</span>
-<span class="n">export_df</span> <span class="o">=</span> <span class="n">export_df</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">{</span>
-    <span class="s1">'Score'</span><span class="p">:</span> <span class="s1">'Predicted_Score'</span><span class="p">,</span>
-    <span class="s1">'Tracks'</span><span class="p">:</span> <span class="s1">'Track_Count'</span>
-<span class="p">})</span>
-
-<span class="c1"># Add gut_score column (empty for now, will be filled by Streamlit)</span>
-<span class="n">export_df</span><span class="p">[</span><span class="s1">'gut_score'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">export_df</span><span class="p">[</span><span class="s1">'gut_score_date'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-<span class="n">export_df</span><span class="p">[</span><span class="s1">'notes'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-
-<span class="c1"># Reorder columns for better readability</span>
-<span class="n">column_order</span> <span class="o">=</span> <span class="p">[</span>
+<span class="c1"># Ensure the order matches your new nmf_results columns</span>
+<span class="n">export_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Genres'</span><span class="p">,</span> <span class="s1">'Label'</span><span class="p">,</span> 
-    <span class="s1">'Predicted_Score'</span><span class="p">,</span> <span class="s1">'gut_score'</span><span class="p">,</span> <span class="s1">'Track_Count'</span><span class="p">,</span> 
-    <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Match_Type'</span><span class="p">,</span> <span class="s1">'Matched_To'</span><span class="p">,</span>
-    <span class="s1">'gut_score_date'</span><span class="p">,</span> <span class="s1">'notes'</span>
+    <span class="s1">'Predicted_Score'</span><span class="p">,</span> <span class="s1">'Consistency'</span><span class="p">,</span> <span class="s1">'Track_Count'</span><span class="p">,</span> 
+    <span class="s1">'Match_Type'</span><span class="p">,</span> <span class="s1">'Matched_To'</span>
 <span class="p">]</span>
-
-<span class="c1"># Only include columns that exist</span>
-<span class="n">export_df</span> <span class="o">=</span> <span class="n">export_df</span><span class="p">[[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">column_order</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">export_df</span><span class="o">.</span><span class="n">columns</span><span class="p">]]</span>
 
 <span class="c1"># Save to CSV</span>
 <span class="n">export_df</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="c1"># Also create a separate feedback file with just the albums</span>
-<span class="n">feedback_df</span> <span class="o">=</span> <span class="n">export_df</span><span class="p">[[</span><span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Predicted_Score'</span><span class="p">,</span> <span class="s1">'gut_score'</span><span class="p">,</span> <span class="s1">'gut_score_date'</span><span class="p">,</span> <span class="s1">'notes'</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-<span class="n">feedback_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">feedback_filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Saved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">export_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums to: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Created feedback template: </span><span class="si">{</span><span class="n">feedback_filename</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   - gut_score column added for Streamlit input"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   - Feedback can be collected and added back to training data"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -11246,12 +11152,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=85b983fa-cc7c-40a3-a922-7e6434d2b0e7">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=85b983fa-cc7c-40a3-a922-7e6434d2b0e7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [90]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Folder where the predictions are saved</span>
@@ -11302,7 +11208,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [118]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">get_album_art</span><span class="p">(</span><span class="n">artist</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">album</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
@@ -11365,12 +11271,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=e126d6b2-d2bb-4c08-bc71-a12a69115c31">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=e126d6b2-d2bb-4c08-bc71-a12a69115c31">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [94]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_spotify_links</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
@@ -11534,12 +11440,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=78dd78cd-cf1f-41fc-9d5e-94bc1e6a70e1">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=78dd78cd-cf1f-41fc-9d5e-94bc1e6a70e1">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [96]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Ensure the 'graphics/' directory exists</span>
@@ -11565,12 +11471,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=35a6ca61-099b-4cb8-9a4c-4f974977cc31">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=35a6ca61-099b-4cb8-9a4c-4f974977cc31">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [98]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Save clean HTML version (no outputs) to graphics folder</span>
@@ -11594,12 +11500,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=be0faab6-013a-4692-819b-92c41fc0b84d">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=be0faab6-013a-4692-819b-92c41fc0b84d">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [100]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
@@ -11664,12 +11570,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=97b193dd-2e3f-4ccd-90b0-8f4a13e0009c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=97b193dd-2e3f-4ccd-90b0-8f4a13e0009c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [102]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># --- PRE-EXPORT VERIFICATION CELL ---</span>
@@ -11703,12 +11609,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1313359e-6a60-4e0f-9082-6096d73a1074">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=1313359e-6a60-4e0f-9082-6096d73a1074">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [104]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -11731,12 +11637,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=6524d5ca-ba8f-4f62-b608-5f3579511b91">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=6524d5ca-ba8f-4f62-b608-5f3579511b91">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [120]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
@@ -11773,35 +11679,6 @@ and applies genres to all dataframes.</p>
 <span class="p">})</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">History standardized! Your app and pipeline are now speaking the same language."</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-</div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=f6423026-8e69-414f-bd09-e5f9e1b53fdb">
-<div class="jp-Cell-inputWrapper" tabindex="0">
-<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
-</div>
-<div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
-<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
-<div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Save clean HTML version (no outputs) to graphics folder</span>
-<span class="kn">from</span> <span class="nn">nbconvert</span> <span class="kn">import</span> <span class="n">HTMLExporter</span>
-<span class="kn">import</span> <span class="nn">nbformat</span>
-<span class="kn">import</span> <span class="nn">os</span>
-
-<span class="c1"># Create graphics folder if it doesn't exist</span>
-<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="s1">'graphics'</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-<span class="c1"># Read notebook, export without outputs, save</span>
-<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'2026 Music Taste Machine Learning Data Prep.ipynb'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-    <span class="n">nb</span> <span class="o">=</span> <span class="n">nbformat</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">as_version</span><span class="o">=</span><span class="mi">4</span><span class="p">)</span>
-    <span class="n">html</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">HTMLExporter</span><span class="p">(</span><span class="n">exclude_output</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">from_notebook_node</span><span class="p">(</span><span class="n">nb</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'graphics/2026_Music_Taste_Data_Prep_5.html'</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span> <span class="k">as</span> <span class="n">out</span><span class="p">:</span>
-        <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Clean HTML saved to: graphics/2026_Music_Taste_Data_Prep_5.html"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
