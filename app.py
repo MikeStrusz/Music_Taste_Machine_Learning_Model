@@ -14,7 +14,7 @@ verify_app_data()
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from datetime import datetime
+from datetime import datetime, timedelta
 import streamlit.components.v1 as components
 import glob
 import os
@@ -26,6 +26,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from time import sleep
 from typing import Dict
 import networkx as nx 
+import random 
 
 # Check if App is Running Locally or on Streamlit's Servers
 def is_running_on_streamlit():
@@ -33,6 +34,66 @@ def is_running_on_streamlit():
 
 # Use this flag to control feedback buttons
 IS_LOCAL = not is_running_on_streamlit()
+
+@st.cache_data(ttl=86400)  # Cache for 24 hours
+def load_hidden_gems_cache():
+    """Load pre-computed Hidden Gems"""
+    cache_file = 'data/hidden_gems_cache.csv'
+    if os.path.exists(cache_file):
+        return pd.read_csv(cache_file)
+    return pd.DataFrame()
+
+@st.cache_data(ttl=86400)
+def load_hidden_gems_sample():
+    """Load sample of Hidden Gems for instant display"""
+    sample_file = 'data/hidden_gems_sample.csv'
+    if os.path.exists(sample_file):
+        return pd.read_csv(sample_file)
+    return pd.DataFrame()
+
+@st.cache_data(ttl=3600)  # Cache for 1 hour
+def load_all_albums(prediction_files, months_back=12):
+    """Load all albums from recent months (cached for performance)"""
+    all_albums_list = []
+    max_date = max(date_obj for _, _, date_obj in prediction_files)
+    cutoff_date = max_date - timedelta(days=30*months_back)
+    
+    for date, file, date_obj in prediction_files:
+        if date_obj < cutoff_date:
+            continue
+        
+        # Direct file reading instead of calling load_predictions()
+        try:
+            df = pd.read_csv(file)
+            
+            # Standardize column names
+            if 'Album' in df.columns:
+                df['Album Name'] = df['Album']
+            elif 'Album Name' in df.columns:
+                df['Album'] = df['Album Name']
+            
+            if 'Artist Name(s)' in df.columns:
+                df['Artist'] = df['Artist Name(s)']
+            
+            if 'Predicted_Score' in df.columns:
+                df['avg_score'] = df['Predicted_Score']
+            
+            if 'playlist_origin' not in df.columns:
+                df['playlist_origin'] = 'unknown'
+            
+            if len(df) > 0:
+                df['source_week'] = date
+                df['source_date'] = date_obj
+                all_albums_list.append(df)
+        except Exception as e:
+            print(f"Error loading {file}: {e}")
+            continue
+    
+    if not all_albums_list:
+        return pd.DataFrame()
+    
+    combined = pd.concat(all_albums_list, ignore_index=True)
+    return combined
 
 @st.cache_data
 def calculate_exact_playtime(album_name, artist):
@@ -362,9 +423,11 @@ def load_predictions(file_path=None):
     
     predictions_df = pd.read_csv(file_path)
     
-    # Standardize column names for the new model
+    # Standardize column names - ALWAYS create both columns for compatibility
     if 'Album' in predictions_df.columns:
         predictions_df['Album Name'] = predictions_df['Album']
+    elif 'Album Name' in predictions_df.columns:
+        predictions_df['Album'] = predictions_df['Album Name']
     
     # Ensure 'Artist' is the primary column name
     if 'Artist Name(s)' in predictions_df.columns:
@@ -394,6 +457,7 @@ def load_predictions(file_path=None):
 @st.cache_data
 def load_album_covers():
     try:
+        # DON'T RENAME - keep original column names
         return pd.read_csv('data/nmf_album_covers.csv')
     except Exception as e:
         st.error(f"Error loading album covers data: {e}")
@@ -420,14 +484,12 @@ def load_similar_artists():
         return pd.DataFrame(columns=['Artist', 'Similar Artists'])
 
 @st.cache_data
-def load_liked_similar():
-    """
-    Load the dataset of similar artists for liked artists.
-    """
+def load_similar_artists():
     try:
+        # Use the file created by your Jupyter notebook
         return pd.read_csv('data/liked_artists_only_similar.csv')
     except Exception as e:
-        st.error(f"Error loading liked similar artists data: {e}")
+        st.error(f"Error loading similar artists data: {e}")
         return pd.DataFrame(columns=['Artist', 'Similar Artists'])
 
 def load_training_data():
@@ -514,8 +576,10 @@ def save_gut_score(album_name, artist, score, file_path):
         import traceback
         st.code(traceback.format_exc())
 
-# The display_album_predictions function
 def display_album_predictions(filtered_data, album_covers_df, similar_artists_df, current_file_path=None):
+    # ADD THIS LINE - it forces Streamlit to treat each call as unique
+    st.markdown("<!-- Unique render -->", unsafe_allow_html=True)
+    
     # Initialize session state for real-time feedback
     if 'recent_ratings' not in st.session_state:
         st.session_state.recent_ratings = {}
@@ -526,29 +590,78 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
         st.error(f"Error loading album links: {e}")
         album_links_df = pd.DataFrame()
     
+    # ... rest of your code stays the same ...
+    
+    # Create working copies to avoid modifying originals
+    data_to_display = filtered_data.copy()
+    
+    # ===== ADD CACHE FORMAT HANDLING HERE =====
+    # Handle cache format (Hidden Gems cache has different column names)
+    if 'Source_Week' in data_to_display.columns and 'source_week' not in data_to_display.columns:
+        data_to_display['source_week'] = data_to_display['Source_Week']
+    
+    if 'Predicted_Score' in data_to_display.columns and 'avg_score' not in data_to_display.columns:
+        data_to_display['avg_score'] = data_to_display['Predicted_Score']
+    
+    # Ensure 'Album Name' column exists (cache has 'Album')
+    if 'Album' in data_to_display.columns and 'Album Name' not in data_to_display.columns:
+        data_to_display['Album Name'] = data_to_display['Album']
+    # ===== END OF CACHE HANDLING =====
+    
+    # Keep these lines - they create copies for merging
+    covers_df = album_covers_df.copy()
+    links_df = album_links_df.copy()
+    
+    # STEP 1: Merge album covers
     try:
-        merged_data = filtered_data.merge(
-            album_covers_df[['Artist', 'Album Name', 'Album Art']], 
+        # data_to_display now has BOTH 'Album' and 'Album Name' (thanks to cache handling above)
+        # covers_df has: Artist, Album Name, Album Art
+        
+        data_to_display = data_to_display.merge(
+            covers_df[['Artist', 'Album Name', 'Album Art']], 
             on=['Artist', 'Album Name'],
             how='left'
         )
-        
-        if not album_links_df.empty:
-            # Standardize columns if not already done by load_album_links
-            if 'Artist Name(s)' in album_links_df.columns:
-                album_links_df = album_links_df.rename(columns={'Artist Name(s)': 'Artist'})
-                
-            merged_data = merged_data.merge(
-                album_links_df[['Album Name', 'Artist', 'Spotify URL']],
-                on=['Album Name', 'Artist'],
-                how='left'
-            )
     except Exception as e:
-        st.error(f"Error merging data: {e}")
-        merged_data = filtered_data
+        st.error(f"Error merging album covers: {e}")
+        # Continue without covers
     
-    filtered_albums = merged_data
+    # STEP 2: Merge Spotify links
+    if not links_df.empty:
+        try:
+            # links_df has: Album Name, Artist Name(s), Spotify URL
+            # Need to match with data_to_display columns: Artist, Album
+            
+            # Standardize links_df column names
+            if 'Artist Name(s)' in links_df.columns:
+                links_df = links_df.rename(columns={'Artist Name(s)': 'Artist'})
+            if 'Album Name' in links_df.columns:
+                links_df = links_df.rename(columns={'Album Name': 'Album'})
+            
+            # Check for duplicate columns before merging
+            duplicate_cols = set(links_df.columns) & set(data_to_display.columns)
+            duplicate_cols.discard('Artist')
+            duplicate_cols.discard('Album')
+            
+            if duplicate_cols:
+                # Rename duplicate columns in links_df
+                for col in duplicate_cols:
+                    links_df = links_df.rename(columns={col: f'{col}_link'})
+            
+            # Merge
+            data_to_display = data_to_display.merge(
+                links_df[['Artist', 'Album', 'Spotify URL']],
+                on=['Artist', 'Album'],
+                how='left',
+                suffixes=('', '_link')
+            )
+        except Exception as e:
+            st.error(f"Error merging Spotify links: {e}")
+            # Continue without links
     
+    filtered_albums = data_to_display
+    
+    # Now display the albums using 'Artist' and 'Album' columns
     for idx, row in filtered_albums.iterrows():
         with st.container():
             st.markdown('<div class="album-container">', unsafe_allow_html=True)
@@ -569,17 +682,50 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     )
             
             with cols[1]:
-                # Album title
-                st.markdown(f'<div class="album-title" style="font-size: 1.8rem; font-weight: 600; margin-bottom: 16px;">{row["Artist"]} - {row["Album Name"]}</div>', unsafe_allow_html=True)
+                # Album title - use 'Artist' and 'Album' columns
+                artist_display = row['Artist']
+                album_display = row['Album']
+                
+                # GET ALBUM HISTORY
+                album_history = get_album_history(artist_display, album_display)
+                
+                # Color code based on history
+                if "Top 100" in album_history:
+                    badge_color = "#ffd700"  # Gold
+                elif "Honorable" in album_history:
+                    badge_color = "#c0c0c0"  # Silver
+                elif "Mid" in album_history:
+                    badge_color = "#ffa500"  # Orange
+                elif "Not Liked" in album_history:
+                    badge_color = "#ff6b6b"  # Red
+                elif "Gut Score" in album_history:
+                    badge_color = "#4caf50"  # Green
+                else:
+                    badge_color = "#6c757d"  # Gray
+                
+                st.markdown(f'''
+                <div class="album-title" style="font-size: 1.8rem; font-weight: 600; margin-bottom: 16px;">
+                    {artist_display} - {album_display}
+                    <br>
+                    <span style="display: inline-block; background-color: {badge_color}; 
+                           color: white; padding: 2px 8px; border-radius: 12px; 
+                           font-size: 0.8rem; margin-top: 5px; font-weight: 500;">
+                        {album_history}
+                    </span>
+                </div>
+                ''', unsafe_allow_html=True)
                 
                 # Genres
-                st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Genre:</strong> {row["Genres"]}</div>', unsafe_allow_html=True)
+                if 'Genres' in row and pd.notna(row['Genres']):
+                    st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Genre:</strong> {row["Genres"]}</div>', unsafe_allow_html=True)
                 
                 # Label
-                st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Label:</strong> {row["Label"]}</div>', unsafe_allow_html=True)
+                if 'Label' in row and pd.notna(row['Label']):
+                    st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Label:</strong> {row["Label"]}</div>', unsafe_allow_html=True)
                 
+                # ... rest of your display code (use artist_display and album_display)
                 # EXACT PLAYTIME
-                playtime_str, track_count = calculate_exact_playtime(row['Album Name'], row['Artist'])
+                playtime_str, track_count = calculate_exact_playtime(album_display, artist_display)
                 
                 if playtime_str:
                     st.markdown(f'''
@@ -597,23 +743,25 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Tracks:</strong> {int(row["Track_Count"])}</div>', unsafe_allow_html=True)
                 
                 # SIMILAR ARTISTS WITH TOP 100 HIGHLIGHTING
-                similar_artists = similar_artists_df[
-                    similar_artists_df['Artist'] == row['Artist']
-                ]
-                
-                if not similar_artists.empty:
-                    similar_list = similar_artists.iloc[0]['Similar Artists']
-                    highlighted_list = highlight_top_100_in_similar(similar_list, TOP_100_ARTISTS)
+                artist_for_lookup = row.get('Artist', row.get('Artist Name(s)', ''))
+                if artist_for_lookup:
+                    similar_artists = similar_artists_df[
+                        similar_artists_df['Artist'] == artist_for_lookup
+                    ]
                     
-                    st.markdown(f'''
-                    <div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;">
-                        <strong>Similar Artists:</strong> {highlighted_list}
-                        <br>
-                        <small style="color: #666; font-style: italic;">
-                        ⭐ = In your Top 100 favorites
-                        </small>
-                    </div>
-                    ''', unsafe_allow_html=True)
+                    if not similar_artists.empty:
+                        similar_list = similar_artists.iloc[0]['Similar Artists']
+                        highlighted_list = highlight_top_100_in_similar(similar_list, TOP_100_ARTISTS)
+                        
+                        st.markdown(f'''
+                        <div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;">
+                            <strong>Similar Artists:</strong> {highlighted_list}
+                            <br>
+                            <small style="color: #666; font-style: italic;">
+                            ⭐ = In your Top 100 favorites
+                            </small>
+                        </div>
+                        ''', unsafe_allow_html=True)
                 
                 # Spotify link
                 if 'Spotify URL' in row and pd.notna(row['Spotify URL']):
@@ -627,11 +775,11 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
             with cols[2]:
                 # Metric container for predicted score
                 st.markdown('<div class="metric-container">', unsafe_allow_html=True)
-                score = row['Predicted_Score'] if 'Predicted_Score' in row else row['avg_score']
+                score = row.get('Predicted_Score', row.get('avg_score', 0))
                 st.metric("Predicted Score", f"{score:.1f}")
                 st.markdown('</div>', unsafe_allow_html=True)
                 
-                # Gut Score section - now displayed in its own container below predicted score
+                # Gut Score section
                 st.markdown('<div class="gut-score-container">', unsafe_allow_html=True)
                 st.markdown("**🎯 Gut Score (0-100)**")
                 
@@ -660,19 +808,19 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         0, 
                         100, 
                         int(current_gut), 
-                        key=f"gut_input_{row['Album Name']}_{row['Artist']}",
+                        key=f"gut_input_{album_display}_{artist_display}",
                         label_visibility="collapsed"
                     )
                 with score_cols[1]:
-                    if st.button("💾 Save", key=f"gut_save_{row['Album Name']}_{row['Artist']}"):
-                        save_gut_score(row['Album Name'], row['Artist'], new_score, current_file_path)
+                    if st.button("💾 Save", key=f"gut_save_{album_display}_{artist_display}"):
+                        save_gut_score(album_display, artist_display, new_score, current_file_path)
                         st.rerun()
                 st.markdown('</div>', unsafe_allow_html=True)
             
             with cols[3]:
-                # DYNAMIC FEEDBACK DISPLAY - Checks if YOU have rated this album
+                # DYNAMIC FEEDBACK DISPLAY
                 try:
-                    album_key = f"{row['Artist']}_{row['Album Name']}"
+                    album_key = f"{artist_display}_{album_display}"
                     
                     # First check session state (for immediate feedback)
                     if album_key in st.session_state.recent_ratings:
@@ -680,7 +828,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         st.markdown(f'🎯 **Just rated: {gut_score}**')
                         st.balloons()  # Celebration!
                     
-                    # Check MASTER gut scores file (where Streamlit saves ratings)
+                    # Check MASTER gut scores file
                     master_file = 'feedback/master_gut_scores.csv'
                     
                     if os.path.exists(master_file):
@@ -688,8 +836,8 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                         
                         # Look for this album in master file
                         album_feedback = master_df[
-                            (master_df['Album'] == row['Album Name']) & 
-                            (master_df['Artist'] == str(row['Artist']))
+                            (master_df['Album'] == album_display) & 
+                            (master_df['Artist'] == str(artist_display))
                         ]
                         
                         if not album_feedback.empty and pd.notna(album_feedback.iloc[0]['gut_score']):
@@ -730,14 +878,14 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                                     st.markdown(f'<div style="font-style: italic; color: #666; margin-top: 5px;">"{comment}"</div>', unsafe_allow_html=True)
                                     break
                             
-                            # Also check if it's in training data (shows it's been processed)
+                            # Also check if it's in training data
                             try:
                                 training_file = 'data/2026_training_complete_with_features.csv'
                                 if os.path.exists(training_file):
                                     training_df = pd.read_csv(training_file)
                                     in_training = training_df[
-                                        (training_df['Album Name'] == row['Album Name']) &
-                                        (training_df['Artist Name(s)'].str.contains(str(row['Artist']), na=False)) &
+                                        (training_df['Album Name'] == album_display) &
+                                        (training_df['Artist Name(s)'].str.contains(str(artist_display), na=False)) &
                                         (training_df['source_type'] == 'gut_score_rated')
                                     ]
                                     
@@ -764,6 +912,39 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     st.caption(str(e)[:50])
             
             st.markdown('</div>', unsafe_allow_html=True)
+
+def get_album_history(artist, album):
+    """Check if album appears in training data and return its history"""
+    try:
+        training_file = 'data/2026_training_complete_with_features.csv'
+        training_df = pd.read_csv(training_file)
+        
+        # Find the album in training data
+        album_tracks = training_df[
+            (training_df['Album Name'] == album) &
+            (training_df['Artist Name(s)'].str.contains(artist, na=False))
+        ]
+        
+        if len(album_tracks) == 0:
+            return "Never Rated"  # Changed from "Never rated" to "Never Rated"
+        
+        # Get the source type and score
+        source_type = album_tracks.iloc[0]['source_type']
+        score = album_tracks.iloc[0]['liked']
+        
+        # Map to human-readable - EXACT strings that match filters
+        history_map = {
+            'top_100_ranked': f"⭐ Top 100 ({score:.1f})",
+            'honorable_mention': f"🏅 Honorable Mention ({score})",
+            'mid': f"😐 Mid Albums ({score})",
+            'not_liked': f"👎 Not Liked ({score})",
+            'gut_score_rated': f"🎯 Gut Scored ({score})"
+        }
+        
+        return history_map.get(source_type, f"Unknown: {source_type}")
+        
+    except Exception as e:
+        return "Unknown"
 
 def about_me_page():
     st.title("# About Me")
@@ -942,6 +1123,172 @@ def notebook_page():
         st.markdown('</div>', unsafe_allow_html=True)
     except Exception as e:
         st.error(f"Error loading notebook content: {e}")
+
+def historical_rating_page():
+    st.title("📅 Rate Historical Albums")
+    
+    # --- LOAD REQUIRED DATA ---
+    album_covers_df = load_album_covers()
+    similar_artists_df = load_similar_artists()
+    
+    # Get all prediction files
+    prediction_files = []
+    for file in glob.glob('predictions/*_Album_Recommendations.csv'):
+        try:
+            date_str = os.path.basename(file).split('_')[0]
+            date_obj = datetime.strptime(date_str, '%m-%d-%y')
+            readable_date = date_obj.strftime('%B %d, %Y')
+            prediction_files.append((readable_date, file, date_obj))
+        except:
+            continue
+    
+    # Sort by date (newest first)
+    prediction_files.sort(key=lambda x: x[2], reverse=True)
+    
+    # === MODE SELECTOR ===
+    st.subheader("🎛️ Exploration Mode")
+    mode = st.radio(
+        "Choose how to explore:",
+        ["🎲 Random Album Explorer", "📅 Browse by Month", "📆 Single Week"],
+        horizontal=True
+    )
+    
+    if mode == "🎲 Random Album Explorer":
+        # ========== RANDOM ALBUM EXPLORER ==========
+        st.subheader("🎲 Random Album Explorer")
+        st.write("Discover random albums from any time period!")
+        
+        # === ONE-CLICK INSTANT EXPLORATION ===
+        st.subheader("🎲 One-Click Instant Exploration")
+        st.write("Click a button, get 3 random albums INSTANTLY!")
+        
+        btn_col1, btn_col2 = st.columns(2)  # Only 2 buttons - Hidden Gems and Random Mix
+        
+        with btn_col1:
+            hidden_gems = st.button(
+                "**🎯\nHidden Gems**\n*210 pre-computed*\n*Never rated + predicted ≥75*", 
+                use_container_width=True, 
+                type="primary",
+                key="hidden_gems_btn"
+            )
+                
+        with btn_col2:
+            random_mix = st.button(
+                "**🎪\nRandom Mix**\n*Anything goes!*\n*From recent months*", 
+                use_container_width=True, 
+                type="secondary",
+                key="random_mix_btn"
+            )
+        
+        # HIDDEN GEMS - INSTANT FROM CACHE
+        if hidden_gems:
+            # Load the pre-computed Hidden Gems sample
+            hidden_gems_df = load_hidden_gems_sample()
+            
+            if hidden_gems_df.empty:
+                st.error("No Hidden Gems found! Run update_hidden_gems.py first.")
+                return
+            
+            # Get 3 random gems from the sample
+            if len(hidden_gems_df) >= 3:
+                random_albums = hidden_gems_df.sample(n=3, random_state=None)  # Different each time
+            else:
+                random_albums = hidden_gems_df
+            
+            st.success(f"🎉 Found {len(random_albums)} Hidden Gems for you! (from 210 total)")
+            
+            # Show sources
+            if 'Source_Week' in random_albums.columns and len(random_albums['Source_Week'].unique()) > 0:
+                weeks = random_albums['Source_Week'].unique()[:2]
+                week_str = ", ".join(weeks)
+                if len(random_albums['Source_Week'].unique()) > 2:
+                    week_str += f" and {len(random_albums['Source_Week'].unique()) - 2} more"
+                st.caption(f"From weeks: {week_str}")
+            
+            # Rename columns to match what display_album_predictions expects
+            if 'Album' in random_albums.columns and 'Album Name' not in random_albums.columns:
+                random_albums['Album Name'] = random_albums['Album']
+            if 'Predicted_Score' in random_albums.columns and 'avg_score' not in random_albums.columns:
+                random_albums['avg_score'] = random_albums['Predicted_Score']
+            
+            display_album_predictions(random_albums, album_covers_df, similar_artists_df, "hidden_gems")
+            
+        # RANDOM MIX - keep the old logic (or simplify it)
+        elif random_mix:
+            # Simple random mix from recent months
+            sample_from = ["Never Rated", "Mid Albums", "Honorable Mention", "Top 100", "Not Liked", "Gut Scored"]
+            min_score = 0
+            num_albums = 3
+            button_name = "Random Mix"
+            
+            # Use recent albums only (last 3 months for speed)
+            max_date = max(date_obj for _, _, date_obj in prediction_files)
+            cutoff_date = max_date - timedelta(days=30*3)
+            
+            # Execute the search
+            with st.spinner(f"Finding {num_albums} random albums..."):
+                # Load recent albums
+                all_albums_list = []
+                for date, file, date_obj in prediction_files:
+                    if date_obj < cutoff_date:
+                        continue
+                    
+                    df, _ = load_predictions(file)
+                    if len(df) > 0:
+                        df['source_week'] = date
+                        df['source_date'] = date_obj
+                        all_albums_list.append(df)
+                
+                if not all_albums_list:
+                    st.error("No albums found in the last 3 months!")
+                    return
+                
+                combined = pd.concat(all_albums_list, ignore_index=True)
+                
+                # Filter by type
+                filtered_indices = []
+                for idx, row in combined.iterrows():
+                    history = get_album_history(row['Artist'], row['Album'])
+                    if any(rating_type in history for rating_type in sample_from):
+                        filtered_indices.append(idx)
+                
+                # Check if we have enough
+                if len(filtered_indices) < num_albums:
+                    st.warning(f"Only found {len(filtered_indices)} albums")
+                    num_albums = min(num_albums, len(filtered_indices))
+                
+                if num_albums > 0:
+                    # Random sample
+                    random_indices = random.sample(filtered_indices, num_albums)
+                    random_albums = combined.loc[random_indices]
+                    
+                    st.success(f"🎉 Found {len(random_albums)} random albums for you!")
+                    
+                    # Show sources
+                    if len(random_albums['source_week'].unique()) > 0:
+                        weeks = random_albums['source_week'].unique()[:2]
+                        week_str = ", ".join(weeks)
+                        if len(random_albums['source_week'].unique()) > 2:
+                            week_str += f" and {len(random_albums['source_week'].unique()) - 2} more"
+                        st.caption(f"From weeks: {week_str}")
+                    
+                    display_album_predictions(random_albums, album_covers_df, similar_artists_df, "random_mix")
+                else:
+                    st.info(f"No random albums found. Try Hidden Gems instead!")
+        
+        else:
+            # No button clicked yet, show stats
+            hidden_gems_df = load_hidden_gems_cache()
+            total_gems = len(hidden_gems_df) if not hidden_gems_df.empty else 0
+            
+            st.info(f"""
+            👆 **Click a button to explore!**
+            
+            **Hidden Gems Cache Status:**
+            - ✅ {total_gems} pre-computed Hidden Gems
+            - 🎯 Never rated + predicted score ≥75
+            - ⚡ Instant results from cache
+            """)
 
 def dacus_game_page(G):
     st.title("🎵 6 Degrees of Lucy Dacus")
@@ -1164,9 +1511,62 @@ def main():
         st.cache_data.clear()
         st.rerun()
     
+    # ===== HIDDEN GEMS CACHE SECTION =====
+    st.sidebar.markdown("---")
+    st.sidebar.header("🔄 Hidden Gems Cache")
+    
+    # Show cache stats
+    cache_file = 'data/hidden_gems_cache.csv'
+    if os.path.exists(cache_file):
+        try:
+            df = pd.read_csv(cache_file)
+            st.sidebar.metric("Hidden Gems in Cache", len(df))
+            avg_score = df['Predicted_Score'].mean() if 'Predicted_Score' in df.columns else "N/A"
+            st.sidebar.metric("Avg Score", f"{avg_score:.1f}" if isinstance(avg_score, (int, float)) else avg_score)
+        except Exception as e:
+            st.sidebar.error(f"Error reading cache: {e}")
+    else:
+        st.sidebar.info("No cache found. Run update script.")
+    
+    if st.sidebar.button("🔄 Update Hidden Gems Cache"):
+        with st.spinner("Updating Hidden Gems cache..."):
+            try:
+                import subprocess
+                result = subprocess.run(
+                    ["python", "update_hidden_gems.py"], 
+                    capture_output=True, 
+                    text=True,
+                    cwd=os.getcwd()
+                )
+                
+                output_text = ""
+                if result.stdout:
+                    output_text += result.stdout
+                if result.stderr:
+                    output_text += f"\nErrors:\n{result.stderr}"
+                
+                if output_text:
+                    st.sidebar.text_area("Update Output:", output_text, height=200)
+                
+                if result.returncode == 0:
+                    st.sidebar.success("✅ Cache updated!")
+                else:
+                    st.sidebar.error("❌ Update failed")
+                
+                # Clear cache to force reload
+                st.cache_data.clear()
+                st.rerun()
+                
+            except Exception as e:
+                st.sidebar.error(f"Error: {e}")
+    # ===== END OF HIDDEN GEMS SECTION =====
+    
     # Navigation - ORIGINAL OPTIONS RESTORED
+    st.sidebar.markdown("---")
+    st.sidebar.header("📱 Navigation")
     page_options = [
         "Weekly Predictions",
+        "Historical Ratings",
         "The Machine Learning Model",
         "6 Degrees of Lucy Dacus",
         "About Me"
@@ -1181,7 +1581,7 @@ def main():
     # Load data needed for multiple pages
     album_covers_df = load_album_covers()
     similar_artists_df = load_similar_artists()
-    liked_similar_df = load_liked_similar()
+    liked_similar_df = load_similar_artists()  # Use the same function
     
     if page == "Weekly Predictions":
         st.title("🎵 New Music Friday Regression Model")
@@ -1260,6 +1660,9 @@ def main():
             
             st.write(f"Showing {len(predictions_df)} albums for {analysis_date}")
             display_album_predictions(predictions_df, album_covers_df, similar_artists_df, selected_file)
+            
+    elif page == "Historical Ratings":  # <-- ADD THIS NEW BLOCK
+        historical_rating_page()
             
     elif page == "Album Fixer":
         album_fixer_page()
