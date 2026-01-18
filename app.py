@@ -496,9 +496,10 @@ def load_training_data():
     df = pd.read_csv('data/df_cleaned_pre_standardized.csv')
     return df[df['playlist_origin'] != 'df_nmf'].copy()
 
-def save_gut_score(album_name, artist, score, file_path):
+def save_gut_score(album_name, artist, score, file_path, notes=""):
     """
     CLEAN VERSION: Only saves when there's an actual score (0-100)
+    Now also saves notes to the predictions CSV
     """
     try:
         # Only save if score is valid (0-100)
@@ -512,18 +513,44 @@ def save_gut_score(album_name, artist, score, file_path):
         source_filename = os.path.basename(file_path)
         date_str = source_filename.split('_')[0]
         
-        # Save to WEEKLY file
+        # ===== 1. SAVE TO PREDICTIONS CSV =====
+        try:
+            # Load the original predictions file
+            predictions_df = pd.read_csv(file_path)
+            
+            # Find and update the row in the predictions file
+            mask = (
+                (predictions_df['Artist'] == artist) & 
+                (predictions_df['Album Name'] == album_name)
+            )
+            
+            if mask.any():
+                # Update both gut_score and notes
+                predictions_df.loc[mask, 'gut_score'] = float(score)
+                predictions_df.loc[mask, 'gut_score_date'] = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+                predictions_df.loc[mask, 'notes'] = notes if notes else ""
+                
+                # Save back to the predictions file
+                predictions_df.to_csv(file_path, index=False)
+                st.write(f"📄 Updated predictions file: {source_filename}")
+            else:
+                st.warning(f"⚠️ Album not found in {source_filename}")
+        except Exception as e:
+            st.error(f"❌ Error updating predictions file: {str(e)}")
+        
+        # ===== 2. SAVE TO WEEKLY FEEDBACK FILE =====
         weekly_file = f'feedback/{date_str}_gut_scores.csv'
         os.makedirs('feedback', exist_ok=True)
         
-        # Create new entry
+        # Create new entry with notes
         new_entry = pd.DataFrame([{
             'Album': album_name,
             'Artist': artist,
-            'gut_score': float(score),  # Ensure float
+            'gut_score': float(score),
             'gut_score_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
             'source_file': source_filename,
-            'predicted_score': None  # Will be filled from predictions file
+            'predicted_score': None,  # Will be filled from predictions file
+            'notes': notes if notes else ""
         }])
         
         # Update or create weekly file
@@ -542,7 +569,7 @@ def save_gut_score(album_name, artist, score, file_path):
         weekly_df.to_csv(weekly_file, index=False)
         st.write(f"📁 Saved to weekly: {weekly_file}")
         
-        # Save to MASTER file
+        # ===== 3. SAVE TO MASTER FILE =====
         master_file = 'feedback/master_gut_scores.csv'
         
         if os.path.exists(master_file):
@@ -589,8 +616,6 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
     except Exception as e:
         st.error(f"Error loading album links: {e}")
         album_links_df = pd.DataFrame()
-    
-    # ... rest of your code stays the same ...
     
     # Create working copies to avoid modifying originals
     data_to_display = filtered_data.copy()
@@ -723,7 +748,6 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 if 'Label' in row and pd.notna(row['Label']):
                     st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Label:</strong> {row["Label"]}</div>', unsafe_allow_html=True)
                 
-                # ... rest of your display code (use artist_display and album_display)
                 # EXACT PLAYTIME
                 playtime_str, track_count = calculate_exact_playtime(album_display, artist_display)
                 
@@ -785,6 +809,7 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                 
                 # Get current gut score if it exists (check both column names)
                 current_gut = 0
+                current_notes = ""
                 gut_col = None
                 
                 # Check which column name exists
@@ -795,26 +820,85 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     
                 if gut_col and pd.notna(row[gut_col]):
                     current_gut = float(row[gut_col])
+                    # Get current notes if they exist
+                    if 'notes' in row and pd.notna(row['notes']):
+                        current_notes = str(row['notes'])
                     # Display current gut score
                     st.markdown(f"**Current:** {int(current_gut)}")
+                    if current_notes:
+                        st.markdown(f"**Notes:** {current_notes}")
                 else:
                     st.markdown("**Current:** Not rated")
                 
-                # Use a columns layout for the score input and save button
-                score_cols = st.columns([3, 2])
-                with score_cols[0]:
-                    new_score = st.number_input(
-                        "New Score", 
-                        0, 
-                        100, 
-                        int(current_gut), 
-                        key=f"gut_input_{album_display}_{artist_display}",
-                        label_visibility="collapsed"
-                    )
-                with score_cols[1]:
-                    if st.button("💾 Save", key=f"gut_save_{album_display}_{artist_display}"):
-                        save_gut_score(album_display, artist_display, new_score, current_file_path)
-                        st.rerun()
+                # Notes input
+                notes_input = st.text_area(
+                    "Notes (optional)", 
+                    value=current_notes,
+                    key=f"notes_{album_display}_{artist_display}",
+                    height=60,
+                    placeholder="Add any notes about this album..."
+                )
+                
+                # Show current score status
+                if current_gut > 0:
+                    st.markdown(f"### 🎯 Current Score: {int(current_gut)}")
+                    
+                    # Update section
+                    update_cols = st.columns([3, 2])
+                    with update_cols[0]:
+                        new_score = st.number_input(
+                            "Update to...", 
+                            0, 
+                            100, 
+                            int(current_gut),  # Default to current score
+                            key=f"update_input_{album_display}_{artist_display}",
+                            label_visibility="collapsed"
+                        )
+                    with update_cols[1]:
+                        if st.button("✏️ Update", key=f"update_btn_{album_display}_{artist_display}"):
+                            save_gut_score(album_display, artist_display, new_score, current_file_path, notes_input)
+                            st.rerun()
+                    
+                    # Quick adjust buttons
+                    st.markdown("**Quick adjust:**")
+                    quick_cols = st.columns(4)
+                    with quick_cols[0]:
+                        if st.button("⬆️ +10", key=f"up10_{album_display}_{artist_display}"):
+                            new_score = min(100, current_gut + 10)
+                            save_gut_score(album_display, artist_display, new_score, current_file_path, notes_input)
+                            st.rerun()
+                    with quick_cols[1]:
+                        if st.button("⬇️ -10", key=f"down10_{album_display}_{artist_display}"):
+                            new_score = max(0, current_gut - 10)
+                            save_gut_score(album_display, artist_display, new_score, current_file_path, notes_input)
+                            st.rerun()
+                    with quick_cols[2]:
+                        if st.button("🔥 Max", key=f"max_{album_display}_{artist_display}"):
+                            save_gut_score(album_display, artist_display, 100, current_file_path, notes_input)
+                            st.rerun()
+                    with quick_cols[3]:
+                        if st.button("💀 Min", key=f"min_{album_display}_{artist_display}"):
+                            save_gut_score(album_display, artist_display, 0, current_file_path, notes_input)
+                            st.rerun()
+                    
+                else:
+                    # Not scored yet
+                    st.markdown("### 🎯 Rate This Album")
+                    score_cols = st.columns([3, 2])
+                    with score_cols[0]:
+                        new_score = st.number_input(
+                            "Score (0-100)", 
+                            0, 
+                            100, 
+                            0,
+                            key=f"gut_input_{album_display}_{artist_display}",
+                            label_visibility="collapsed"
+                        )
+                    with score_cols[1]:
+                        if st.button("💾 Save Score", key=f"gut_save_{album_display}_{artist_display}"):
+                            save_gut_score(album_display, artist_display, new_score, current_file_path, notes_input)
+                            st.rerun()
+                
                 st.markdown('</div>', unsafe_allow_html=True)
             
             with cols[3]:
@@ -878,6 +962,12 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                                     st.markdown(f'<div style="font-style: italic; color: #666; margin-top: 5px;">"{comment}"</div>', unsafe_allow_html=True)
                                     break
                             
+                            # Show notes if they exist
+                            if 'notes' in album_feedback.columns and not pd.isna(album_feedback.iloc[0]['notes']):
+                                notes = str(album_feedback.iloc[0]['notes']).strip()
+                                if notes:  # Only show if not empty
+                                    st.markdown(f'<div style="background-color: #f0f0f0; padding: 8px; border-radius: 4px; margin-top: 5px; font-size: 0.9rem;"><strong>📝 Notes:</strong> {notes}</div>', unsafe_allow_html=True)
+                            
                             # Also check if it's in training data
                             try:
                                 training_file = 'data/2026_training_complete_with_features.csv'
@@ -912,7 +1002,6 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     st.caption(str(e)[:50])
             
             st.markdown('</div>', unsafe_allow_html=True)
-
 def get_album_history(artist, album):
     """Check if album appears in training data and return its history"""
     try:
