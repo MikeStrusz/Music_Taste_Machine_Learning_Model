@@ -1676,42 +1676,54 @@ def main():
         st.title("🎵 New Music Friday Regression Model")
         st.subheader("Personalized New Music Friday Recommendations")
         
-        # MOVE DATE SELECTOR TO TOP OF SIDEBAR
-        file_dates = get_all_prediction_files()
-        if file_dates:
-            # Create a dictionary for the selectbox
-            date_options = {formatted: file for file, obj, formatted in file_dates}
+            # ===== TOP FILTERS SECTION =====
+            st.markdown("---")
+            col1, col2, col3, col4 = st.columns(4)
             
-            # MOVE TO TOP OF SIDEBAR
-            st.sidebar.markdown("---")
-            st.sidebar.header("📅 Date Selection")
-            selected_date_str = st.sidebar.selectbox(
-                "Select Analysis Date",
-                options=list(date_options.keys()),
-                index=0  # Default to newest
-            )
-            selected_file = date_options[selected_date_str]
-        else:
-            selected_file = None
-            
-        predictions_df, analysis_date = load_predictions(selected_file)
-        
-        if predictions_df is not None:
-            # Filter out nuked albums
-            nuked_df = load_nuked_albums()
-            if not nuked_df.empty:
-                # Create a combined key for filtering
-                predictions_df['filter_key'] = predictions_df['Artist'] + predictions_df['Album Name']
-                nuked_df['filter_key'] = nuked_df['Artist'] + nuked_df['Album Name']
-                predictions_df = predictions_df[~predictions_df['filter_key'].isin(nuked_df['filter_key'])]
-                predictions_df = predictions_df.drop(columns=['filter_key'])
+            with col1:
+                st.markdown(f"**📅 Most Recent:** {selected_date_str}")
+                
+            with col2:
+                # Genre Filter
+                if 'Genres' in predictions_df.columns:
+                    # Extract all unique genres
+                    all_genres = set()
+                    for genres in predictions_df['Genres'].dropna():
+                        for g in str(genres).split(','):
+                            all_genres.add(g.strip())
+                    
+                    sorted_genres = sorted(list(all_genres))
+                    selected_genres = st.multiselect("🎵 Filter by Genre", options=sorted_genres)
+                    
+                    if selected_genres:
+                        # Filter rows that contain ANY of the selected genres
+                        predictions_df = predictions_df[
+                            predictions_df['Genres'].apply(lambda x: any(g.strip() in selected_genres for g in str(x).split(',')) if pd.notna(x) else False)
+                        ]
 
-            # MOVE FILTERS TO PROMINENT POSITION IN SIDEBAR
-            st.sidebar.markdown("---")
-            st.sidebar.header("🎵 Filters")
+            with col3:
+                # Search Filter
+                search_query = st.text_input("🔍 Search Artist/Album", "").lower()
+                
+            with col4:
+                # Sort Order
+                sort_order = st.selectbox("📊 Sort by", ["Highest First", "Lowest First"])
             
-            # Search
-            search_query = st.sidebar.text_input("Search Artist or Album", "").lower()
+            st.markdown("---")
+            # ===== END TOP FILTERS =====
+            # Apply search
+            if search_query:
+                predictions_df = predictions_df[
+                    predictions_df['Artist'].str.lower().str.contains(search_query) |
+                    predictions_df['Album Name'].str.lower().str.contains(search_query)
+                ]
+            
+            # Apply sort
+            score_col = 'Predicted_Score' if 'Predicted_Score' in predictions_df.columns else 'avg_score'
+            predictions_df = predictions_df.sort_values(
+                by=score_col, 
+                ascending=(sort_order == "Lowest First")
+            )
             
             # Genre Filter
             if 'Genres' in predictions_df.columns:
