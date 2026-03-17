@@ -1,0 +1,17 @@
+# covers — only keep 2026
+covers/
+
+# data files too big for GitHub
+data/2026_training_complete_with_features.csv
+data/archived_nmf_with_features/
+
+# env variables (future)
+.env
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/secrets.toml

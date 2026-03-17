@@ -1,2 +1,10 @@
-# Ignore feedback directory to prevent overwriting public reviews
-feedback/
+# Local covers folder — too large for GitHub, app falls back to remote URLs
+covers/
+
+# Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Streamlit
+.streamlit/secrets.toml

@@ -7536,7 +7536,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [3]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Standard Library Imports</span>
@@ -7612,7 +7612,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [5]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [9]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="n">df_liked</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s2">"data/liked.csv"</span><span class="p">)</span>  <span class="c1"># For PageRank only</span>
@@ -7635,54 +7635,160 @@ a.anchor-link {
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=27131ea0-b794-4115-a983-f72dceb97aec">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=27131ea0-b794-4115-a983-f72dceb97aec">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [7]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [11]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ====================================================================</span>
 <span class="c1"># 🔄 AUTO-LOAD GUT SCORES FROM FEEDBACK FOLDER</span>
-<span class="c1"># Add this RIGHT AFTER loading df_training</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=31b275f6-1f58-4fc4-a303-ec60a70e3092">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ====================================================================</span>
+<span class="c1"># 🔄 THURSDAY PIPELINE: AUTO-UPDATE TRAINING WITH NEW GUT SCORES</span>
+<span class="c1"># Pulled from RUN_THURSDAY.ipynb — runs automatically every Friday</span>
 <span class="c1"># ====================================================================</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">"</span> <span class="o">+</span> <span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"🔄 CHECKING FEEDBACK FOLDER FOR GUT SCORES"</span><span class="p">)</span>
+<span class="kn">import</span> <span class="nn">glob</span><span class="o">,</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">"🗓️ AUTO GUT SCORE INTEGRATION"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
 
-<span class="n">feedback_files</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">'feedback/*_gut_scores.csv'</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">read_csv_safe</span><span class="p">(</span><span class="n">filepath</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'utf-8'</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filepath</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">'latin-1'</span><span class="p">)</span>
 
-<span class="k">if</span> <span class="n">feedback_files</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">feedback_files</span><span class="p">)</span><span class="si">}</span><span class="s2"> feedback files"</span><span class="p">)</span>
-    
-    <span class="n">all_feedback</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">file</span> <span class="ow">in</span> <span class="n">feedback_files</span><span class="p">:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">fb_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-            <span class="c1"># Filter for albums with gut scores</span>
-            <span class="n">fb_df</span> <span class="o">=</span> <span class="n">fb_df</span><span class="p">[</span><span class="n">fb_df</span><span class="p">[</span><span class="s1">'gut_score'</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()]</span>
-            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">fb_df</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">all_feedback</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fb_df</span><span class="p">)</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  ✓ </span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">fb_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums"</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  ⚠️ Error loading </span><span class="si">{</span><span class="n">file</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="n">all_feedback</span><span class="p">:</span>
-        <span class="n">combined_feedback</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">all_feedback</span><span class="p">,</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📊 Total: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">combined_feedback</span><span class="p">)</span><span class="si">}</span><span class="s2"> gut-scored albums in feedback"</span><span class="p">)</span>
-        
-        <span class="c1"># Show what we found</span>
-        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">combined_feedback</span><span class="o">.</span><span class="n">tail</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>  <span class="c1"># Show last 5</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  • </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'Artist'</span><span class="p">]</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'Album'</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'gut_score'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">💡 These scores are in feedback folder but need to be"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   added to training data via the Streamlit app."</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"ℹ️ No gut scores found in feedback files"</span><span class="p">)</span>
+<span class="n">master_file</span> <span class="o">=</span> <span class="s1">'feedback/master_gut_scores.csv'</span>
+<span class="n">training_file</span> <span class="o">=</span> <span class="s1">'data/2026_training_complete_with_features.csv'</span>
+
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">master_file</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ℹ️  No master gut scores file yet — skipping"</span><span class="p">)</span>
 <span class="k">else</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">"ℹ️ No feedback files found"</span><span class="p">)</span>
+    <span class="n">master_df</span> <span class="o">=</span> <span class="n">read_csv_safe</span><span class="p">(</span><span class="n">master_file</span><span class="p">)</span>
+    <span class="n">master_df</span> <span class="o">=</span> <span class="n">master_df</span><span class="p">[</span><span class="n">master_df</span><span class="p">[</span><span class="s1">'gut_score'</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()]</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">master_df</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"ℹ️  No gut scores yet — skipping"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">df_training_current</span> <span class="o">=</span> <span class="n">read_csv_safe</span><span class="p">(</span><span class="n">training_file</span><span class="p">)</span>
+        <span class="n">archive_files</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">'data/archived_nmf_with_features/*.csv'</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">safe_contains</span><span class="p">(</span><span class="n">series</span><span class="p">,</span> <span class="n">text</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">series</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">escape</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">)),</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">case</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">series</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">text</span><span class="p">),</span> <span class="n">na</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+        <span class="n">tracks_added</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">new_albums_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">fb_row</span> <span class="ow">in</span> <span class="n">master_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+            <span class="n">artist</span> <span class="o">=</span> <span class="n">fb_row</span><span class="p">[</span><span class="s1">'Artist'</span><span class="p">]</span>
+            <span class="n">album</span>  <span class="o">=</span> <span class="n">fb_row</span><span class="p">[</span><span class="s1">'Album'</span><span class="p">]</span>
+            <span class="n">score</span>  <span class="o">=</span> <span class="n">fb_row</span><span class="p">[</span><span class="s1">'gut_score'</span><span class="p">]</span>
+
+            <span class="c1"># Skip if already in training</span>
+            <span class="n">already</span> <span class="o">=</span> <span class="n">df_training_current</span><span class="p">[</span>
+                <span class="p">(</span><span class="n">df_training_current</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">album</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="n">safe_contains</span><span class="p">(</span><span class="n">df_training_current</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">],</span> <span class="n">artist</span><span class="p">)</span> <span class="o">&amp;</span>
+                <span class="p">(</span><span class="n">df_training_current</span><span class="p">[</span><span class="s1">'source_type'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'gut_score_rated'</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">already</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">continue</span>
+
+            <span class="c1"># Search archives for tracks with full features</span>
+            <span class="n">found_tracks</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">for</span> <span class="n">archive_file</span> <span class="ow">in</span> <span class="n">archive_files</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">archive_df</span> <span class="o">=</span> <span class="n">read_csv_safe</span><span class="p">(</span><span class="n">archive_file</span><span class="p">)</span>
+                    <span class="n">hits</span> <span class="o">=</span> <span class="n">archive_df</span><span class="p">[</span>
+                        <span class="p">(</span><span class="n">archive_df</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span> <span class="o">==</span> <span class="n">album</span><span class="p">)</span> <span class="o">&amp;</span>
+                        <span class="n">safe_contains</span><span class="p">(</span><span class="n">archive_df</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">],</span> <span class="n">artist</span><span class="p">)</span>
+                    <span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">hits</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">found_tracks</span> <span class="o">=</span> <span class="n">hits</span>
+                        <span class="k">break</span>
+                <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                    <span class="k">continue</span>
+
+            <span class="k">if</span> <span class="n">found_tracks</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  ⚠️  No archive tracks found for: </span><span class="si">{</span><span class="n">artist</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">album</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">found_tracks</span><span class="p">[</span><span class="s1">'liked'</span><span class="p">]</span>           <span class="o">=</span> <span class="n">score</span>
+            <span class="n">found_tracks</span><span class="p">[</span><span class="s1">'source_type'</span><span class="p">]</span>     <span class="o">=</span> <span class="s1">'gut_score_rated'</span>
+            <span class="n">found_tracks</span><span class="p">[</span><span class="s1">'gut_score_date'</span><span class="p">]</span>  <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y-%m-</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
+
+            <span class="n">df_training_current</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span>
+                <span class="p">[</span><span class="n">df_training_current</span><span class="p">,</span> <span class="n">found_tracks</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+            <span class="n">tracks_added</span> <span class="o">+=</span> <span class="nb">len</span><span class="p">(</span><span class="n">found_tracks</span><span class="p">)</span>
+            <span class="n">new_albums_list</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">artist</span><span class="p">,</span> <span class="n">album</span><span class="p">,</span> <span class="n">score</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">tracks_added</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># Deduplicate — keep highest liked score</span>
+            <span class="k">def</span> <span class="nf">clean_artist</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">s</span><span class="p">):</span> <span class="k">return</span> <span class="s1">''</span>
+                <span class="k">for</span> <span class="n">sep</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">' feat. '</span><span class="p">,</span> <span class="s1">' ft. '</span><span class="p">,</span> <span class="s1">' with '</span><span class="p">,</span> <span class="s1">';'</span><span class="p">,</span> <span class="s1">','</span><span class="p">]:</span>
+                    <span class="k">if</span> <span class="n">sep</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">sep</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+                <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+            <span class="n">df_training_current</span><span class="p">[</span><span class="s1">'_artist_clean'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">df_training_current</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">clean_artist</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">df_training_current</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">df_training_current</span>
+                <span class="o">.</span><span class="n">sort_values</span><span class="p">(</span><span class="s1">'liked'</span><span class="p">,</span> <span class="n">ascending</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span>
+                    <span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">,</span> <span class="s1">'_artist_clean'</span><span class="p">,</span> <span class="s1">'Track Name'</span><span class="p">],</span>
+                    <span class="n">keep</span><span class="o">=</span><span class="s1">'first'</span>
+                <span class="p">)</span>
+                <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="n">columns</span><span class="o">=</span><span class="p">[</span><span class="s1">'_artist_clean'</span><span class="p">])</span>
+            <span class="p">)</span>
+
+            <span class="c1"># Backup then save</span>
+            <span class="n">backup_dir</span> <span class="o">=</span> <span class="s1">'data/backups'</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">backup_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">backup_path</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">backup_dir</span><span class="si">}</span><span class="s2">/training_backup_"</span>
+                <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y%m</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span><span class="si">}</span><span class="s2">.csv"</span>
+            <span class="p">)</span>
+            <span class="n">read_csv_safe</span><span class="p">(</span><span class="n">training_file</span><span class="p">)</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">backup_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+            <span class="n">df_training_current</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">training_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># Reload df_training so rest of notebook sees the update</span>
+            <span class="n">df_training</span> <span class="o">=</span> <span class="n">read_csv_safe</span><span class="p">(</span><span class="n">training_file</span><span class="p">)</span>
+
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Added </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">new_albums_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> new albums (</span><span class="si">{</span><span class="n">tracks_added</span><span class="si">}</span><span class="s2"> tracks):"</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">artist</span><span class="p">,</span> <span class="n">album</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">new_albums_list</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   • </span><span class="si">{</span><span class="n">artist</span><span class="p">[:</span><span class="mi">25</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2"> - </span><span class="si">{</span><span class="n">album</span><span class="p">[:</span><span class="mi">25</span><span class="p">]</span><span class="si">:</span><span class="s2">&lt;25</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Backup saved: </span><span class="si">{</span><span class="n">backup_path</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">"ℹ️  No new gut scores to add this week"</span><span class="p">)</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📈 Training total: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_training</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> tracks"</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   Gut-scored: "</span>
+              <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="p">(</span><span class="n">df_training</span><span class="p">[</span><span class="s1">'source_type'</span><span class="p">]</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s1">'gut_score_rated'</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
 </pre></div>
@@ -7695,7 +7801,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [8]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ====================================================================</span>
@@ -7746,7 +7852,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [10]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [15]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Initialize LastFM API client with rate limiting and request limits</span>
@@ -7916,7 +8022,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [12]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [17]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === 2026 RETOOLED DATA LOADING ===</span>
@@ -7991,7 +8097,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [13]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === CHECK 2026 RETOOLED DATA ===</span>
@@ -8060,7 +8166,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [14]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [19]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === FEATURE ENGINEERING SETUP ===</span>
@@ -8109,7 +8215,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [16]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [21]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === 2026 DATA CLEANUP ===</span>
@@ -8192,7 +8298,7 @@ a.anchor-link {
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [18]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [23]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ============================================</span>
@@ -8487,7 +8593,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [20]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ============================================</span>
@@ -9017,7 +9123,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [22]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># ============================================</span>
@@ -9102,7 +9208,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [25]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [30]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === RECORD LABEL FREQUENCY ENCODING (FIXED - PROPER SORTING) ===</span>
@@ -9197,7 +9303,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [27]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [32]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === GENRE TARGET ENCODING (FIXED - NO INFINITE LOOP) ===</span>
@@ -9227,7 +9333,7 @@ and applies genres to all dataframes.</p>
 <span class="p">}</span>
 
 <span class="n">preferred_genres</span> <span class="o">=</span> <span class="p">{</span>
-    <span class="s1">'chamber pop'</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s1">'bedroom pop'</span><span class="p">:</span> <span class="mf">8.5</span><span class="p">,</span>
+    <span class="s1">'alternative r&amp;b'</span><span class="p">:</span> <span class="mi">10</span><span class="p">,</span> <span class="s1">'chamber pop'</span><span class="p">:</span> <span class="mi">9</span><span class="p">,</span> <span class="s1">'bedroom pop'</span><span class="p">:</span> <span class="mf">8.5</span><span class="p">,</span>
     <span class="s1">'indie folk'</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="s1">'post punk'</span><span class="p">:</span> <span class="mi">7</span><span class="p">,</span> <span class="s1">'indie'</span><span class="p">:</span> <span class="mf">6.5</span><span class="p">,</span> <span class="s1">'jangle pop'</span><span class="p">:</span> <span class="mf">6.3</span><span class="p">,</span>
     <span class="s1">'retro soul'</span><span class="p">:</span> <span class="mi">5</span><span class="p">,</span> <span class="s1">'folk pop'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s1">'indie rock'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s1">'indie pop'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span>
     <span class="s1">'baroque pop'</span><span class="p">:</span> <span class="mf">3.5</span><span class="p">,</span> <span class="s1">'americana'</span><span class="p">:</span> <span class="mi">3</span>
@@ -9259,50 +9365,70 @@ and applies genres to all dataframes.</p>
     <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">genre_stats</span><span class="p">[</span><span class="s1">'genre_list'</span><span class="p">],</span> <span class="n">genre_stats</span><span class="p">[</span><span class="s1">'smoothed'</span><span class="p">])),</span> <span class="n">global_mean</span>
 
 <span class="k">def</span> <span class="nf">encode_single_genre</span><span class="p">(</span><span class="n">genre_str</span><span class="p">,</span> <span class="n">encoding_map</span><span class="p">,</span> <span class="n">global_mean</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">"""Encode a single genre string using the encoding map"""</span>
+<span class="w">    </span><span class="sd">"""Encode a single genre string — 2025 weighted-average approach restored."""</span>
     <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">genre_str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">genre_str</span> <span class="o">==</span> <span class="s1">'Unknown'</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">global_mean</span>
-    
-    <span class="n">genres</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">genre_str</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">', '</span><span class="p">)</span> 
-             <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="n">g</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'seen live'</span><span class="p">,</span> <span class="s1">'Unknown'</span><span class="p">]]</span>
-    
+
+    <span class="n">genres</span> <span class="o">=</span> <span class="p">[</span><span class="n">g</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">genre_str</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">', '</span><span class="p">)</span>
+              <span class="k">if</span> <span class="n">g</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="ow">and</span> <span class="n">g</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'seen live'</span><span class="p">,</span> <span class="s1">'Unknown'</span><span class="p">]]</span>
+
     <span class="k">if</span> <span class="ow">not</span> <span class="n">genres</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">global_mean</span>
-    
-    <span class="c1"># Calculate base encoded value</span>
-    <span class="n">base_values</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">genre</span> <span class="ow">in</span> <span class="n">genres</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">genre</span> <span class="ow">in</span> <span class="n">encoding_map</span><span class="p">:</span>
-            <span class="n">base_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">encoding_map</span><span class="p">[</span><span class="n">genre</span><span class="p">])</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">base_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">global_mean</span><span class="p">)</span>
-    
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">base_values</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">global_mean</span>
-    
-    <span class="n">base_score</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">base_values</span><span class="p">)</span>
-    
-    <span class="c1"># Apply preference adjustments</span>
-    <span class="k">for</span> <span class="n">genre</span> <span class="ow">in</span> <span class="n">genres</span><span class="p">:</span>
-        <span class="n">genre_lower</span> <span class="o">=</span> <span class="n">genre</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
-        
-        <span class="c1"># Check preferred genres</span>
-        <span class="k">for</span> <span class="n">pref_key</span><span class="p">,</span> <span class="n">pref_weight</span> <span class="ow">in</span> <span class="n">preferred_genres</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">pref_key</span> <span class="ow">in</span> <span class="n">genre_lower</span><span class="p">:</span>
-                <span class="n">boost</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">pref_weight</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span>
-                <span class="n">base_score</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">base_score</span> <span class="o">*</span> <span class="n">boost</span><span class="p">)</span>
-        
-        <span class="c1"># Check disliked genres</span>
-        <span class="k">for</span> <span class="n">dislike_key</span><span class="p">,</span> <span class="n">severity</span> <span class="ow">in</span> <span class="n">disliked_genres</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="n">dislike_key</span> <span class="ow">in</span> <span class="n">genre_lower</span><span class="p">:</span>
-                <span class="n">penalty</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="n">severity</span> <span class="o">/</span> <span class="mi">20</span><span class="p">)</span>
-                <span class="n">base_score</span> <span class="o">=</span> <span class="n">base_score</span> <span class="o">*</span> <span class="n">penalty</span>
-    
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">base_score</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>
 
-<span class="c1"># Create encoding map from training data</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📊 Creating genre encoding map from training data..."</span><span class="p">)</span>
-<span class="n">encoding_map</span><span class="p">,</span> <span class="n">global_mean</span> <span class="o">=</span> <span class="n">create_genre_encoding_map</span><span class="p">(</span><span class="n">df_training</span><span class="p">,</span> <span class="n">smoothing</span><span class="o">=</span><span class="mi">35</span><span class="p">)</span>
+    <span class="c1"># Single-genre fast path: hard floor/ceiling for obvious cases</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">genres</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="s1">' '</span> <span class="ow">in</span> <span class="n">genres</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">genre_lower</span> <span class="o">=</span> <span class="n">genres</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">preferred_term</span> <span class="ow">in</span> <span class="n">preferred_genres</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">preferred_term</span> <span class="ow">in</span> <span class="n">genre_lower</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">global_mean</span> <span class="o">*</span> <span class="mf">1.5</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">disliked_term</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'metal'</span><span class="p">,</span> <span class="s1">'satanic'</span><span class="p">,</span> <span class="s1">'gore'</span><span class="p">,</span> <span class="s1">'brutal'</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="n">disliked_term</span> <span class="ow">in</span> <span class="n">genre_lower</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mf">30.0</span>
+
+    <span class="n">genre_values</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">genre_weights</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">genre</span> <span class="ow">in</span> <span class="n">genres</span><span class="p">:</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="n">encoding_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">genre</span><span class="p">,</span> <span class="n">global_mean</span><span class="p">)</span>
+        <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span>
+        <span class="n">genre_lower</span> <span class="o">=</span> <span class="n">genre</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="c1"># FROM 2025: blessing — preferred genres get value boost AND higher pull weight</span>
+        <span class="k">if</span> <span class="n">genre_lower</span> <span class="ow">in</span> <span class="n">preferred_genres</span><span class="p">:</span>
+            <span class="n">blessing_factor</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">+</span> <span class="p">(</span><span class="n">preferred_genres</span><span class="p">[</span><span class="n">genre_lower</span><span class="p">]</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="n">value</span> <span class="o">*</span> <span class="n">blessing_factor</span><span class="p">)</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.5</span>
+
+        <span class="c1"># FROM 2025: penalty — disliked genres get value penalty AND higher pull weight</span>
+        <span class="k">elif</span> <span class="n">genre_lower</span> <span class="ow">in</span> <span class="n">disliked_genres</span><span class="p">:</span>
+            <span class="n">severity</span> <span class="o">=</span> <span class="n">disliked_genres</span><span class="p">[</span><span class="n">genre_lower</span><span class="p">]</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.0</span> <span class="o">-</span> <span class="p">(</span><span class="n">severity</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">))</span>
+            <span class="n">weight</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">severity</span> <span class="o">/</span> <span class="mf">10.0</span><span class="p">)</span>
+
+        <span class="c1"># FROM 2025: extra nudge down for genres statistically below your mean</span>
+        <span class="k">elif</span> <span class="n">genre</span> <span class="ow">in</span> <span class="n">encoding_map</span> <span class="ow">and</span> <span class="n">encoding_map</span><span class="p">[</span><span class="n">genre</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">global_mean</span> <span class="o">-</span> <span class="mi">10</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span> <span class="o">*</span> <span class="mf">0.75</span>
+
+        <span class="n">genre_values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="n">genre_weights</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weight</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">genre_values</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">global_mean</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+        <span class="nb">sum</span><span class="p">(</span><span class="n">v</span> <span class="o">*</span> <span class="n">w</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">genre_values</span><span class="p">,</span> <span class="n">genre_weights</span><span class="p">))</span> <span class="o">/</span> <span class="nb">sum</span><span class="p">(</span><span class="n">genre_weights</span><span class="p">),</span>
+        <span class="mi">30</span><span class="p">,</span> <span class="mi">100</span>
+    <span class="p">)</span>
+
+<span class="c1"># Create encoding map from training data + liked songs corpus</span>
+<span class="c1"># Liked songs are NOT in model training (avoids bias) but their genre</span>
+<span class="c1"># distribution enriches the encoding map — this is the 2025 special sauce.</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📊 Creating genre encoding map from training + liked songs corpus..."</span><span class="p">)</span>
+<span class="n">df_liked_for_encoding</span> <span class="o">=</span> <span class="n">df_liked</span><span class="p">[[</span><span class="s1">'Genres'</span><span class="p">,</span> <span class="s1">'liked'</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">df_liked_for_encoding</span><span class="p">[</span><span class="s1">'liked'</span><span class="p">]</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># Treat all liked songs as score=100 for encoding</span>
+<span class="n">df_encoding_corpus</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">df_training</span><span class="p">[[</span><span class="s1">'Genres'</span><span class="p">,</span> <span class="s1">'liked'</span><span class="p">]],</span> <span class="n">df_liked_for_encoding</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">encoding_map</span><span class="p">,</span> <span class="n">global_mean</span> <span class="o">=</span> <span class="n">create_genre_encoding_map</span><span class="p">(</span><span class="n">df_encoding_corpus</span><span class="p">,</span> <span class="n">smoothing</span><span class="o">=</span><span class="mi">35</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  Encoding corpus: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_training</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> training rows + </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_liked_for_encoding</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> liked songs = </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_encoding_corpus</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> total"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Global mean 'liked' score: </span><span class="si">{</span><span class="n">global_mean</span><span class="si">:</span><span class="s2">.2f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Encoded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">encoding_map</span><span class="p">)</span><span class="si">}</span><span class="s2"> unique genres"</span><span class="p">)</span>
 
@@ -9372,7 +9498,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [29]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [34]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === ARTIST CENTRALITY ANALYSIS (2026 RETOOLED - COMPLETE NETWORK) ===</span>
@@ -9638,7 +9764,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [31]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [36]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === ULTRA-SIMPLE CENTRALITY SUMMARY ===</span>
@@ -9678,7 +9804,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [33]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [38]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === LUCY DACUS NETWORK WITH TOP 100 HIERARCHY ===</span>
@@ -10011,7 +10137,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [35]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [40]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === MOOD &amp; ENERGY FEATURES (SIMPLIFIED) ===</span>
@@ -10057,7 +10183,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [37]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [42]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === ALBUM ID FOR NMF ===</span>
@@ -10103,7 +10229,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [39]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [44]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === CHECK COLUMNS ===</span>
@@ -10141,20 +10267,15 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=cb709d88-3b66-4b3d-bd0f-31c17b361b8c">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=cb709d88-3b66-4b3d-bd0f-31c17b361b8c">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [42]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [47]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === STANDARDIZE NUMERIC COLUMNS ===</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">"📏 STANDARDIZING NUMERIC COLUMNS"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">50</span><span class="p">)</span>
-
-<span class="c1"># Define numeric columns to scale (same for all dataframes)</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Skipping 0-1 scaling — final 1-100 scaling happens in the next cell</span>
 <span class="n">numeric_columns</span> <span class="o">=</span> <span class="p">[</span>
     <span class="s1">'Genres_encoded'</span><span class="p">,</span>
     <span class="s1">'Artist Centrality'</span><span class="p">,</span>
@@ -10163,24 +10284,6 @@ and applies genres to all dataframes.</p>
     <span class="s1">'mood_score'</span><span class="p">,</span>
     <span class="s1">'energy_profile'</span>
 <span class="p">]</span>
-
-<span class="c1"># Check which columns exist</span>
-<span class="n">available_cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">numeric_columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">df_training</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Scaling </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">available_cols</span><span class="p">)</span><span class="si">}</span><span class="s2"> columns: </span><span class="si">{</span><span class="n">available_cols</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-
-<span class="c1"># Initialize scaler (scale to 0-1 range)</span>
-<span class="n">scaler</span> <span class="o">=</span> <span class="n">MinMaxScaler</span><span class="p">()</span>
-
-<span class="c1"># Fit on training data only</span>
-<span class="n">scaler</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">df_training</span><span class="p">[</span><span class="n">available_cols</span><span class="p">])</span>
-
-<span class="c1"># Transform all dataframes</span>
-<span class="n">df_training</span><span class="p">[</span><span class="n">available_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df_training</span><span class="p">[</span><span class="n">available_cols</span><span class="p">])</span>
-<span class="n">df_nmf</span><span class="p">[</span><span class="n">available_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df_nmf</span><span class="p">[</span><span class="n">available_cols</span><span class="p">])</span>
-<span class="n">df_liked</span><span class="p">[</span><span class="n">available_cols</span><span class="p">]</span> <span class="o">=</span> <span class="n">scaler</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="n">df_liked</span><span class="p">[</span><span class="n">available_cols</span><span class="p">])</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">✅ Scaled: Training(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_training</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">), NMF(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_nmf</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">), Liked(</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">df_liked</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">)"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"   All features now in range: 0.0 - 1.0"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -10191,7 +10294,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [43]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [48]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === SCALE TO 1-100 RANGE ===</span>
@@ -10227,7 +10330,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [44]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [49]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># In your main notebook, AFTER all feature engineering:</span>
@@ -10276,7 +10379,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [46]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [51]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === TUNE MODELS WITH 2026 RETOOLING (NO LIKED SONGS IN TRAINING) ===</span>
@@ -10448,7 +10551,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [48]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [53]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === FINAL 80/20 ALBUM-LEVEL VALIDATION ===</span>
@@ -10523,9 +10626,11 @@ and applies genres to all dataframes.</p>
     <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"❌ POOR: R² = </span><span class="si">{</span><span class="n">r2</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2"> (album memorization problem)"</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">🎯 COMPARISON TO TRACK-LEVEL:"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Track-level R² (inflated): 0.873"</span><span class="p">)</span>
+<span class="n">track_level_r2</span> <span class="o">=</span> <span class="n">r2_score</span><span class="p">(</span><span class="n">df_training</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">,</span> <span class="s1">'liked'</span><span class="p">],</span> 
+                           <span class="n">rf_model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">df_training</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">train_indices</span><span class="p">,</span> <span class="n">features</span><span class="p">]))</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Track-level R² (inflated): </span><span class="si">{</span><span class="n">track_level_r2</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Album-level R² (real):     </span><span class="si">{</span><span class="n">r2</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Inflation:                 </span><span class="si">{</span><span class="mf">0.873</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">r2</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Inflation:                 </span><span class="si">{</span><span class="n">track_level_r2</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">r2</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
 
 <span class="c1"># Show some predictions vs actual</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">📋 SAMPLE PREDICTIONS:"</span><span class="p">)</span>
@@ -10553,7 +10658,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [49]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [54]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === RETRAIN WITH ALBUM-AWARE SPLIT FOR NMF ===</span>
@@ -10562,15 +10667,9 @@ and applies genres to all dataframes.</p>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"="</span> <span class="o">*</span> <span class="mi">60</span><span class="p">)</span>
 
 <span class="c1"># Use 80% of albums for training, 20% held out</span>
+
 <span class="n">unique_albums</span> <span class="o">=</span> <span class="n">df_training</span><span class="p">[[</span><span class="s1">'Album Name'</span><span class="p">,</span> <span class="s1">'Artist Name(s)'</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
 <span class="n">train_albums</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">unique_albums</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-
-<span class="c1"># Get training tracks</span>
-<span class="n">train_indices</span> <span class="o">=</span> <span class="n">df_training</span><span class="p">[</span>
-    <span class="n">df_training</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">train_albums</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">])</span> <span class="o">&amp;</span>
-    <span class="n">df_training</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">train_albums</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">])</span>
-<span class="p">]</span><span class="o">.</span><span class="n">index</span>
-
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Training on: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_albums</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> albums → </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">train_indices</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> tracks"</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"(Holding out </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">unique_albums</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">train_albums</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2"> albums for generalization)"</span><span class="p">)</span>
 
@@ -10601,7 +10700,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [50]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [55]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === DISCOVERY MODEL: CLASSIFICATION FOR 85+ SCORES ===</span>
@@ -10633,7 +10732,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [51]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [56]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === FIXED: FEATURE COMPARISON ===</span>
@@ -10772,7 +10871,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [52]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [57]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === LET'S CHECK THE REAL ERROR METRICS ===</span>
@@ -10837,7 +10936,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [53]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [58]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === IMPLEMENT WEIGHTED TRAINING FOR 2026 RETOOLING ===</span>
@@ -10886,13 +10985,7 @@ and applies genres to all dataframes.</p>
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  45-59 (Mid):       1.0x weight → Okay to be less precise"</span><span class="p">)</span>
 
 <span class="c1"># Album-aware split (to prevent memorization)</span>
-<span class="n">unique_albums</span> <span class="o">=</span> <span class="n">df_training</span><span class="p">[[</span><span class="s1">'Album Name'</span><span class="p">,</span> <span class="s1">'Artist Name(s)'</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span>
-<span class="n">albums_train</span><span class="p">,</span> <span class="n">albums_test</span> <span class="o">=</span> <span class="n">train_test_split</span><span class="p">(</span><span class="n">unique_albums</span><span class="p">,</span> <span class="n">test_size</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
-
-<span class="n">train_indices</span> <span class="o">=</span> <span class="n">df_training</span><span class="p">[</span>
-    <span class="n">df_training</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">albums_train</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">])</span> <span class="o">&amp;</span>
-    <span class="n">df_training</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">albums_train</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">])</span>
-<span class="p">]</span><span class="o">.</span><span class="n">index</span>
+<span class="c1"># train_indices defined in Cell 48 — reusing that split here</span>
 
 <span class="n">test_indices</span> <span class="o">=</span> <span class="n">df_training</span><span class="p">[</span>
     <span class="n">df_training</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">albums_test</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">])</span> <span class="o">&amp;</span>
@@ -11050,7 +11143,7 @@ and applies genres to all dataframes.</p>
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [60]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># =======================================================================================</span>
@@ -11157,22 +11250,63 @@ and applies genres to all dataframes.</p>
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
         <span class="n">artist</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'Primary Artist'</span><span class="p">]</span>
         
-        <span class="c1"># Check direct match</span>
-        <span class="n">match</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">find_best_match</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">liked_artists</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+        <span class="c1"># Tier 1: exact match to liked artist</span>
+        <span class="k">if</span> <span class="n">artist</span> <span class="ow">in</span> <span class="n">liked_artists</span><span class="p">:</span>
             <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'similarity_boost'</span><span class="p">]</span> <span class="o">=</span> <span class="n">boost_factor</span>
             <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'match_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'direct_liked'</span>
-            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'matched_to'</span><span class="p">]</span> <span class="o">=</span> <span class="n">match</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'matched_to'</span><span class="p">]</span> <span class="o">=</span> <span class="n">artist</span>
             <span class="k">continue</span>
-            
-        <span class="c1"># Check similar match</span>
+
+        <span class="c1"># Tier 2: FROM 2025 — fuzzy match to liked artist (confidence-scaled)</span>
+        <span class="n">best_match</span><span class="p">,</span> <span class="n">match_score</span> <span class="o">=</span> <span class="n">find_best_match</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">liked_artists</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">best_match</span><span class="p">:</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'similarity_boost'</span><span class="p">]</span> <span class="o">=</span> <span class="n">boost_factor</span> <span class="o">*</span> <span class="mf">0.8</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'match_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'direct_liked_fuzzy'</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'matched_to'</span><span class="p">]</span> <span class="o">=</span> <span class="n">best_match</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Tier 3: similar-to-liked — fuzzy match, confidence-scaled boost</span>
         <span class="n">match</span><span class="p">,</span> <span class="n">score</span> <span class="o">=</span> <span class="n">find_best_match</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="nb">set</span><span class="p">(</span><span class="n">similar_to_liked_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
         <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'similarity_boost'</span><span class="p">]</span> <span class="o">=</span> <span class="n">boost_factor</span> <span class="o">*</span> <span class="mf">0.7</span>
-            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'match_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'similar_to_liked'</span>
-            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'matched_to'</span><span class="p">]</span> <span class="o">=</span> <span class="s2">", "</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">similar_to_liked_mapping</span><span class="p">[</span><span class="n">match</span><span class="p">][:</span><span class="mi">2</span><span class="p">])</span>
-            
+            <span class="n">liked_connections</span> <span class="o">=</span> <span class="n">similar_to_liked_mapping</span><span class="p">[</span><span class="n">match</span><span class="p">]</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'similarity_boost'</span><span class="p">]</span> <span class="o">=</span> <span class="n">boost_factor</span> <span class="o">*</span> <span class="mf">0.6</span> <span class="o">*</span> <span class="p">(</span><span class="n">score</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'match_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'fuzzy_similar_match'</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'matched_to'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">match</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">score</span><span class="si">}</span><span class="s2">%) -&gt; </span><span class="si">{</span><span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">liked_connections</span><span class="p">[:</span><span class="mi">2</span><span class="p">])</span><span class="si">}</span><span class="s2">"</span>
+            <span class="k">continue</span>
+
+        <span class="c1"># Tier 4: FROM 2025 — fuzzy match directly against liked artists, last resort</span>
+        <span class="n">best_match</span><span class="p">,</span> <span class="n">match_score</span> <span class="o">=</span> <span class="n">find_best_match</span><span class="p">(</span><span class="n">artist</span><span class="p">,</span> <span class="n">liked_artists</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">best_match</span><span class="p">:</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'similarity_boost'</span><span class="p">]</span> <span class="o">=</span> <span class="n">boost_factor</span> <span class="o">*</span> <span class="mf">0.7</span> <span class="o">*</span> <span class="p">(</span><span class="n">match_score</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'match_type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'fuzzy_direct_match'</span>
+            <span class="n">df_nmf_copy</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="s1">'matched_to'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="n">best_match</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">match_score</span><span class="si">}</span><span class="s2">%)"</span>
+
     <span class="k">return</span> <span class="n">df_nmf_copy</span>
+
+<span class="c1"># --- 3. FROM 2025: CONFIDENCE SCALING FUNCTIONS ---</span>
+<span class="k">def</span> <span class="nf">get_prediction_interval</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">y_std</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">,</span> <span class="n">percentile</span><span class="o">=</span><span class="mi">95</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Ask every tree in the forest to predict independently — spread = uncertainty."""</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">estimator</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">estimators_</span><span class="p">:</span>
+        <span class="n">predictions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">estimator</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">X</span><span class="p">)</span> <span class="o">*</span> <span class="n">y_std</span> <span class="o">+</span> <span class="n">y_mean</span><span class="p">)</span>
+    <span class="n">predictions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">predictions</span><span class="p">)</span>
+    <span class="n">lower</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="n">percentile</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">upper</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">percentile</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="mi">100</span> <span class="o">-</span> <span class="p">(</span><span class="mi">100</span> <span class="o">-</span> <span class="n">percentile</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span>
+
+<span class="k">def</span> <span class="nf">apply_confidence_scaling</span><span class="p">(</span><span class="n">predictions</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">X</span><span class="p">,</span> <span class="n">y_std</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">,</span> <span class="n">min_confidence</span><span class="o">=</span><span class="mi">40</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">"""Pull uncertain predictions back toward the mean. High agreement = trust it."""</span>
+    <span class="n">lower</span><span class="p">,</span> <span class="n">upper</span> <span class="o">=</span> <span class="n">get_prediction_interval</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">y_std</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">)</span>
+    <span class="n">uncertainty</span> <span class="o">=</span> <span class="n">upper</span> <span class="o">-</span> <span class="n">lower</span>
+    <span class="n">confidence</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">uncertainty</span> <span class="o">/</span> <span class="n">uncertainty</span><span class="o">.</span><span class="n">max</span><span class="p">())</span> <span class="o">*</span> <span class="mi">100</span>
+
+    <span class="n">scaled</span> <span class="o">=</span> <span class="n">predictions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+    <span class="n">high_conf</span> <span class="o">=</span> <span class="n">confidence</span> <span class="o">&gt;=</span> <span class="n">min_confidence</span>
+    <span class="n">scaled</span><span class="p">[</span><span class="n">high_conf</span><span class="p">]</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[</span><span class="n">high_conf</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.9</span> <span class="o">+</span> <span class="mf">0.1</span> <span class="o">*</span> <span class="p">(</span><span class="n">confidence</span><span class="p">[</span><span class="n">high_conf</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span><span class="p">))</span>
+    <span class="n">low_conf</span> <span class="o">=</span> <span class="n">confidence</span> <span class="o">&lt;</span> <span class="n">min_confidence</span>
+    <span class="n">scaled</span><span class="p">[</span><span class="n">low_conf</span><span class="p">]</span> <span class="o">=</span> <span class="n">predictions</span><span class="p">[</span><span class="n">low_conf</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mf">0.6</span> <span class="o">+</span> <span class="mf">0.3</span> <span class="o">*</span> <span class="p">(</span><span class="n">confidence</span><span class="p">[</span><span class="n">low_conf</span><span class="p">]</span> <span class="o">/</span> <span class="n">min_confidence</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">scaled</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="mi">100</span><span class="p">),</span> <span class="n">confidence</span>
 
 <span class="c1"># --- 3. EXECUTION ---</span>
 <span class="c1"># Train models with 2026 weights</span>
@@ -11197,13 +11331,34 @@ and applies genres to all dataframes.</p>
 <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'base_prediction'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">nmf_weights</span> <span class="o">*</span> <span class="n">rf_nmf</span><span class="p">)</span> <span class="o">+</span> <span class="p">((</span><span class="mi">1</span> <span class="o">-</span> <span class="n">nmf_weights</span><span class="p">)</span> <span class="o">*</span> <span class="n">xgb_nmf</span><span class="p">)</span>
 
 <span class="c1"># Apply Similarity Boost</span>
+<span class="c1"># FROM 2025: use liked songs + top 100 ranked albums as the universe</span>
+<span class="c1"># so artists from favorite albums also trigger the direct-match boost</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Applying artist similarity boost..."</span><span class="p">)</span>
-<span class="n">df_nmf</span> <span class="o">=</span> <span class="n">calculate_artist_similarity_boost</span><span class="p">(</span><span class="n">df_nmf</span><span class="p">,</span> <span class="n">df_liked_similar</span><span class="p">,</span> <span class="n">df_liked</span><span class="p">)</span>
+<span class="n">liked_artists_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span>
+    <span class="n">df_liked</span><span class="p">,</span>
+    <span class="n">df_training</span><span class="p">[</span><span class="n">df_training</span><span class="p">[</span><span class="s1">'source_type'</span><span class="p">]</span> <span class="o">==</span> <span class="s1">'top_100_ranked'</span><span class="p">]</span>
+<span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">df_nmf</span> <span class="o">=</span> <span class="n">calculate_artist_similarity_boost</span><span class="p">(</span><span class="n">df_nmf</span><span class="p">,</span> <span class="n">df_liked_similar</span><span class="p">,</span> <span class="n">liked_artists_df</span><span class="p">)</span>
 
-<span class="c1"># Final Score = Base Prediction + Similarity Boost</span>
-<span class="n">df_nmf</span><span class="p">[</span><span class="s1">'final_predicted_score'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'base_prediction'</span><span class="p">]</span> <span class="o">+</span> <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'similarity_boost'</span><span class="p">]</span>
-<span class="c1"># Clip to 100</span>
-<span class="n">df_nmf</span><span class="p">[</span><span class="s1">'final_predicted_score'</span><span class="p">]</span> <span class="o">=</span> <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'final_predicted_score'</span><span class="p">]</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">upper</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+<span class="c1"># Apply similarity boost</span>
+<span class="n">boosted_predictions</span> <span class="o">=</span> <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'base_prediction'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span> <span class="o">+</span> <span class="n">df_nmf</span><span class="p">[</span><span class="s1">'similarity_boost'</span><span class="p">]</span><span class="o">.</span><span class="n">values</span>
+
+<span class="c1"># FROM 2025: confidence scaling — uncertain predictions get pulled back toward the mean</span>
+<span class="n">final_predictions</span><span class="p">,</span> <span class="n">confidence_scores</span> <span class="o">=</span> <span class="n">apply_confidence_scaling</span><span class="p">(</span>
+    <span class="n">boosted_predictions</span><span class="p">,</span> <span class="n">rf_final</span><span class="p">,</span> <span class="n">df_nmf</span><span class="p">[</span><span class="n">features</span><span class="p">],</span> <span class="n">y_std</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">,</span> <span class="n">min_confidence</span><span class="o">=</span><span class="mi">40</span>
+<span class="p">)</span>
+
+<span class="n">df_nmf</span><span class="p">[</span><span class="s1">'final_predicted_score'</span><span class="p">]</span> <span class="o">=</span> <span class="n">final_predictions</span>
+<span class="n">df_nmf</span><span class="p">[</span><span class="s1">'prediction_confidence'</span><span class="p">]</span> <span class="o">=</span> <span class="n">confidence_scores</span>
+<span class="n">df_nmf</span><span class="p">[</span><span class="s1">'is_unknown_artist'</span><span class="p">]</span> <span class="o">=</span> <span class="o">~</span><span class="n">df_nmf</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">)</span><span class="o">.</span><span class="n">str</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span>
+    <span class="nb">set</span><span class="p">(</span><span class="n">df_liked_similar</span><span class="p">[</span><span class="s1">'Artist'</span><span class="p">])</span>
+<span class="p">)</span>
+
+<span class="c1"># Prediction intervals for exploration notebook</span>
+<span class="n">lower_bound</span><span class="p">,</span> <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">get_prediction_interval</span><span class="p">(</span><span class="n">df_nmf</span><span class="p">[</span><span class="n">features</span><span class="p">],</span> <span class="n">rf_final</span><span class="p">,</span> <span class="n">y_std</span><span class="p">,</span> <span class="n">y_mean</span><span class="p">)</span>
+<span class="n">df_nmf</span><span class="p">[</span><span class="s1">'prediction_lower'</span><span class="p">]</span> <span class="o">=</span> <span class="n">lower_bound</span>
+<span class="n">df_nmf</span><span class="p">[</span><span class="s1">'prediction_upper'</span><span class="p">]</span> <span class="o">=</span> <span class="n">upper_bound</span>
+<span class="n">df_nmf</span><span class="p">[</span><span class="s1">'prediction_uncertainty'</span><span class="p">]</span> <span class="o">=</span> <span class="n">upper_bound</span> <span class="o">-</span> <span class="n">lower_bound</span>
 
 <span class="c1"># --- 4. ALBUM AGGREGATION ---</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Aggregating album-level predictions..."</span><span class="p">)</span>
@@ -11284,12 +11439,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=a654a1fb-6b7d-4a6f-abb7-b5e4aa785ae0">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=a654a1fb-6b7d-4a6f-abb7-b5e4aa785ae0">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [61]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># --- 5. SAVE RECOMMENDATIONS (2025 STYLE) WITH GUT_SCORE ---</span>
@@ -11346,6 +11501,15 @@ and applies genres to all dataframes.</p>
 
 <span class="c1"># Also create a separate feedback file with just the albums</span>
 <span class="n">feedback_df</span> <span class="o">=</span> <span class="n">export_df</span><span class="p">[[</span><span class="s1">'Album'</span><span class="p">,</span> <span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Predicted_Score'</span><span class="p">,</span> <span class="s1">'gut_score'</span><span class="p">,</span> <span class="s1">'gut_score_date'</span><span class="p">,</span> <span class="s1">'notes'</span><span class="p">]]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="c1"># Merge in Similar Artists from df_liked_similar</span>
+<span class="k">if</span> <span class="s1">'df_liked_similar'</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">df_liked_similar</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+    <span class="n">feedback_df</span> <span class="o">=</span> <span class="n">feedback_df</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+        <span class="n">df_liked_similar</span><span class="p">[[</span><span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Similar Artists'</span><span class="p">]],</span>
+        <span class="n">on</span><span class="o">=</span><span class="s1">'Artist'</span><span class="p">,</span>
+        <span class="n">how</span><span class="o">=</span><span class="s1">'left'</span>
+    <span class="p">)</span>
+
 <span class="n">feedback_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">feedback_filename</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Saved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">export_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums to: </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
@@ -11368,12 +11532,12 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=85b983fa-cc7c-40a3-a922-7e6434d2b0e7">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=85b983fa-cc7c-40a3-a922-7e6434d2b0e7">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
 <div class="jp-InputArea jp-Cell-inputArea">
-<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-InputPrompt jp-InputArea-prompt">In [63]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
 <div class="highlight hl-ipython3"><pre><span></span><span class="c1"># Folder where the predictions are saved</span>
@@ -11419,7 +11583,7 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
-</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=536a20ad-63e1-4b72-aa0c-da53b59ee761">
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell" id="cell-id=536a20ad-63e1-4b72-aa0c-da53b59ee761">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
 </div>
@@ -11460,7 +11624,24 @@ and applies genres to all dataframes.</p>
                     <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
-            <span class="n">album_art</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'artworkUrl100'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"100x100"</span><span class="p">,</span> <span class="s2">"600x600"</span><span class="p">)</span>
+            <span class="n">album_art_url</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'artworkUrl100'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">"100x100"</span><span class="p">,</span> <span class="s2">"600x600"</span><span class="p">)</span>
+            <span class="c1"># Try to download to local covers folder</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">hashlib</span>
+                <span class="n">covers_dir</span> <span class="o">=</span> <span class="s1">'covers'</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">covers_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">artist</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">_</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">album</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">local_filename</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">(</span><span class="n">key</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span> <span class="o">+</span> <span class="s1">'.jpg'</span>
+                <span class="n">local_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">covers_dir</span><span class="p">,</span> <span class="n">local_filename</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">local_path</span><span class="p">):</span>
+                    <span class="n">img_response</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">album_art_url</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+                    <span class="n">img_response</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">local_path</span><span class="p">,</span> <span class="s1">'wb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                        <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">img_response</span><span class="o">.</span><span class="n">content</span><span class="p">)</span>
+                <span class="n">album_art</span> <span class="o">=</span> <span class="n">local_path</span>  <span class="c1"># store local path instead of URL</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"  ⚠️ Download failed, storing URL instead: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">album_art</span> <span class="o">=</span> <span class="n">album_art_url</span>  <span class="c1"># fall back to URL if download fails</span>
             <span class="c1"># print(f"  ✅ Success: {artist} - {album}") # Optional: uncomment for more verbose output</span>
             <span class="k">return</span> <span class="p">{</span><span class="s1">'Artist'</span><span class="p">:</span> <span class="n">artist</span><span class="p">,</span> <span class="s1">'Album Name'</span><span class="p">:</span> <span class="n">album</span><span class="p">,</span> <span class="s1">'Album Art'</span><span class="p">:</span> <span class="n">album_art</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">:</span> <span class="s1">'success'</span><span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
@@ -11471,6 +11652,46 @@ and applies genres to all dataframes.</p>
         <span class="k">return</span> <span class="p">{</span><span class="s1">'Artist'</span><span class="p">:</span> <span class="n">artist</span><span class="p">,</span> <span class="s1">'Album Name'</span><span class="p">:</span> <span class="n">album</span><span class="p">,</span> <span class="s1">'Album Art'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">:</span> <span class="sa">f</span><span class="s1">'error: </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">}</span>
     
     <span class="k">return</span> <span class="p">{</span><span class="s1">'Artist'</span><span class="p">:</span> <span class="n">artist</span><span class="p">,</span> <span class="s1">'Album Name'</span><span class="p">:</span> <span class="n">album</span><span class="p">,</span> <span class="s1">'Album Art'</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">:</span> <span class="s1">'no_results'</span><span class="p">}</span>
+
+<span class="c1"># --- EXECUTE: Fetch album art for all NMF albums ---</span>
+<span class="n">covers_file</span> <span class="o">=</span> <span class="s1">'data/nmf_album_covers.csv'</span>
+
+<span class="c1"># Load existing covers if they exist</span>
+<span class="n">existing_covers</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
+<span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">covers_file</span><span class="p">):</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">existing_covers</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">covers_file</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">existing_covers</span><span class="p">)</span><span class="si">}</span><span class="s2"> existing album covers."</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error loading existing covers: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+
+<span class="c1"># Get current NMF albums</span>
+<span class="n">nmf_albums</span> <span class="o">=</span> <span class="n">final_recommendations</span><span class="p">[[</span><span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Album'</span><span class="p">]]</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">()</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">nmf_albums</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Album Name'</span><span class="p">]</span>
+
+<span class="c1"># Only fetch albums not already in the covers file</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">existing_covers</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+    <span class="n">already_have</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">existing_covers</span><span class="p">[</span><span class="s1">'Artist'</span><span class="p">],</span> <span class="n">existing_covers</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]))</span>
+    <span class="n">nmf_albums</span> <span class="o">=</span> <span class="n">nmf_albums</span><span class="p">[</span>
+        <span class="o">~</span><span class="n">nmf_albums</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="k">lambda</span> <span class="n">r</span><span class="p">:</span> <span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">'Artist'</span><span class="p">],</span> <span class="n">r</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">])</span> <span class="ow">in</span> <span class="n">already_have</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="p">]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Fetching art for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">nmf_albums</span><span class="p">)</span><span class="si">}</span><span class="s2"> new albums..."</span><span class="p">)</span>
+
+<span class="n">new_covers</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">nmf_albums</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">get_album_art</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="s1">'Artist'</span><span class="p">],</span> <span class="n">row</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'Album Art'</span><span class="p">):</span>
+        <span class="n">new_covers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">new_covers</span><span class="p">:</span>
+    <span class="n">new_covers_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">new_covers</span><span class="p">)[[</span><span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Album Name'</span><span class="p">,</span> <span class="s1">'Album Art'</span><span class="p">]]</span>
+    <span class="n">combined_covers</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">existing_covers</span><span class="p">,</span> <span class="n">new_covers_df</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">combined_covers</span> <span class="o">=</span> <span class="n">combined_covers</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">'Artist'</span><span class="p">,</span> <span class="s1">'Album Name'</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s1">'last'</span><span class="p">)</span>
+    <span class="n">combined_covers</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">covers_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Saved </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">new_covers</span><span class="p">)</span><span class="si">}</span><span class="s2"> new covers. Total: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">combined_covers</span><span class="p">)</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">"ℹ️ No new covers fetched."</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -11495,21 +11716,18 @@ and applies genres to all dataframes.</p>
 <div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
 <div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
 <div class="cm-editor cm-s-jupyter">
-<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_spotify_links</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">generate_spotify_links</span><span class="p">(</span><span class="n">batch_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pred_file</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
     
     <span class="n">output_file</span> <span class="o">=</span> <span class="s1">'data/nmf_album_links.csv'</span>
     
-    <span class="c1"># Check if the output file already exists</span>
+    <span class="c1"># Load existing links if they Fexist</span>
+    <span class="n">existing_links</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">()</span>
     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">overwrite</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Output file </span><span class="si">{</span><span class="n">output_file</span><span class="si">}</span><span class="s2"> already exists."</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"Loading existing links file instead of regenerating..."</span><span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">existing_links</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">output_file</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Loaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">existing_links</span><span class="p">)</span><span class="si">}</span><span class="s2"> existing album links."</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">existing_links</span>
         <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Error loading existing file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">"Continuing with link generation..."</span><span class="p">)</span>
     
     <span class="nb">print</span><span class="p">(</span><span class="s2">"Starting Spotify link generation..."</span><span class="p">)</span>
     
@@ -11598,10 +11816,8 @@ and applies genres to all dataframes.</p>
             <span class="k">break</span>
     
     <span class="k">if</span> <span class="n">track_id_column</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">"ERROR: Could not find a track ID or URI column. Available columns are:"</span><span class="p">)</span>
-        <span class="nb">print</span><span class="p">(</span><span class="n">albums</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
-        <span class="k">return</span> <span class="kc">None</span>
-    
+        <span class="nb">print</span><span class="p">(</span><span class="s2">"No Track URI column found — will search by artist/album name instead."</span><span class="p">)</span>
+
     <span class="c1"># Determine which albums to process</span>
     <span class="k">if</span> <span class="n">batch_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">albums_to_process</span> <span class="o">=</span> <span class="n">albums</span><span class="o">.</span><span class="n">head</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
@@ -11609,13 +11825,31 @@ and applies genres to all dataframes.</p>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">albums_to_process</span> <span class="o">=</span> <span class="n">albums</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Processing all </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">albums</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums..."</span><span class="p">)</span>
-    
+
+    <span class="c1"># Skip albums we already have links for</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">existing_links</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">already_have</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">existing_links</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+        <span class="n">albums_to_process</span> <span class="o">=</span> <span class="n">albums_to_process</span><span class="p">[</span><span class="o">~</span><span class="n">albums_to_process</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span><span class="o">.</span><span class="n">str</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">already_have</span><span class="p">)]</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Skipping </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">albums</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">albums_to_process</span><span class="p">)</span><span class="si">}</span><span class="s2"> already-linked albums. </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">albums_to_process</span><span class="p">)</span><span class="si">}</span><span class="s2"> to fetch."</span><span class="p">)</span>
+
     <span class="c1"># Instead of using apply, let's process one by one for better error tracking</span>
     <span class="n">albums</span><span class="p">[</span><span class="s1">'Album ID'</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    
+
     <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="n">row</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">albums_to_process</span><span class="o">.</span><span class="n">iterrows</span><span class="p">()):</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"</span><span class="se">\n</span><span class="s2">Processing album </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">albums_to_process</span><span class="p">)</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
-        <span class="n">album_id</span> <span class="o">=</span> <span class="n">get_album_id</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">track_id_column</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">track_id_column</span><span class="p">:</span>
+            <span class="n">album_id</span> <span class="o">=</span> <span class="n">get_album_id</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">track_id_column</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Search by artist + album name</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">"album:</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">]</span><span class="si">}</span><span class="s2"> artist:</span><span class="si">{</span><span class="n">row</span><span class="p">[</span><span class="s1">'Artist Name(s)'</span><span class="p">]</span><span class="si">}</span><span class="s2">"</span>
+                <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                <span class="n">search</span> <span class="o">=</span> <span class="n">sp</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">q</span><span class="o">=</span><span class="n">query</span><span class="p">,</span> <span class="nb">type</span><span class="o">=</span><span class="s1">'album'</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+                <span class="n">items</span> <span class="o">=</span> <span class="n">search</span><span class="p">[</span><span class="s1">'albums'</span><span class="p">][</span><span class="s1">'items'</span><span class="p">]</span>
+                <span class="n">album_id</span> <span class="o">=</span> <span class="n">items</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">'id'</span><span class="p">]</span> <span class="k">if</span> <span class="n">items</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Search error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+                <span class="n">album_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">albums</span><span class="o">.</span><span class="n">at</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="s1">'Album ID'</span><span class="p">]</span> <span class="o">=</span> <span class="n">album_id</span>
     
     <span class="c1"># Filter out any failed lookups</span>
@@ -11625,20 +11859,26 @@ and applies genres to all dataframes.</p>
     
     <span class="c1"># Select and reorder columns for output</span>
     <span class="n">output_columns</span> <span class="o">=</span> <span class="p">[</span><span class="s1">'Album Name'</span><span class="p">,</span> <span class="s1">'Artist Name(s)'</span><span class="p">,</span> <span class="s1">'Album ID'</span><span class="p">,</span> <span class="s1">'Spotify URL'</span><span class="p">]</span>
-    <span class="c1"># Make sure all required columns exist</span>
     <span class="n">output_columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">col</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">output_columns</span> <span class="k">if</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">processed_albums</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
     
     <span class="n">output_df</span> <span class="o">=</span> <span class="n">processed_albums</span><span class="p">[</span><span class="n">output_columns</span><span class="p">]</span>
     
-    <span class="c1"># Save to CSV</span>
-    <span class="n">output_df</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="c1"># Merge with existing links — append new, keep old</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">existing_links</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">existing_links</span><span class="p">,</span> <span class="n">output_df</span><span class="p">],</span> <span class="n">ignore_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">combined</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="n">subset</span><span class="o">=</span><span class="p">[</span><span class="s1">'Album Name'</span><span class="p">],</span> <span class="n">keep</span><span class="o">=</span><span class="s1">'last'</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">combined</span> <span class="o">=</span> <span class="n">output_df</span>
     
-    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Successfully generated album links for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">output_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums"</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">output_df</span>
+    <span class="n">combined</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">output_file</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Successfully generated album links for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">output_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> new albums"</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"Total in file: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">combined</span><span class="p">)</span><span class="si">}</span><span class="s2"> albums"</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">combined</span>
 
 <span class="c1"># Run the function</span>
 <span class="c1"># Pass overwrite=True to regenerate links even if the file exists</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">generate_spotify_links</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>  <span class="c1"># Force regenerate all links</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">generate_spotify_links</span><span class="p">(</span><span class="n">overwrite</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">pred_file</span><span class="o">=</span><span class="n">filename</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="s2">"Function completed"</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -11687,6 +11927,33 @@ and applies genres to all dataframes.</p>
 </div>
 </div>
 </div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=0672bbda-5aba-499e-9465-0bf9f47a0b51">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="c1"># === BACKUP COVERS AND LINKS ===</span>
+<span class="n">backup_dir</span> <span class="o">=</span> <span class="s1">'data/backups'</span>
+<span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">backup_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">today</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">'%Y%m</span><span class="si">%d</span><span class="s1">'</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">fname</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'nmf_album_covers.csv'</span><span class="p">,</span> <span class="s1">'nmf_album_links.csv'</span><span class="p">]:</span>
+    <span class="n">src</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'data/</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s1">'</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">src</span><span class="p">):</span>
+        <span class="n">dst</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">backup_dir</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="n">today</span><span class="si">}</span><span class="s1">_</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s1">'</span>
+        <span class="kn">import</span> <span class="nn">shutil</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">dst</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Backed up </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2"> → </span><span class="si">{</span><span class="n">dst</span><span class="si">}</span><span class="s2">"</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"⚠️ </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2"> not found, skipping backup"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
 </div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=35a6ca61-099b-4cb8-9a4c-4f974977cc31">
 <div class="jp-Cell-inputWrapper" tabindex="0">
 <div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
@@ -11711,6 +11978,118 @@ and applies genres to all dataframes.</p>
         <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">html</span><span class="p">)</span>
 
 <span class="nb">print</span><span class="p">(</span><span class="s2">"✅ Clean HTML saved to: graphics/2026_Music_Taste_Data_Prep_CLEAN_New_Years4.html"</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=1e2ba953-bd99-42a2-bd1c-2dd92a257f35">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">smtplib</span>
+<span class="kn">from</span> <span class="nn">email.mime.multipart</span> <span class="kn">import</span> <span class="n">MIMEMultipart</span>
+<span class="kn">from</span> <span class="nn">email.mime.text</span> <span class="kn">import</span> <span class="n">MIMEText</span>
+<span class="kn">from</span> <span class="nn">email.mime.base</span> <span class="kn">import</span> <span class="n">MIMEBase</span>
+<span class="kn">from</span> <span class="nn">email</span> <span class="kn">import</span> <span class="n">encoders</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># --- Ensure feedback_df and filename exist ---</span>
+<span class="k">if</span> <span class="s1">'feedback_df'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span> <span class="ow">or</span> <span class="n">feedback_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"No feedback dataframe available to email."</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="s1">'filename'</span> <span class="ow">not</span> <span class="ow">in</span> <span class="nb">globals</span><span class="p">()</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">"CSV file not found to attach."</span><span class="p">)</span>
+
+<span class="c1"># Format subject line as full month + day + year</span>
+<span class="c1"># Try to parse the date from your CSV date_str first</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">csv_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="s2">"%m-</span><span class="si">%d</span><span class="s2">-%y"</span><span class="p">)</span>
+    <span class="n">subject_date</span> <span class="o">=</span> <span class="n">csv_date</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%B </span><span class="si">%d</span><span class="s2">, %Y"</span><span class="p">)</span>  <span class="c1"># e.g., February 13, 2026</span>
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+    <span class="n">subject_date</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">today</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">"%B </span><span class="si">%d</span><span class="s2">, %Y"</span><span class="p">)</span>
+
+<span class="c1"># Create the email</span>
+<span class="n">msg</span> <span class="o">=</span> <span class="n">MIMEMultipart</span><span class="p">()</span>
+<span class="n">msg</span><span class="p">[</span><span class="s1">'From'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'mike.strusz@gmail.com'</span>
+<span class="n">msg</span><span class="p">[</span><span class="s1">'To'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'mike.strusz@gmail.com'</span>
+<span class="n">msg</span><span class="p">[</span><span class="s1">'Subject'</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">'🎵 NMF Predictions — </span><span class="si">{</span><span class="n">subject_date</span><span class="si">}</span><span class="s1">'</span>
+
+<span class="c1"># Plain-text fallback</span>
+<span class="n">plain_text</span> <span class="o">=</span> <span class="s2">"Model run finished! Open this email in HTML to see the album predictions table."</span>
+
+<span class="c1"># Build HTML table</span>
+<span class="n">html</span> <span class="o">=</span> <span class="s2">"""</span>
+<span class="s2">&lt;html&gt;</span>
+<span class="s2">  &lt;body&gt;</span>
+<span class="s2">    &lt;p&gt;Model run finished! Fill in your scores in the 'Your Score' column while away from the app:&lt;/p&gt;</span>
+<span class="s2">    &lt;table border="1" cellpadding="4" cellspacing="0" style="border-collapse: collapse; font-family: Arial, sans-serif;"&gt;</span>
+<span class="s2">      &lt;tr style="background-color:#f2f2f2;"&gt;</span>
+<span class="s2">        &lt;th&gt;Artist&lt;/th&gt;</span>
+<span class="s2">        &lt;th&gt;Album&lt;/th&gt;</span>
+<span class="s2">        &lt;th&gt;Predicted Score&lt;/th&gt;</span>
+<span class="s2">        &lt;th&gt;Genres&lt;/th&gt;</span>
+<span class="s2">        &lt;th&gt;Similar Artists&lt;/th&gt;</span>
+<span class="s2">        &lt;th&gt;Your Score&lt;/th&gt;</span>
+<span class="s2">      &lt;/tr&gt;</span>
+<span class="s2">"""</span>
+
+<span class="k">for</span> <span class="n">_</span><span class="p">,</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">feedback_df</span><span class="o">.</span><span class="n">iterrows</span><span class="p">():</span>
+    <span class="n">artist</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'Artist'</span><span class="p">]</span>
+    <span class="n">album</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'Album'</span><span class="p">]</span>
+    <span class="n">predicted_score</span> <span class="o">=</span> <span class="n">row</span><span class="p">[</span><span class="s1">'Predicted_Score'</span><span class="p">]</span>
+    
+    <span class="c1"># Genres (empty string if missing)</span>
+    <span class="n">genres</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">'Genres'</span><span class="p">,</span> <span class="s1">''</span><span class="p">)</span> <span class="k">if</span> <span class="s1">'Genres'</span> <span class="ow">in</span> <span class="n">row</span> <span class="k">else</span> <span class="s1">''</span>
+    
+    <span class="c1"># Similar artists: take top 3 from comma-separated string</span>
+    <span class="n">similar_artists</span> <span class="o">=</span> <span class="s1">''</span>
+    <span class="n">similar_col</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">'Similar Artists'</span><span class="p">,</span> <span class="s1">'Similar_Artists'</span><span class="p">]</span> <span class="k">if</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">row</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">similar_col</span> <span class="ow">and</span> <span class="n">row</span><span class="p">[</span><span class="n">similar_col</span><span class="p">]:</span>
+        <span class="n">similar_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">row</span><span class="p">[</span><span class="n">similar_col</span><span class="p">])</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">','</span><span class="p">)]</span>
+        <span class="n">similar_artists</span> <span class="o">=</span> <span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">similar_list</span><span class="p">[:</span><span class="mi">3</span><span class="p">])</span>
+
+    <span class="n">html</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">"""</span>
+<span class="s2">      &lt;tr&gt;</span>
+<span class="s2">        &lt;td&gt;</span><span class="si">{</span><span class="n">artist</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">        &lt;td&gt;</span><span class="si">{</span><span class="n">album</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">        &lt;td&gt;</span><span class="si">{</span><span class="n">predicted_score</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">        &lt;td&gt;</span><span class="si">{</span><span class="n">genres</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">        &lt;td&gt;</span><span class="si">{</span><span class="n">similar_artists</span><span class="si">}</span><span class="s2">&lt;/td&gt;</span>
+<span class="s2">        &lt;td&gt;&lt;/td&gt;</span>
+<span class="s2">      &lt;/tr&gt;</span>
+<span class="s2">    """</span>
+
+<span class="n">html</span> <span class="o">+=</span> <span class="s2">"""</span>
+<span class="s2">    &lt;/table&gt;</span>
+<span class="s2">    &lt;p&gt;Optional: Add notes or gut scores in your reply, and they can be merged back later.&lt;/p&gt;</span>
+<span class="s2">  &lt;/body&gt;</span>
+<span class="s2">&lt;/html&gt;</span>
+<span class="s2">"""</span>
+
+<span class="c1"># Attach both plain text and HTML body</span>
+<span class="n">msg</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">MIMEText</span><span class="p">(</span><span class="n">plain_text</span><span class="p">,</span> <span class="s1">'plain'</span><span class="p">))</span>
+<span class="n">msg</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">MIMEText</span><span class="p">(</span><span class="n">html</span><span class="p">,</span> <span class="s1">'html'</span><span class="p">))</span>
+
+<span class="c1"># Attach the CSV</span>
+<span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">'rb'</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+    <span class="n">part</span> <span class="o">=</span> <span class="n">MIMEBase</span><span class="p">(</span><span class="s1">'application'</span><span class="p">,</span> <span class="s1">'octet-stream'</span><span class="p">)</span>
+    <span class="n">part</span><span class="o">.</span><span class="n">set_payload</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+    <span class="n">encoders</span><span class="o">.</span><span class="n">encode_base64</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+    <span class="n">part</span><span class="o">.</span><span class="n">add_header</span><span class="p">(</span><span class="s1">'Content-Disposition'</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'attachment; filename=</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span><span class="si">}</span><span class="s1">'</span><span class="p">)</span>
+    <span class="n">msg</span><span class="o">.</span><span class="n">attach</span><span class="p">(</span><span class="n">part</span><span class="p">)</span>
+
+<span class="c1"># Send the email via Gmail SMTP</span>
+<span class="k">with</span> <span class="n">smtplib</span><span class="o">.</span><span class="n">SMTP_SSL</span><span class="p">(</span><span class="s1">'smtp.gmail.com'</span><span class="p">,</span> <span class="mi">465</span><span class="p">)</span> <span class="k">as</span> <span class="n">server</span><span class="p">:</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">login</span><span class="p">(</span><span class="s1">'mike.strusz@gmail.com'</span><span class="p">,</span> <span class="s1">'boxjgsqsvlpyzwtx'</span><span class="p">)</span>
+    <span class="n">server</span><span class="o">.</span><span class="n">send_message</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">"✅ Predictions emailed with HTML table and CSV attachment to mike.strusz@gmail.com"</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>

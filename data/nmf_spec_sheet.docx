@@ -1,0 +1,450 @@
+**NMF Model --- Project Spec Sheet**
+
+2026 Pipeline · March 2026 Session
+
+*Predict how much you\'ll like each week\'s new releases before you
+listen.*
+
+**1. What We Fixed This Session**
+
+**Genre Pipeline --- Restoring 2025 Special Sauce**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  Added \'alternative r&b: 10\'   *Cell 26*                 **✅ Done**
+  back to preferred_genres                                  
+
+  Restored 2025 weighted-average  *Cell 26*                 **✅ Done**
+  genre encoding                                            
+
+  Fed liked songs into genre      *Cell 26*                 **✅ Done**
+  encoding corpus                                           
+
+  Added incompatibility filter    *Cell 19*                 **✅ Done**
+  (\_filter_incompatible)                                   
+  ------------------------------- ------------------------- -------------
+
+**Similarity Boost --- Restoring 2025 Backreaching Blessing**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  Expanded liked_artists_df to    *Cell 54*                 **✅ Done**
+  include top 100 ranked albums                             
+
+  Restored 4-tier fuzzy boost     *Cell 54*                 **✅ Done**
+  (was 2 tiers in 2026)                                     
+
+  Tier 2: fuzzy direct match at   *Cell 54*                 **✅ Done**
+  0.8x boost_factor                                         
+
+  Tier 3: fuzzy similar match,    *Cell 54*                 **✅ Done**
+  confidence-scaled                                         
+
+  Tier 4: fuzzy direct liked as   *Cell 54*                 **✅ Done**
+  final fallback                                            
+  ------------------------------- ------------------------- -------------
+
+**Confidence Scaling --- Restored from 2025**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  get_prediction_interval() ---   *Cell 54*                 **✅ Done**
+  tree disagreement as                                      
+  uncertainty                                               
+
+  apply_confidence_scaling() ---  *Cell 54*                 **✅ Done**
+  uncertain scores pulled back                              
+
+  prediction_confidence and       *Cell 54*                 **✅ Done**
+  prediction_uncertainty columns                            
+  added                                                     
+  ------------------------------- ------------------------- -------------
+
+**Security & Environment**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  Last.fm API key moved to .env   *Cell 09, Cell 19*        **✅ Done**
+  file                                                      
+
+  Spotify client_id and           *Cell 61*                 **✅ Done**
+  client_secret moved to .env                               
+
+  .gitignore added to protect     *nmf_app/*                **✅ Done**
+  secrets                                                   
+
+  python-dotenv installed         *environment*             **✅ Done**
+
+  All pd.read_csv calls wrapped   *Cells 04, 17*            **✅ Done**
+  in read_csv_safe()                                        
+  ------------------------------- ------------------------- -------------
+
+**Gut Score Pipeline**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  Thursday gut score pull         *After Cell 06*           **✅ Done**
+  embedded in 2026 notebook                                 
+
+  Gut scores auto-fold into       *Cell 06.5*               **✅ Done**
+  training before feature                                   
+  engineering                                               
+
+  Backup created before each      *Cell 06.5*               **✅ Done**
+  training update                                           
+
+  master_gut_scores.csv →         *RUN_THURSDAY.ipynb*      **✅ Done**
+  source_type = gut_score_rated                             
+  ------------------------------- ------------------------- -------------
+
+**App.py --- Album Matching Fixes**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  load_album_covers() normalizes  *app.py*                  **✅ Done**
+  to \'Album\' column on load                               
+
+  load_album_links() normalizes   *app.py*                  **✅ Done**
+  to \'Album\' column on load                               
+
+  display_album_predictions()     *app.py*                  **✅ Done**
+  merge simplified to single                                
+  column standard                                           
+
+  load_training_data() pointed to *app.py*                  **✅ Done**
+  2026 training CSV                                         
+
+  Dead verify_data import removed *app.py*                  **✅ Done**
+
+  Duplicate                       *app.py*                  **✅ Done**
+  load_similar_artists()                                    
+  definition removed                                        
+  ------------------------------- ------------------------- -------------
+
+**2. In Progress / Still Needs Attention**
+
+**Notebook Cells That Are Wrapping Paper**
+
+These cells can be skipped on every Friday run --- they print
+diagnostics but produce no output the model uses:
+
+  ---------- ------------------------------------------- ------------------
+  **Cell**   **Name**                                    **Safe to Skip**
+
+  07         Final Gut Score Verification                Yes --- prints
+                                                         only
+
+  12         Check 2026 Retooled Data                    Yes --- prints
+                                                         only
+
+  13         Feature Engineering Setup                   Yes --- prints
+                                                         only
+
+  30         Ultra-Simple Centrality Summary             Yes --- prints
+                                                         only
+
+  38         Check Columns                               Yes --- prints
+                                                         only
+
+  47         Final 80/20 Album-Level Validation          Yes --- redundant
+                                                         with Cell 54
+
+  48         Retrain with Album-Aware Split              Yes ---
+                                                         intermediate draft
+
+  50         Feature Comparison                          Yes --- diagnostic
+                                                         only
+
+  51         Real Error Metrics                          Yes --- depends on
+                                                         Cell 50
+  ---------- ------------------------------------------- ------------------
+
+**Cell 55 --- Duplicate Save**
+
+Cell 54 now saves predictions. Cell 55 is a second save. Verify Cell
+54\'s output includes gut_score column --- if yes, Cell 55 can be
+skipped on future runs.
+
+**app.py Still Running on Old File**
+
+The uploaded app.py in the project has the old fixes applied above. The
+new streamlit_app.py generated this session is the clean version. Make
+sure nmf_app/streamlit_app.py is the file you\'re actually running, not
+the old app.py.
+
+**3. Every Friday --- Weekly Run Checklist**
+
+  ---------- ------------------------------------------------ -------------
+  **Step**   **Action**                                       **Time**
+
+  1          Build this week\'s NMF playlist in Spotify from  15-20 min
+             blogs                                            
+
+  2          Export via Exportify → save as data/nmf.csv      2 min
+
+  3          Run 2026 notebook top to bottom (skip wrapping   \~13 min
+             paper cells)                                     
+
+  4          Open Streamlit app --- browse predictions, rate  Weekend
+             a few albums                                     
+
+  5          Gut score pull runs automatically next Friday at Automatic
+             notebook start                                   
+  ---------- ------------------------------------------------ -------------
+
+*Tip: Build next week\'s playlist on your work laptop while the model
+runs on your personal PC. Nearly zero idle time.*
+
+**4. Catch-Up Run Plan (Jan 1 --- Mar 7)**
+
+You have \~10 weeks of missed NMF to archive for the Hidden Gems
+backlog. None of these weeks need perfect predictions --- the goal is
+just to populate data/archived_nmf_with_features/ so the Historical
+Ratings page has something to browse.
+
+-   **Build each week\'s playlist** from your usual blogs in Spotify
+
+-   **Export via Exportify** → save as data/nmf.csv
+
+-   **Run the notebook.** Each run archives that week automatically.
+
+-   **Repeat \~10 times.** Parallel workflow: build next playlist while
+    current run trains.
+
+-   **Speed option:** temporarily drop n_iter=20 to n_iter=10 in Cell 45
+    for catch-up runs, restore for weekly runs.
+
+*Important: The date shown in the Streamlit dropdown comes from Release
+Date in nmf.csv --- not when you ran the notebook. As long as the tracks
+have correct release dates, the app labels each week correctly even if
+you ran them all on the same afternoon.*
+
+**5. Architecture --- What Lives Where**
+
+  ----------------------------------------------- ---------------------------------------
+  **File / Folder**                               **Purpose**
+
+  data/nmf.csv                                    This week\'s NMF tracks from Exportify
+                                                  --- swap out every Friday
+
+  data/2026_training_complete_with_features.csv   Master training set --- grows weekly as
+                                                  gut scores are added
+
+  data/archived_nmf_with_features/                Full-featured NMF tracks from every
+                                                  past week --- feeds Hidden Gems
+
+  data/backups/                                   Auto-backup of training CSV created
+                                                  before each Thursday update
+
+  feedback/master_gut_scores.csv                  Every gut score you\'ve ever entered
+                                                  --- source of truth
+
+  feedback/{date}\_gut_scores.csv                 Weekly gut score files ---
+                                                  automatically merged into master
+
+  predictions/{date}\_Album_Recommendations.csv   Weekly prediction output --- Streamlit
+                                                  reads these for the dropdown
+
+  data/nmf_album_covers.csv                       Cumulative album art cache --- grows
+                                                  each week
+
+  data/nmf_album_links.csv                        Cumulative Spotify link cache --- grows
+                                                  each week
+
+  data/liked_artists_only_similar.csv             Last.fm similar artists --- grows as
+                                                  new artists appear
+
+  data/ten_genres.csv                             Genre cache --- Last.fm fetched genres,
+                                                  updated each run
+
+  data/obscure_artists_mike_likes.csv             Manual genre overrides for artists
+                                                  Last.fm doesn\'t know
+
+  .env                                            API keys --- never commit this file
+  ----------------------------------------------- ---------------------------------------
+
+**6. Possible Future Improvements**
+
+**App.py --- Nice to Have**
+
+-   **Hidden Gems cache refresh:** Currently requires manually clicking
+    \'Update Hidden Gems Cache\' in sidebar. Could auto-refresh after
+    each Thursday pull.
+
+-   **Album art fallback:** When Apple Music returns no art, could try
+    MusicBrainz Cover Art Archive as a secondary source.
+
+-   **Spotify link generation:** Cell 61 hits Spotify API and is slow.
+    Could be parallelized more aggressively or cached more
+    intelligently.
+
+-   **st.cache_data TTL:** load_album_covers() is cached indefinitely.
+    After catch-up runs with many new weeks, the cache will serve stale
+    art until manually cleared. Consider setting TTL=3600.
+
+**Model --- Possible Upgrades**
+
+-   **apply_confidence_scaling:** Just restored from 2025. Worth
+    comparing predicted vs gut score accuracy over the first month to
+    see if it\'s actually helping.
+
+-   **gut_score_rated weighting:** Currently gut-scored albums get
+    importance_weight applied like any other training row. Could give
+    them higher weight since they\'re your most recent, specific signal.
+
+-   **Discovery classifier:** Cell 49 trains a binary 85+ classifier.
+    Its output (discovery_chance) isn\'t surfaced in the Streamlit app
+    yet --- could be a useful secondary signal.
+
+**Data --- Exportify Dependency**
+
+-   **Exportify is grandfathered:** Pre-November 2024 Spotify API
+    access. Don\'t create a new Spotify developer app or modify your
+    existing one --- this would lose grandfathered access.
+
+-   **Contingency plan:** If Exportify loses access, Last.fm has
+    track-level data and genre tags but no audio features. mood_score
+    and energy_profile would need to be rebuilt from genre proxies. Not
+    urgent.
+
+**7. Key Files to Bring to Future Sessions**
+
+When starting a new Claude session on this project, upload or reference:
+
+-   **2026_Music_Taste_Machine_Learning_Data_Prep.ipynb** --- the main
+    notebook, source of truth for the pipeline
+
+-   **RUN_THURSDAY.ipynb** --- gut score integration (now embedded in
+    main notebook, but keep as backup)
+
+-   **streamlit_app.py** --- the Streamlit UI
+
+-   **A short note:** what changed last week, what broke, what you want
+    to tackle
+
+*Claude Projects keeps memory of this session context, but uploading the
+notebook ensures Claude can read the exact current state of your code
+rather than relying on session memory.*
+
+*NMF Model · Milwaukee · Built for catching good shows before they sell
+out*
+
+---
+
+**March 14, 2026 Session --- Full Day**
+
+**Notebook Bug Fixes**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  read_csv_safe() defined before  Cell 06                   **✅ Done**
+  first call                                                
+
+  OptionalF typo fixed to         Cell 01 imports           **✅ Done**
+  Optional                                                  
+
+  Double scaling removed          Cell 42 / 43              **✅ Done**
+  (0-1 then 1-100 redundant)                                
+
+  Hardcoded R² 0.873 replaced     Cell 48                   **✅ Done**
+  with live calculation                                     
+
+  train_indices defined once,     Cell 49 / 50              **✅ Done**
+  duplicate definitions removed                             
+
+  train_albums NameError fixed    Cell 49                   **✅ Done**
+
+  ------------------------------- ------------------------- -------------
+
+**Notebook --- Multi-Week Backfill**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  generate_spotify_links()        Cell 61                   **✅ Done**
+  appends new albums instead of                             
+  skipping if file exists                                   
+
+  Album art execution cell added  After get_album_art()     **✅ Done**
+  (was defined but never called)  def                       
+
+  Backfill cell added: fetches    After Cell 44 archive     **✅ Done**
+  missing covers + Spotify links  cell                      
+  from all archived weeks in one                            
+  shot                                                      
+
+  ------------------------------- ------------------------- -------------
+
+**App.py --- Full Overhaul**
+
+  ------------------------------- ------------------------- -------------
+  **What**                        **Where**                 **Status**
+
+  Sidebar replaced with tab       main()                    **✅ Done**
+  navigation (7 tabs)                                       
+
+  Lora italic Google Font for     cols[2] rating section    **✅ Done**
+  Rate This Album header                                    
+
+  Gut score UI unified ---        display_album_predictions **✅ Done**
+  rated/unrated same form,                                  
+  pre-populated                                             
+
+  Green score + italic review     cols[1] title block       **✅ Done**
+  shown under album title when                              
+  rated                                                     
+
+  Tyler Fix tab added --- edit    Album Fixer tab5          **✅ Done**
+  artist/album/genre/label in                               
+  predictions CSV                                           
+
+  Auto-fetch iTunes covers        Album Fixer tab1          **✅ Done**
+  button added                                              
+
+  Google Images search link per   Album Fixer tab1          **✅ Done**
+  missing album                                             
+
+  TTL=1 on load_predictions,      Cache functions           **✅ Done**
+  load_album_covers,                                        
+  load_album_links                                          
+
+  cache_data.clear() on gut       save_gut_score()          **✅ Done**
+  score save                                                
+
+  Week selector moved to bottom   main() tab1               **✅ Done**
+  with session state rerun                                  
+
+  Date formatted as Month DD      main() tab1               **✅ Done**
+  YYYY                                                      
+
+  Ghost div boxes removed         cols[2], title block      **✅ Done**
+  (gut-score-container,                                     
+  metric-container)                                         
+
+  Playtime fallback to archive    calculate_exact_playtime  **✅ Done**
+  files when not in training                                
+
+  Top 100 star uses HTML strong   highlight_top_100         **✅ Done**
+  instead of markdown **                                    
+
+  Star legend only shows when     display_album_predictions **✅ Done**
+  Top 100 artist present                                    
+
+  Duplicate load_similar_artists  app.py                    **✅ Done**
+  removed                                                   
+
+  ------------------------------- ------------------------- -------------
+
+**Weekly Run Status**
+
+First 2026 weekly run completed March 14. 43 albums predicted for March
+13 2026. R² improved from 0.224 to 0.285. 6 catch-up weeks (Jan-Mar)
+queued to run back to back before next Friday.
+
