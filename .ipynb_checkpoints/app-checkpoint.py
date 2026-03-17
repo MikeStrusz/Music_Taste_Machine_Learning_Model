@@ -475,13 +475,14 @@ def load_album_covers():
         if 'Artist Name(s)' in df.columns and 'Artist' not in df.columns:
             df = df.rename(columns={'Artist Name(s)': 'Artist'})
         df = df.drop_duplicates(subset=['Artist', 'Album'], keep='first')
-        # Prefer local file over remote URL
-        df['Album Art'] = df.apply(
-            lambda row: cover_filename(row['Artist'], row['Album'])
-            if os.path.exists(cover_filename(row['Artist'], row['Album']))
-            else row['Album Art'],
-            axis=1
-        )
+        # Prefer local file over remote URL — only if running locally
+        if not is_running_on_streamlit():
+            df['Album Art'] = df.apply(
+                lambda row: cover_filename(row['Artist'], row['Album'])
+                if os.path.exists(cover_filename(row['Artist'], row['Album']))
+                else row['Album Art'],
+                axis=1
+            )
         return df
     except Exception as e:
         st.error(f"Error loading album covers data: {e}")
