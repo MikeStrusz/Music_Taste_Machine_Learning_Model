@@ -391,18 +391,24 @@ st.markdown("""
 def get_all_prediction_files():
     """
     Get all prediction files and their corresponding dates.
+    Only returns weeks on or after February 1, 2025.
     """
     prediction_files = glob.glob('predictions/*_Album_Recommendations.csv')
     if not prediction_files:
         st.error("No prediction files found!")
         return []
     
-    # Sort files by date (newest first)
+    # Cutoff date: only include weeks from February 2025 onward
+    cutoff_date = datetime(2025, 2, 1)
+    
     file_dates = []
     for file in prediction_files:
         date_str = os.path.basename(file).split('_')[0]
         try:
             date_obj = datetime.strptime(date_str, '%m-%d-%y')
+            # Skip if file date is before cutoff
+            if date_obj < cutoff_date:
+                continue
             formatted_date = date_obj.strftime('%B %d, %Y')
             file_dates.append((file, date_obj, formatted_date))
         except ValueError:
@@ -642,6 +648,104 @@ def save_gut_score(album_name, artist, score, file_path, notes=""):
         
     except Exception as e:
         st.error(f"❌ Error saving gut score: {str(e)}")
+        import traceback
+        st.code(traceback.format_exc())
+
+def save_manual_album(artist, album, score, notes="", genres="", label="", release_date=None, similar_artists="", cover_url=""):
+    """Save a manually added album to the master gut scores file and update covers/links/similar artists."""
+    try:
+        if not artist or not album:
+            st.warning("Artist and Album are required.")
+            return
+        if pd.isna(score) or score < 0 or score > 100:
+            st.warning(f"Invalid score: {score}. Must be 0-100.")
+            return
+
+        master_file = 'feedback/master_gut_scores.csv'
+        os.makedirs('feedback', exist_ok=True)
+
+        # 1. Save to master gut scores
+        new_entry = pd.DataFrame([{
+            'Album': album,
+            'Artist': artist,
+            'gut_score': float(score),
+            'gut_score_date': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+            'notes': notes,
+            'Genres': genres,
+            'Label': label,
+            'Release Date': release_date,
+            'Similar Artists': similar_artists
+        }])
+
+        if os.path.exists(master_file):
+            master_df = pd.read_csv(master_file)
+            master_df = master_df[~((master_df['Album'] == album) & (master_df['Artist'] == artist))]
+            master_df = pd.concat([master_df, new_entry], ignore_index=True)
+        else:
+            master_df = new_entry
+        master_df.to_csv(master_file, index=False)
+        st.write(f"📁 Saved to master: {master_file}")
+
+        # 2. Update covers CSV if cover URL provided
+        if cover_url:
+            covers_file = 'data/nmf_album_covers.csv'
+            os.makedirs('covers', exist_ok=True)
+            key = f"{artist.strip().lower()}_{album.strip().lower()}"
+            local_path = os.path.join('covers', hashlib.md5(key.encode()).hexdigest() + '.jpg')
+            try:
+                img_response = requests.get(cover_url, timeout=10)
+                img_response.raise_for_status()
+                with open(local_path, 'wb') as f:
+                    f.write(img_response.content)
+                # Add to covers CSV
+                if os.path.exists(covers_file):
+                    covers_df = pd.read_csv(covers_file)
+                else:
+                    covers_df = pd.DataFrame(columns=['Artist', 'Album Name', 'Album Art'])
+                covers_df = covers_df[~((covers_df['Artist'] == artist) & (covers_df['Album Name'] == album))]
+                new_covers_row = pd.DataFrame([{'Artist': artist, 'Album Name': album, 'Album Art': local_path}])
+                covers_df = pd.concat([covers_df, new_covers_row], ignore_index=True)
+                covers_df.to_csv(covers_file, index=False)
+                st.write(f"🖼️ Saved cover to: {covers_file}")
+            except Exception as e:
+                st.warning(f"Could not download cover: {e}")
+
+        # 3. Update similar artists CSV
+        if similar_artists:
+            sim_file = 'data/liked_artists_only_similar.csv'
+            if os.path.exists(sim_file):
+                sim_df = pd.read_csv(sim_file)
+            else:
+                sim_df = pd.DataFrame(columns=['Artist', 'Similar Artists'])
+            sim_df = sim_df[sim_df['Artist'] != artist]
+            new_sim_row = pd.DataFrame([{'Artist': artist, 'Similar Artists': similar_artists}])
+            sim_df = pd.concat([sim_df, new_sim_row], ignore_index=True)
+            sim_df.to_csv(sim_file, index=False)
+            st.write(f"🎤 Saved similar artists to: {sim_file}")
+
+        # 4. Also write to manual metadata patches for future model runs
+        if genres or label or release_date:
+            patches_path = 'data/manual_metadata_patches.csv'
+            new_patch = pd.DataFrame([{
+                'Artist': artist,
+                'Album': album,
+                'Genres': genres,
+                'Label': label,
+                'Release Date': release_date
+            }])
+            if os.path.exists(patches_path):
+                patch_df = pd.read_csv(patches_path)
+                patch_df = patch_df[~((patch_df['Artist'] == artist) & (patch_df['Album'] == album))]
+                patch_df = pd.concat([patch_df, new_patch], ignore_index=True)
+            else:
+                patch_df = new_patch
+            patch_df.to_csv(patches_path, index=False)
+            st.write(f"📁 Also saved to patches: {patches_path}")
+
+        st.success(f"✅ Album metadata saved successfully!")
+
+    except Exception as e:
+        st.error(f"❌ Error saving manual album: {str(e)}")
         import traceback
         st.code(traceback.format_exc())
 
@@ -1451,6 +1555,41 @@ def historical_rating_page():
                                     except Exception as e:
                                         st.error(f"❌ Failed: {e}")
 
+    # --- MANUAL ADD ALBUM ---
+    with st.expander("➕ Manually Add Older Album", expanded=False):
+        with st.form("manual_add_form"):
+            col1, col2 = st.columns(2)
+            with col1:
+                manual_artist = st.text_input("Artist", key="manual_artist")
+                manual_album = st.text_input("Album", key="manual_album")
+                manual_score = st.number_input("Gut Score (0-100)", 0, 100, key="manual_score")
+                manual_release_date = st.date_input("Release Date (optional)", value=None, key="manual_release_date")
+            with col2:
+                manual_genres = st.text_input("Genres (optional)", key="manual_genres", placeholder="e.g. Indie Rock, Dream Pop")
+                manual_label = st.text_input("Label (optional)", key="manual_label", placeholder="e.g. Sub Pop, 4AD")
+                manual_similar = st.text_input("Similar Artists (optional, comma‑separated)", key="manual_similar", placeholder="e.g. Beach House, Mazzy Star")
+                manual_cover_url = st.text_input("Album Cover URL (optional)", key="manual_cover_url", placeholder="Paste image URL")
+            manual_notes = st.text_area("Notes (optional)", key="manual_notes", height=68)
+            submitted = st.form_submit_button("💾 Save Album")
+
+            if submitted:
+                if manual_artist and manual_album and manual_score is not None:
+                    # Convert release date to string if provided
+                    release_date_str = manual_release_date.strftime('%Y-%m-%d') if manual_release_date else None
+                    save_manual_album(
+                        manual_artist, manual_album, manual_score,
+                        notes=manual_notes,
+                        genres=manual_genres,
+                        label=manual_label,
+                        release_date=release_date_str,
+                        similar_artists=manual_similar,
+                        cover_url=manual_cover_url
+                    )
+                    st.success(f"✅ Saved {manual_artist} - {manual_album} with score {manual_score}!")
+                    st.rerun()
+                else:
+                    st.warning("Please fill in Artist, Album, and Gut Score.")
+
     # --- OLD FAV LOGIC ---
     if old_fav_btn:
         candidates = []
@@ -2254,6 +2393,18 @@ def main():
         if predictions_df is None:
             st.error("No data found for selected week.")
             return
+        
+        # Filter out nuked albums
+        nuked_df = load_nuked_albums()
+        if not nuked_df.empty:
+            nuked_set = set(zip(nuked_df['Artist'], nuked_df['Album Name']))
+            original_len = len(predictions_df)
+            predictions_df = predictions_df[
+                ~predictions_df.apply(lambda row: (row['Artist'], row['Album Name']) in nuked_set, axis=1)
+            ]
+            if len(predictions_df) < original_len:
+                st.info(f"🎧 Filtered out {original_len - len(predictions_df)} nuked album(s).")
+        
         analysis_date_formatted = datetime.strptime(analysis_date, '%Y-%m-%d').strftime('%B %d, %Y')
         st.subheader(f"Showing {len(predictions_df)} albums for {analysis_date_formatted}")
         st.markdown("<div style='margin-bottom: 20px;'></div>", unsafe_allow_html=True)
