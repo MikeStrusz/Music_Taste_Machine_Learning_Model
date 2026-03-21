@@ -1,5 +1,4 @@
 Album,Artist,Predicted_Score,gut_score,gut_score_date,notes,source_file,predicted_score
-Prizefighter,Mumford & Sons;Chris Stapleton,78.92273657518369,,,,,
 Instant Comfort,Lucid Express,74.79629048562188,,,,,
 Da Realest,Babyfxce E,72.03093814288975,,,,,
 Dedication,Mirah,70.18364031909104,,,,,
@@ -44,3 +43,4 @@ Beautiful Disaster,MGNA Crrrta,37.13475979120613,,,,,
 WORLD WAR TOO,Borokov Borokov;Marie Klock,36.34019056156854,,,,,
 5 Signs You Are Dealing With A Human Demon,Schacke,31.025352092027685,,,,,
 Don't Blame The Peach,Twat Union,,80.0,2026-03-16 14:15:52,"It's a bit crass, but girly british punk is a genre I do enjoy.",02-20-26_Album_Recommendations.csv,
+Prizefighter,Mumford & Sons;Chris Stapleton,,65.0,2026-03-21 15:58:33,,02-20-26_Album_Recommendations.csv,
