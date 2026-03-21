@@ -810,8 +810,39 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     ''', unsafe_allow_html=True)
                 
 # Genres
-                if 'Genres' in row and pd.notna(row['Genres']):
+                if 'Genres' in row and pd.notna(row['Genres']) and str(row['Genres']).strip():
                     st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Genre:</strong> {row["Genres"]}</div>', unsafe_allow_html=True)
+                else:
+                    genre_fix_key = f"fix_genre_{row['Artist']}_{row['Album']}"
+                    if not st.session_state.get(f"genre_saved_{genre_fix_key}"):
+                        with st.expander("🎸 Add Genre", expanded=False):
+                            new_genre = st.text_input("Genre(s)", placeholder="e.g. Indie Rock, Dream Pop", key=f"genre_input_{genre_fix_key}")
+                            if st.button("💾 Save Genre", key=f"genre_save_{genre_fix_key}"):
+                                if new_genre and current_file_path and current_file_path not in ['hidden_gems', 'random_mix', 'random_draw']:
+                                    try:
+                                        pred_df = pd.read_csv(current_file_path)
+                                        if 'Album' in pred_df.columns and 'Album Name' not in pred_df.columns:
+                                            pred_df['Album Name'] = pred_df['Album']
+                                        if 'Artist Name(s)' in pred_df.columns and 'Artist' not in pred_df.columns:
+                                            pred_df['Artist'] = pred_df['Artist Name(s)']
+                                        mask = (pred_df['Artist'] == row['Artist']) & (pred_df['Album Name'] == row['Album'])
+                                        pred_df.loc[mask, 'Genres'] = new_genre
+                                        pred_df.to_csv(current_file_path, index=False)
+                                        # Also write to persistent patch file
+                                        patches_path = 'data/manual_metadata_patches.csv'
+                                        new_patch = pd.DataFrame([{'Artist': row['Artist'], 'Album': row['Album'], 'Label': '', 'Genres': new_genre}])
+                                        if os.path.exists(patches_path):
+                                            patch_df = pd.read_csv(patches_path)
+                                            patch_df = patch_df[~((patch_df['Artist'] == row['Artist']) & (patch_df['Album'] == row['Album']))]
+                                            patch_df = pd.concat([patch_df, new_patch], ignore_index=True)
+                                        else:
+                                            patch_df = new_patch
+                                        patch_df.to_csv(patches_path, index=False)
+                                        st.session_state[f"genre_saved_{genre_fix_key}"] = True
+                                        st.cache_data.clear()
+                                        st.rerun()
+                                    except Exception as e:
+                                        st.error(f"❌ Failed: {e}")
 
                 # Similar Artists
                 artist_for_lookup = row.get('Artist', row.get('Artist Name(s)', ''))
@@ -829,6 +860,34 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                             {"<br><small style='color: #666; font-style: italic;'>⭐ = In your Top 100 favorites</small>" if has_top_100 else ""}
                         </div>
                         ''', unsafe_allow_html=True)
+                    else:
+                        sim_fix_key = f"fix_similar_{artist_for_lookup}"
+                        if not st.session_state.get(f"similar_saved_{sim_fix_key}"):
+                            with st.expander("🎤 Add Similar Artists", expanded=False):
+                                google_query = f"artists similar to {artist_for_lookup}".replace(' ', '+')
+                                google_url = f"https://www.google.com/search?q={google_query}"
+                                sim_col, btn_col = st.columns([3, 1])
+                                with sim_col:
+                                    new_similar = st.text_input("Similar Artists", placeholder="e.g. Beach House, Mazzy Star, Slowdive", key=f"similar_input_{sim_fix_key}")
+                                with btn_col:
+                                    st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+                                    st.markdown(f"[🔍 Google]({google_url})", unsafe_allow_html=True)
+                                if st.button("💾 Save Similar Artists", key=f"similar_save_{sim_fix_key}"):
+                                    if new_similar:
+                                        try:
+                                            sim_df = pd.read_csv('data/liked_artists_only_similar.csv')
+                                            mask = sim_df['Artist'] == artist_for_lookup
+                                            if mask.any():
+                                                sim_df.loc[mask, 'Similar Artists'] = new_similar
+                                            else:
+                                                new_row = pd.DataFrame([{'Artist': artist_for_lookup, 'Similar Artists': new_similar}])
+                                                sim_df = pd.concat([sim_df, new_row], ignore_index=True)
+                                            sim_df.to_csv('data/liked_artists_only_similar.csv', index=False)
+                                            st.session_state[f"similar_saved_{sim_fix_key}"] = True
+                                            st.cache_data.clear()
+                                            st.rerun()
+                                        except Exception as e:
+                                            st.error(f"❌ Failed: {e}")
 
                 # Playtime
                 playtime_str, track_count = calculate_exact_playtime(album_display, artist_display)
@@ -840,8 +899,52 @@ def display_album_predictions(filtered_data, album_covers_df, similar_artists_df
                     st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Tracks:</strong> {int(row["Track_Count"])}</div>', unsafe_allow_html=True)
 
                 # Label
-                if 'Label' in row and pd.notna(row['Label']):
+                if 'Label' in row and pd.notna(row['Label']) and str(row['Label']).strip():
                     st.markdown(f'<div class="large-text" style="font-size: 1.2rem; line-height: 1.6; margin: 8px 0;"><strong>Label:</strong> {row["Label"]}</div>', unsafe_allow_html=True)
+                else:
+                    label_fix_key = f"fix_label_{row['Artist']}_{row['Album']}"
+                    if not st.session_state.get(f"label_saved_{label_fix_key}"):
+                        with st.expander("🏷️ Add Label", expanded=False):
+                            release_year = ""
+                            if 'Release Date' in row and pd.notna(row['Release Date']):
+                                try:
+                                    release_year = str(datetime.strptime(str(row['Release Date']), '%Y-%m-%d').year)
+                                except:
+                                    release_year = str(row['Release Date'])[:4]
+                            google_query = f"what record label was {row['Artist']} on when they released {row['Album']} in {release_year}".replace(' ', '+')
+                            google_url = f"https://www.google.com/search?q={google_query}"
+                            label_col, btn_col = st.columns([3, 1])
+                            with label_col:
+                                new_label = st.text_input("Music Label", placeholder="e.g. Sub Pop, 4AD, Matador", key=f"label_input_{label_fix_key}")
+                            with btn_col:
+                                st.markdown("<div style='margin-top: 28px;'></div>", unsafe_allow_html=True)
+                                st.markdown(f"[🔍 Google]({google_url})", unsafe_allow_html=True)
+                            if st.button("💾 Save Label", key=f"label_save_{label_fix_key}"):
+                                if new_label and current_file_path and current_file_path not in ['hidden_gems', 'random_mix', 'random_draw']:
+                                    try:
+                                        pred_df = pd.read_csv(current_file_path)
+                                        if 'Album' in pred_df.columns and 'Album Name' not in pred_df.columns:
+                                            pred_df['Album Name'] = pred_df['Album']
+                                        if 'Artist Name(s)' in pred_df.columns and 'Artist' not in pred_df.columns:
+                                            pred_df['Artist'] = pred_df['Artist Name(s)']
+                                        mask = (pred_df['Artist'] == row['Artist']) & (pred_df['Album Name'] == row['Album'])
+                                        pred_df.loc[mask, 'Label'] = new_label
+                                        pred_df.to_csv(current_file_path, index=False)
+                                        # Also write to persistent patch file
+                                        patches_path = 'data/manual_metadata_patches.csv'
+                                        new_patch = pd.DataFrame([{'Artist': row['Artist'], 'Album': row['Album'], 'Label': new_label, 'Genres': ''}])
+                                        if os.path.exists(patches_path):
+                                            patch_df = pd.read_csv(patches_path)
+                                            patch_df = patch_df[~((patch_df['Artist'] == row['Artist']) & (patch_df['Album'] == row['Album']))]
+                                            patch_df = pd.concat([patch_df, new_patch], ignore_index=True)
+                                        else:
+                                            patch_df = new_patch
+                                        patch_df.to_csv(patches_path, index=False)
+                                        st.session_state[f"label_saved_{label_fix_key}"] = True
+                                        st.cache_data.clear()
+                                        st.rerun()
+                                    except Exception as e:
+                                        st.error(f"❌ Failed: {e}")
 
                 # Release Date
                 release_date = None
@@ -985,9 +1088,10 @@ def album_fixer_page():
     if 'Artist Name(s)' in album_links_df.columns:
         album_links_df = album_links_df.rename(columns={'Artist Name(s)': 'Artist'})
     
-    tab1, tab2 = st.tabs([
+    tab1, tab2, tab3 = st.tabs([
         "✏️ Edit Album",
         "☢️ Nuke Albums",
+        "✏️ Tyler Fix"
     ])
 
     with tab1:
@@ -1159,6 +1263,52 @@ def album_fixer_page():
             st.success(f"☢️ Nuked {nuke_album}!")
             st.rerun()
 
+    with tab3:
+        st.header("✏️ Tyler Fix — Edit Album Metadata")
+        st.write("Fix artist names, album names, genres, or labels for albums in the current week's predictions.")
+
+        selected = st.selectbox(
+            "Select an album to fix",
+            options=[f"{r['Artist']} - {r['Album Name']}" for _, r in current_albums.iterrows()],
+            key="tyler_fix_select"
+        )
+
+        if selected:
+            current_artist = selected.split(' - ')[0]
+            current_album = selected.split(' - ', 1)[1]
+
+            # Load the predictions file fresh
+            predictions_df = pd.read_csv(latest_file_path)
+            if 'Album' in predictions_df.columns and 'Album Name' not in predictions_df.columns:
+                predictions_df['Album Name'] = predictions_df['Album']
+            if 'Artist Name(s)' in predictions_df.columns and 'Artist' not in predictions_df.columns:
+                predictions_df['Artist'] = predictions_df['Artist Name(s)']
+
+            mask = (
+                (predictions_df['Artist'] == current_artist) &
+                (predictions_df['Album Name'] == current_album)
+            )
+            row = predictions_df[mask].iloc[0] if mask.any() else None
+
+            if row is not None:
+                new_artist = st.text_input("Artist Name", value=current_artist, key="tyler_artist")
+                new_album  = st.text_input("Album Name",  value=current_album,  key="tyler_album")
+                new_genres = st.text_input("Genres",      value=str(row.get('Genres', '')), key="tyler_genres")
+                new_label  = st.text_input("Label",       value=str(row.get('Label', '')),  key="tyler_label")
+
+                if st.button("💾 Save Fixes", key="tyler_save"):
+                    predictions_df.loc[mask, 'Artist']     = new_artist
+                    predictions_df.loc[mask, 'Album Name'] = new_album
+                    predictions_df.loc[mask, 'Album']      = new_album
+                    predictions_df.loc[mask, 'Genres']     = new_genres
+                    predictions_df.loc[mask, 'Label']      = new_label
+                    predictions_df.to_csv(latest_file_path, index=False)
+                    st.success(f"✅ Fixed! {current_artist} - {current_album} updated.")
+                    st.cache_data.clear()
+                    st.rerun()
+            else:
+                st.error("Could not find that album in the predictions file.")
+
 def notebook_page():
     st.title("📓 The Machine Learning Model in my Jupyter Notebook")
     st.subheader("Embedded notebook content below:")
@@ -1227,6 +1377,79 @@ def historical_rating_page():
         st.markdown('</div>', unsafe_allow_html=True)
 
     st.markdown("---")
+
+    # --- QUICK GUT SCORE WIDGET ---
+    with st.expander("⚡ Quick Rate an Album", expanded=False):
+        # Build master album list from all prediction files — cached so typing doesn't rescan CSVs
+        @st.cache_data
+        def build_quick_rate_list(file_list):
+            all_albums_list = []
+            for _, file in file_list:
+                try:
+                    df = pd.read_csv(file)
+                    if 'Album' not in df.columns and 'Album Name' in df.columns:
+                        df['Album'] = df['Album Name']
+                    if 'Artist' not in df.columns and 'Artist Name(s)' in df.columns:
+                        df['Artist'] = df['Artist Name(s)']
+                    for _, r in df[['Artist', 'Album']].drop_duplicates().iterrows():
+                        label = f"{r['Artist']} — {r['Album']}"
+                        all_albums_list.append({'label': label, 'Artist': r['Artist'], 'Album': r['Album'], 'file': file})
+                except:
+                    continue
+            return all_albums_list
+
+        all_albums_list = build_quick_rate_list(tuple(prediction_files))
+
+        if not all_albums_list:
+            st.warning("No albums found.")
+        else:
+            all_labels = [a['label'] for a in all_albums_list]
+            selected_label = st.selectbox("Search artist or album", options=all_labels, index=None, placeholder="Type to search...", key="quick_rate_search")
+            if selected_label:
+                match = next((a for a in all_albums_list if a['label'] == selected_label), None)
+                if match:
+                    qr_col1, qr_col2 = st.columns([1, 3])
+                    with qr_col1:
+                        quick_score = st.number_input("Gut Score", 0, 100, key="quick_rate_score")
+                    with qr_col2:
+                        quick_notes = st.text_area("Mini Review (optional)", height=68, key="quick_rate_notes", placeholder="First impression, vibe, anything...")
+                    if st.button("💾 Save", key="quick_rate_save"):
+                        save_gut_score(match['Album'], match['Artist'], quick_score, match['file'], quick_notes)
+
+                    # Cover fix — only shows if cover is missing
+                    cover_check = album_covers_df[
+                        (album_covers_df['Artist'] == match['Artist']) &
+                        (album_covers_df['Album'] == match['Album'])
+                    ]
+                    has_cover = not cover_check.empty and pd.notna(cover_check.iloc[0]['Album Art']) and str(cover_check.iloc[0]['Album Art']).strip()
+                    if not has_cover:
+                        qr_fix_key = f"qr_fix_cover_{match['Artist']}_{match['Album']}"
+                        if not st.session_state.get(f"qr_cover_saved_{qr_fix_key}"):
+                            st.markdown("<div style='margin-top:8px; font-size:0.9rem; color:#888;'>🖼️ No cover found — add one:</div>", unsafe_allow_html=True)
+                            google_url = f"https://www.google.com/search?tbm=isch&q={match['Artist'].replace(' ', '+')}+{match['Album'].replace(' ', '+')}+album+cover"
+                            st.markdown(f"[🔍 Search Google Images]({google_url})")
+                            new_url = st.text_input("Paste image URL", key=f"qr_cover_url_{qr_fix_key}")
+                            if st.button("💾 Save Cover", key=f"qr_cover_save_{qr_fix_key}"):
+                                if new_url:
+                                    import hashlib, requests as req
+                                    key = f"{match['Artist'].strip().lower()}_{match['Album'].strip().lower()}"
+                                    local_path = os.path.join('covers', hashlib.md5(key.encode()).hexdigest() + '.jpg')
+                                    try:
+                                        os.makedirs('covers', exist_ok=True)
+                                        img_response = req.get(new_url, timeout=10)
+                                        img_response.raise_for_status()
+                                        with open(local_path, 'wb') as f:
+                                            f.write(img_response.content)
+                                        covers_csv = pd.read_csv('data/nmf_album_covers.csv')
+                                        new_row = pd.DataFrame([{'Artist': match['Artist'], 'Album Name': match['Album'], 'Album Art': local_path}])
+                                        covers_csv = pd.concat([covers_csv, new_row], ignore_index=True)
+                                        covers_csv = covers_csv.drop_duplicates(subset=['Artist', 'Album Name'], keep='last')
+                                        covers_csv.to_csv('data/nmf_album_covers.csv', index=False)
+                                        st.session_state[f"qr_cover_saved_{qr_fix_key}"] = True
+                                        st.cache_data.clear()
+                                        st.rerun()
+                                    except Exception as e:
+                                        st.error(f"❌ Failed: {e}")
 
     # --- OLD FAV LOGIC ---
     if old_fav_btn:
@@ -1743,6 +1966,227 @@ def build_graph(df, df_liked_similar, include_nmf=False):
     
     return G
 
+
+def top_100_page():
+    st.title("🏆 Mike's 2026 Album Rankings")
+    st.caption("Live leaderboard — updated as you rate. Only the Top 100 survive.")
+
+    # Load all gut scores from master file
+    master_file = 'feedback/master_gut_scores.csv'
+    if not os.path.exists(master_file):
+        st.info("No gut scores yet — start rating albums in the Weekly Predictions or Discover tabs!")
+        return
+
+    master_df = pd.read_csv(master_file)
+    if master_df.empty or 'gut_score' not in master_df.columns:
+        st.info("No gut scores yet — start rating albums!")
+        return
+
+    # Filter to scored albums only, current year
+    master_df = master_df[master_df['gut_score'].notna()].copy()
+    master_df['gut_score'] = pd.to_numeric(master_df['gut_score'], errors='coerce')
+    master_df = master_df.dropna(subset=['gut_score'])
+
+    # Filter to current year only
+    current_year = datetime.now().year
+    if 'gut_score_date' in master_df.columns:
+        master_df['gut_score_date'] = pd.to_datetime(master_df['gut_score_date'], errors='coerce')
+        master_df = master_df[master_df['gut_score_date'].dt.year == current_year]
+
+    if master_df.empty:
+        st.info(f"No albums rated in {current_year} yet.")
+        return
+
+    # Sort by score descending, keep Top 100 only
+    master_df = master_df.sort_values('gut_score', ascending=False).head(100).reset_index(drop=True)
+    total_rated = len(master_df)
+
+    st.markdown(f"**{total_rated} albums rated in {current_year}** · Showing Top {min(total_rated, 100)}")
+    st.markdown("---")
+
+    # Load covers and links for lookup
+    covers_df = load_album_covers()
+    links_df = load_album_links()
+    prediction_files = [(date_obj, file) for file, date_obj, _ in get_all_prediction_files()]
+
+    # Render each album billboard-style
+    for idx, row in master_df.iterrows():
+        rank = idx + 1
+        artist = str(row.get('Artist', ''))
+        album = str(row.get('Album', ''))
+        score = int(row['gut_score'])
+        notes = str(row.get('notes', '') or '').strip()
+        if notes.lower() == 'nan':
+            notes = ''
+
+        # Look up week it was rated
+        week_str = ''
+        if pd.notna(row.get('gut_score_date')):
+            week_str = row['gut_score_date'].strftime('%B %d, %Y')
+
+        # Look up cover art
+        cover_art = None
+        if not covers_df.empty:
+            cover_match = covers_df[
+                (covers_df['Artist'] == artist) & (covers_df['Album'] == album)
+            ]
+            if not cover_match.empty and pd.notna(cover_match.iloc[0]['Album Art']):
+                cover_art = cover_match.iloc[0]['Album Art']
+
+        # Look up genre and label from predictions files
+        genre_str = ''
+        label_str = ''
+        for file in glob.glob('predictions/*_Album_Recommendations.csv'):
+            try:
+                pred_df = pd.read_csv(file)
+                if 'Album' not in pred_df.columns and 'Album Name' in pred_df.columns:
+                    pred_df['Album'] = pred_df['Album Name']
+                if 'Artist' not in pred_df.columns and 'Artist Name(s)' in pred_df.columns:
+                    pred_df['Artist'] = pred_df['Artist Name(s)']
+                match = pred_df[(pred_df['Artist'] == artist) & (pred_df['Album'] == album)]
+                if not match.empty:
+                    genre_str = str(match.iloc[0].get('Genres', '') or '')
+                    label_str = str(match.iloc[0].get('Label', '') or '')
+                    break
+            except:
+                continue
+
+        # Rank color — gold/silver/bronze for top 3
+        if rank == 1:
+            rank_color = "#FFD700"
+            rank_size = "2.8rem"
+        elif rank == 2:
+            rank_color = "#C0C0C0"
+            rank_size = "2.4rem"
+        elif rank == 3:
+            rank_color = "#CD7F32"
+            rank_size = "2.2rem"
+        elif rank <= 10:
+            rank_color = "#4caf50"
+            rank_size = "2rem"
+        elif rank <= 25:
+            rank_color = "#2196F3"
+            rank_size = "1.8rem"
+        else:
+            rank_color = "#9E9E9E"
+            rank_size = "1.6rem"
+
+        # Look up Spotify URL
+        spotify_url = None
+        if not links_df.empty:
+            link_match = links_df[
+                (links_df['Artist'] == artist) & (links_df['Album'] == album)
+            ]
+            if not link_match.empty and pd.notna(link_match.iloc[0]['Spotify URL']):
+                raw_url = str(link_match.iloc[0]['Spotify URL']).strip()
+                spotify_url = raw_url if raw_url.startswith('http') else 'https://' + raw_url
+
+        # Billboard row
+        col_rank, col_cover, col_info, col_score = st.columns([1, 1, 5, 1])
+
+        with col_rank:
+            st.markdown(
+                f"<div style='font-size: {rank_size}; font-weight: 800; color: {rank_color}; "
+                f"text-align: center; padding-top: 20px;'>#{rank}</div>",
+                unsafe_allow_html=True
+            )
+
+        with col_cover:
+            if cover_art:
+                st.image(cover_art, width=80)
+            else:
+                st.markdown(
+                    "<div style='width:80px; height:80px; background:#f0f0f0; "
+                    "border-radius:6px; display:flex; align-items:center; "
+                    "justify-content:center; font-size:1.8rem;'>🎵</div>",
+                    unsafe_allow_html=True
+                )
+
+        with col_info:
+            # Tiny edit button inline
+            edit_key = f"edit_open_{rank}_{artist}_{album}"
+            toggle_key = f"edit_expanded_{rank}_{artist}_{album}"
+            title_col_a, title_col_b = st.columns([6, 1])
+            with title_col_a:
+                st.markdown(
+                    f"<div style='font-size:1.2rem; font-weight:700; margin-top:8px;'>"
+                    f"{artist} — {album}</div>",
+                    unsafe_allow_html=True
+                )
+            with title_col_b:
+                st.markdown("<div style='margin-top:4px;'>", unsafe_allow_html=True)
+                if st.button("edit", key=edit_key):
+                    st.session_state[toggle_key] = not st.session_state.get(toggle_key, False)
+                st.markdown("</div>", unsafe_allow_html=True)
+
+            meta_parts = []
+            if genre_str.strip():
+                meta_parts.append(genre_str.strip())
+            if label_str.strip():
+                meta_parts.append(f"🏷️ {label_str.strip()}")
+            if week_str:
+                meta_parts.append(f"📅 {week_str}")
+            if spotify_url:
+                meta_parts.append(f"<a href='{spotify_url}' target='_blank' style='color:#1DB954; text-decoration:none; font-size:0.8rem;'>▶ Spotify</a>")
+            if meta_parts:
+                st.markdown(
+                    f"<div style='font-size:0.85rem; color:#888; margin-top:2px;'>"
+                    f"{' · '.join(meta_parts)}</div>",
+                    unsafe_allow_html=True
+                )
+            if notes.strip():
+                st.markdown(
+                    f"<div style='font-size:0.9rem; font-style:italic; color:#666; margin-top:4px;'>"
+                    f"\"{notes.strip()}\"</div>",
+                    unsafe_allow_html=True
+                )
+
+        with col_score:
+            st.markdown(
+                f"<div style='font-size:2rem; font-weight:800; color:{rank_color}; "
+                f"text-align:center; padding-top:16px;'>{score}</div>",
+                unsafe_allow_html=True
+            )
+
+        # Inline edit panel — toggled by edit button
+        if st.session_state.get(toggle_key, False):
+            with st.container():
+                st.markdown("<div style='background:#f8f9fa; border-radius:8px; padding:12px; margin-bottom:8px;'>", unsafe_allow_html=True)
+                edit_col1, edit_col2 = st.columns([1, 3])
+                with edit_col1:
+                    new_score = st.number_input(
+                        "Gut Score",
+                        0, 100, score,
+                        key=f"top100_score_{rank}_{artist}_{album}"
+                    )
+                with edit_col2:
+                    new_notes = st.text_area(
+                        "Mini Review",
+                        value=notes,
+                        height=68,
+                        key=f"top100_notes_{rank}_{artist}_{album}",
+                        placeholder="What do you think of this album?"
+                    )
+                if st.button("💾 Save", key=f"top100_save_{rank}_{artist}_{album}"):
+                    source_file = None
+                    for _, file in prediction_files:
+                        try:
+                            df = pd.read_csv(file)
+                            album_col = 'Album' if 'Album' in df.columns else 'Album Name'
+                            artist_col = 'Artist' if 'Artist' in df.columns else 'Artist Name(s)'
+                            if not df[(df[album_col] == album) & (df[artist_col].str.contains(artist, na=False))].empty:
+                                source_file = file
+                                break
+                        except:
+                            continue
+                    if source_file is None and prediction_files:
+                        source_file = prediction_files[0][1]
+                    save_gut_score(album, artist, new_score, source_file, new_notes)
+                st.markdown("</div>", unsafe_allow_html=True)
+
+        st.markdown("<hr style='margin: 4px 0; border-color: #f0f0f0;'>", unsafe_allow_html=True)
+
+
 def main():
     # Hide sidebar and tighten top padding
     st.markdown("""
@@ -1759,10 +2203,11 @@ def main():
     similar_artists_df = load_similar_artists()
     liked_similar_df = load_similar_artists()
 
-    # Tab navigation
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+    # Tab navigation (now 7 tabs)
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
         "🎵 Weekly Predictions",
         "📅 Historical Ratings",
+        "🏆 Top 100",
         "📓 The Model",
         "🎵 6 Degrees of Lucy Dacus",
         "👤 About Me",
@@ -1861,9 +2306,12 @@ def main():
         historical_rating_page()
 
     with tab3:
-        notebook_page()
+        top_100_page()
 
     with tab4:
+        notebook_page()
+
+    with tab5:
         latest_file = get_all_prediction_files()[0][0] if get_all_prediction_files() else None
         predictions_data = load_predictions(latest_file)
         if predictions_data is None:
@@ -1873,10 +2321,10 @@ def main():
         G = build_graph(df, liked_similar_df, include_nmf=True)
         dacus_game_page(G)
 
-    with tab5:
+    with tab6:
         about_me_page()
 
-    with tab6:
+    with tab7:
         album_fixer_page()
 
 if __name__ == "__main__":

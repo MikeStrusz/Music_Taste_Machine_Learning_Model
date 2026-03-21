@@ -1,6 +1,5 @@
 Album,Artist,Predicted_Score,gut_score,gut_score_date,notes,source_file,predicted_score
 Live at Glasshaus,Annahstasia,73.18600487535959,,,,,
-Better in My Head,Kiss the Scientist,70.07390155879654,,,,,
 Jason P. Woodbury and The Night Bird Singing Quartet,Jason P. Woodbury,68.91141497152483,,,,,
 Sit Down for Rock and Roll,The Foot & Leg Clinic,68.82869118170696,,,,,
 Back to Dust,Hollow Suns,68.66485340289468,,,,,
@@ -42,3 +41,4 @@ Trying Times,James Blake,,75.0,2026-03-15 21:06:51,,03-13-26_Album_Recommendatio
 Lotus Bridge,The Monochrome Set,,62.0,2026-03-15 21:45:53,,03-13-26_Album_Recommendations.csv,
 Monica,Jack Harlow,,70.0,2026-03-16 09:40:07,,03-13-26_Album_Recommendations.csv,
 Preservers Of The Pearl,Daniel Romano;The Outfit,,63.0,2026-03-16 10:06:24,,03-13-26_Album_Recommendations.csv,
+Better in My Head,Kiss the Scientist,,68.0,2026-03-17 10:22:06,,03-13-26_Album_Recommendations.csv,
