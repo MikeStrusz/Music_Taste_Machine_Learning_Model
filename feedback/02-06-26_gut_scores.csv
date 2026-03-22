@@ -1,5 +1,4 @@
 Album,Artist,Predicted_Score,gut_score,gut_score_date,notes,source_file,predicted_score
-Singin’ to an Empty Chair,Ratboys,94.5298844709364,,,,,
 I Swam Here,John Craigie,71.04686017034763,,,,,
 Jessica Pratt,Asher White,67.07845426884968,,,,,
 URGH,"Mandy, Indiana",64.96370010759114,,,,,
@@ -16,3 +15,4 @@ My Ghosts Go Ghost,By Storm;Injury Reserve,37.841226523285854,,,,,
 EXPO,Ulrika Spacek,36.6431324672217,,,,,
 Patchwork,Charlotte Day Wilson,36.267683102494445,,,,,
 Move On With The Year,Alice Costelloe,,58.0,2026-03-17 11:54:28,,02-06-26_Album_Recommendations.csv,
+Singin’ to an Empty Chair,Ratboys,,84.0,2026-03-21 17:52:30,,02-06-26_Album_Recommendations.csv,
