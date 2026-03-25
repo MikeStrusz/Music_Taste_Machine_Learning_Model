@@ -1416,3 +1416,270 @@ def discover_feed(limit: int = 20, offset: int = 0):
         item['Similar Artists'] = sim_match.iloc[0]['Similar Artists'] if not sim_match.empty else None
 
     return clean_nan(feed)
+
+@app.get("/genres")
+def list_genres():
+    """Return all unique genres from prediction files and training data, sorted."""
+    genres = set()
+
+    prediction_files = get_all_prediction_files()
+    for file, _, _ in prediction_files:
+        try:
+            df = pd.read_csv(file)
+            if 'Genres' in df.columns:
+                for val in df['Genres'].dropna():
+                    for g in str(val).split(','):
+                        g = g.strip()
+                        if g:
+                            genres.add(g)
+        except Exception:
+            continue
+
+    training_file = 'data/2026_training_complete_with_features.csv'
+    if os.path.exists(training_file):
+        df = pd.read_csv(training_file)
+        if 'Genres' in df.columns:
+            for val in df['Genres'].dropna():
+                for g in str(val).split(','):
+                    g = g.strip()
+                    if g:
+                        genres.add(g)
+
+    return sorted(genres, key=lambda x: x.lower())
+
+
+@app.get("/discover/filter")
+def discover_filter(genre: str, limit: int = 20, offset: int = 0):
+    """
+    Returns a weighted feed (same as /discover/feed) but only includes albums
+    whose Genres field contains the given genre string (case‑insensitive substring).
+    """
+    # Load vault for historical rank labels
+    vault_df = pd.DataFrame()
+    vault_file = 'data/vault_clean.csv'
+    if os.path.exists(vault_file):
+        vault_df = pd.read_csv(vault_file)
+        vault_df['Artist'] = vault_df['Artist'].str.strip()
+        vault_df['Album'] = vault_df['Album'].str.strip()
+
+    # Load gut scores and nuked albums to exclude
+    gut_scores = load_master_gut_scores()
+    rated_set = set(
+        (g['Artist'], g['Album']) for g in gut_scores
+        if 'Artist' in g and 'Album' in g and g.get('gut_score') is not None
+    )
+    nuke_file = 'data/nuked_albums.csv'
+    nuked_set = set()
+    if os.path.exists(nuke_file):
+        nuked_df = pd.read_csv(nuke_file)
+        nuked_set = set(zip(nuked_df['Artist'], nuked_df['Album Name']))
+
+    excluded = rated_set | nuked_set
+
+    prediction_files = get_all_prediction_files()
+    current_year = datetime.now().year
+
+    new_potential = []
+    take_a_chance = []
+
+    genre_lower = genre.lower().strip()
+
+    for file, date_obj, _ in prediction_files:
+        is_2026 = date_obj.year == current_year
+        try:
+            df = pd.read_csv(file)
+            if 'Album' in df.columns and 'Album Name' not in df.columns:
+                df['Album Name'] = df['Album']
+            if 'Artist Name(s)' in df.columns and 'Artist' not in df.columns:
+                df['Artist'] = df['Artist Name(s)']
+            score_col = 'Predicted_Score' if 'Predicted_Score' in df.columns else 'avg_score'
+            for _, row in df.iterrows():
+                artist = str(row.get('Artist', '')).strip()
+                album = str(row.get('Album', row.get('Album Name', ''))).strip()
+                if not artist or not album:
+                    continue
+                if (artist, album) in excluded:
+                    continue
+                # Genre filter
+                genres = row.get('Genres', '')
+                if pd.isna(genres) or genre_lower not in str(genres).lower():
+                    continue
+
+                score = row.get(score_col, 0)
+                if pd.isna(score):
+                    score = 0
+                entry = {
+                    'Artist': artist,
+                    'Album': album,
+                    'avg_score': float(score),
+                    'gut_score': None,
+                    'notes': None,
+                    'Genres': row.get('Genres'),
+                    'Record Label': row.get('Record Label'),
+                    'Release Date': row.get('Release Date'),
+                    'Similar Artists': None,
+                    'Spotify URL': None,
+                    'Album Art': None,
+                    'feed_type': None,
+                    'is_2026': is_2026,
+                    'prediction_year': str(date_obj.year),
+                }
+                if score >= 65:
+                    new_potential.append(entry)
+                elif score >= 40:
+                    take_a_chance.append(entry)
+        except Exception:
+            continue
+
+    # Old favs — from training data high scorers
+    old_favs = []
+    training_file = 'data/2026_training_complete_with_features.csv'
+    if os.path.exists(training_file):
+        training_df = pd.read_csv(training_file)
+        # Filter training by genre
+        genre_mask = training_df['Genres'].fillna('').str.lower().str.contains(genre_lower, na=False)
+        top_training = training_df[
+            (training_df['source_type'] == 'top_100_ranked') &
+            (training_df['liked'] >= 75) &
+            genre_mask
+        ][['Album Name', 'Artist Name(s)', 'liked', 'Genres']].drop_duplicates()
+        for _, row in top_training.iterrows():
+            artist = str(row['Artist Name(s)']).split(';')[0].split(',')[0].strip()
+            album = str(row['Album Name']).strip()
+            if (artist, album) in excluded:
+                continue
+            vault_match = vault_df[
+                (vault_df['Artist'] == artist) & (vault_df['Album'] == album)
+            ] if not vault_df.empty else pd.DataFrame()
+            vault_rank = int(vault_match.iloc[0]['Rank']) if not vault_match.empty else None
+            vault_year = int(vault_match.iloc[0]['Year']) if not vault_match.empty else None
+            vault_spotify = vault_match.iloc[0]['Spotify URL'] if not vault_match.empty else None
+
+            old_favs.append({
+                'Artist': artist,
+                'Album': album,
+                'avg_score': float(row['liked']),
+                'gut_score': None,
+                'notes': None,
+                'Genres': row.get('Genres'),
+                'Record Label': None,
+                'Release Date': None,
+                'Similar Artists': None,
+                'Spotify URL': vault_spotify,
+                'Album Art': None,
+                'feed_type': 'old_fav',
+                'is_2026': False,
+                'vault_rank': vault_rank,
+                'vault_year': vault_year,
+            })
+
+    # Deduplicate each pool
+    def dedup(pool):
+        seen = set()
+        out = []
+        for item in pool:
+            k = (item['Artist'], item['Album'])
+            if k not in seen:
+                seen.add(k)
+                out.append(item)
+        return out
+
+    new_potential = dedup(new_potential)
+    take_a_chance = dedup(take_a_chance)
+    old_favs = dedup(old_favs)
+
+    # Bias 2026 to front but add randomness within year groups
+    current_2026_new = [x for x in new_potential if x['is_2026']]
+    older_new = [x for x in new_potential if not x['is_2026']]
+    random.shuffle(current_2026_new)
+    random.shuffle(older_new)
+    new_potential = current_2026_new + older_new
+
+    current_2026_chance = [x for x in take_a_chance if x['is_2026']]
+    older_chance = [x for x in take_a_chance if not x['is_2026']]
+    random.shuffle(current_2026_chance)
+    random.shuffle(older_chance)
+    take_a_chance = current_2026_chance + older_chance
+
+    random.shuffle(old_favs)
+
+    # Build weighted feed: 60% new potential, 20% take a chance, 20% old fav
+    total = limit
+    n_new = int(total * 0.6)
+    n_chance = int(total * 0.2)
+    n_old = total - n_new - n_chance
+
+    # Apply offset for pagination
+    pool_new = new_potential[offset * n_new: offset * n_new + n_new]
+    pool_chance = take_a_chance[offset * n_chance: offset * n_chance + n_chance]
+    pool_old = old_favs[offset * n_old: offset * n_old + n_old]
+
+    # Tag feed types
+    for item in pool_new:
+        item['feed_type'] = 'new_potential'
+    for item in pool_chance:
+        item['feed_type'] = 'take_a_chance'
+    for item in pool_old:
+        item['feed_type'] = 'old_fav'
+
+    # Interleave: new, new, new, chance, old, new, new, new, chance, old...
+    feed = []
+    i_new, i_chance, i_old = 0, 0, 0
+    pattern = ['new', 'new', 'new', 'chance', 'old']
+    while len(feed) < total:
+        for slot in pattern:
+            if len(feed) >= total:
+                break
+            if slot == 'new' and i_new < len(pool_new):
+                feed.append(pool_new[i_new]); i_new += 1
+            elif slot == 'chance' and i_chance < len(pool_chance):
+                feed.append(pool_chance[i_chance]); i_chance += 1
+            elif slot == 'old' and i_old < len(pool_old):
+                feed.append(pool_old[i_old]); i_old += 1
+        if i_new >= len(pool_new) and i_chance >= len(pool_chance) and i_old >= len(pool_old):
+            break
+
+    # Enrich with covers, links, similar artists (same as in discover_feed)
+    covers_df = pd.DataFrame()
+    covers_file = 'data/nmf_album_covers.csv'
+    if os.path.exists(covers_file):
+        covers_df = pd.read_csv(covers_file)
+        if 'Artist Name(s)' in covers_df.columns:
+            covers_df = covers_df.rename(columns={'Artist Name(s)': 'Artist'})
+        if 'Album Name' in covers_df.columns and 'Album' not in covers_df.columns:
+            covers_df = covers_df.rename(columns={'Album Name': 'Album'})
+        covers_df = covers_df.drop_duplicates(subset=['Artist', 'Album'], keep='first')
+        def fix_cover_path(val):
+            if pd.isna(val): return None
+            if not isinstance(val, str): return None
+            val = val.replace('\\', '/')
+            if val.startswith('covers/'): return f"/{val}"
+            return val
+        covers_df['Album Art'] = covers_df['Album Art'].apply(fix_cover_path)
+
+    links_df = pd.DataFrame()
+    links_file1 = 'data/nmf_album_links.csv'
+    if os.path.exists(links_file1):
+        links_df1 = pd.read_csv(links_file1)
+        if 'Artist Name(s)' in links_df1.columns:
+            links_df1 = links_df1.rename(columns={'Artist Name(s)': 'Artist'})
+        if 'Album Name' in links_df1.columns:
+            links_df1 = links_df1.rename(columns={'Album Name': 'Album'})
+        links_df = links_df1[['Artist', 'Album', 'Spotify URL']].copy()
+
+    similar_df = pd.DataFrame()
+    similar_file = 'data/liked_artists_only_similar.csv'
+    if os.path.exists(similar_file):
+        similar_df = pd.read_csv(similar_file)
+        similar_df = similar_df.drop_duplicates(subset=['Artist'], keep='first')
+
+    for item in feed:
+        artist, album = item['Artist'], item['Album']
+        cover_match = covers_df[(covers_df['Artist'] == artist) & (covers_df['Album'] == album)] if not covers_df.empty else pd.DataFrame()
+        item['Album Art'] = cover_match.iloc[0]['Album Art'] if not cover_match.empty else None
+        link_match = links_df[(links_df['Artist'] == artist) & (links_df['Album'] == album)] if not links_df.empty else pd.DataFrame()
+        item['Spotify URL'] = link_match.iloc[0]['Spotify URL'] if not link_match.empty else None
+        sim_match = similar_df[similar_df['Artist'] == artist] if not similar_df.empty else pd.DataFrame()
+        item['Similar Artists'] = sim_match.iloc[0]['Similar Artists'] if not sim_match.empty else None
+
+    return clean_nan(feed)

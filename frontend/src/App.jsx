@@ -133,6 +133,7 @@ function AlbumCard({
   onCancelEdit,
   onSaveCover,
   onToggleCoverFix,
+  onSaveMetadata,
 }) {
   const albumKey = `${album.Artist}|${album.Album}`
   const coverUrl = getCoverUrl(album)
@@ -163,6 +164,29 @@ function AlbumCard({
   const [cardHeight, setCardHeight] = useState(null)
   const cardRef = useRef(null)
   const THRESHOLD = 120
+
+  // ── Metadata editing (Genre, Artist, Album) ──
+  const [editingMetadata, setEditingMetadata] = useState(null) // { field, initialValue }
+  const [metadataValue, setMetadataValue] = useState('')
+
+  const startEditMetadata = (field, currentValue) => {
+    setEditingMetadata({ field, initialValue: currentValue })
+    setMetadataValue(currentValue || '')
+  }
+
+  const saveMetadata = () => {
+    if (!editingMetadata) return
+    const { field } = editingMetadata
+    const newValue = metadataValue.trim()
+    if (newValue !== (editingMetadata.initialValue || '')) {
+      onSaveMetadata(album, field, newValue)
+    }
+    setEditingMetadata(null)
+  }
+
+  const cancelEditMetadata = () => {
+    setEditingMetadata(null)
+  }
 
   const getClientX = (e) => e.touches ? e.touches[0].clientX : e.clientX
   const getClientY = (e) => e.touches ? e.touches[0].clientY : e.clientY
@@ -346,8 +370,41 @@ function AlbumCard({
           </div>
 
           <div className="card-title">
-            <span className="artist">{album.Artist}</span> –{' '}
-            <span className="album">{album.Album}</span>
+            {editingMetadata?.field === 'Artist' ? (
+              <input
+                value={metadataValue}
+                onChange={e => setMetadataValue(e.target.value)}
+                onBlur={saveMetadata}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') saveMetadata()
+                  if (e.key === 'Escape') cancelEditMetadata()
+                }}
+                autoFocus
+                style={{ width: 'auto', minWidth: '100px', fontSize: '1rem', fontWeight: 'bold' }}
+              />
+            ) : (
+              <span className="artist" onDoubleClick={() => startEditMetadata('Artist', album.Artist)} style={{ cursor: 'pointer' }}>
+                {album.Artist}
+              </span>
+            )}
+            {' – '}
+            {editingMetadata?.field === 'Album' ? (
+              <input
+                value={metadataValue}
+                onChange={e => setMetadataValue(e.target.value)}
+                onBlur={saveMetadata}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') saveMetadata()
+                  if (e.key === 'Escape') cancelEditMetadata()
+                }}
+                autoFocus
+                style={{ width: 'auto', minWidth: '100px', fontSize: '1rem', fontWeight: 'normal' }}
+              />
+            ) : (
+              <span className="album" onDoubleClick={() => startEditMetadata('Album', album.Album)} style={{ cursor: 'pointer' }}>
+                {album.Album}
+              </span>
+            )}
           </div>
 
           <div className="card-scores">
@@ -400,8 +457,33 @@ function AlbumCard({
             </div>
           </div>
 
-          {album.Genres && (
-            <div className="card-metadata"><strong>Genres:</strong> {album.Genres}</div>
+          {album.Genres !== undefined && (
+            <div className="card-metadata">
+              <strong>Genres:</strong>{' '}
+              {editingMetadata?.field === 'Genres' ? (
+                <textarea
+                  value={metadataValue}
+                  onChange={e => setMetadataValue(e.target.value)}
+                  onBlur={saveMetadata}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      saveMetadata()
+                    }
+                    if (e.key === 'Escape') cancelEditMetadata()
+                  }}
+                  onMouseDown={e => e.stopPropagation()}
+                  onTouchStart={e => e.stopPropagation()}
+                  autoFocus
+                  rows={3}
+                  style={{ width: '100%', fontSize: '0.85rem', padding: '4px', fontFamily: 'inherit', resize: 'vertical' }}
+                />
+              ) : (
+                <span onDoubleClick={() => startEditMetadata('Genres', album.Genres || '')} style={{ cursor: 'pointer' }}>
+                  {album.Genres || ''}
+                </span>
+              )}
+            </div>
           )}
           {album['Similar Artists'] && (
             <div className="card-metadata"><strong>Similar Artists:</strong> {album['Similar Artists']}</div>
@@ -455,6 +537,125 @@ function AlbumCard({
   )
 }
 
+// ─── GenreCombobox ────────────────────────────────────────────────────────────
+function GenreCombobox({ value, onChange, onSelect }) {
+  const [allGenres, setAllGenres] = useState([])
+  const [open, setOpen] = useState(false)
+  const [inputVal, setInputVal] = useState(value || '')
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    axios.get('http://localhost:8000/genres')
+      .then(res => setAllGenres(res.data))
+      .catch(() => {})
+  }, [])
+
+  // Sync external clears (e.g. reshuffle)
+  useEffect(() => {
+    if (value === '') setInputVal('')
+  }, [value])
+
+  const filtered = inputVal.trim()
+    ? allGenres.filter(g => g.toLowerCase().includes(inputVal.toLowerCase()))
+    : allGenres
+
+  const handleInput = (e) => {
+    const val = e.target.value
+    setInputVal(val)
+    setOpen(true)
+    if (val === '') {
+      onSelect('')   // clear filter immediately
+    }
+  }
+
+  const handleSelect = (genre) => {
+    setInputVal(genre)
+    setOpen(false)
+    onSelect(genre)
+  }
+
+  const handleClear = () => {
+    setInputVal('')
+    setOpen(false)
+    onSelect('')
+  }
+
+  // Close on outside click
+  useEffect(() => {
+    const handler = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    return () => document.removeEventListener('mousedown', handler)
+  }, [])
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative', width: '220px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', background: '#fff', overflow: 'hidden' }}>
+        <input
+          type="text"
+          value={inputVal}
+          onChange={handleInput}
+          onFocus={() => setOpen(true)}
+          placeholder="Filter by genre…"
+          style={{
+            flex: 1,
+            padding: '0.35rem 0.7rem',
+            border: 'none',
+            outline: 'none',
+            fontSize: '0.85rem',
+            background: 'transparent',
+          }}
+        />
+        {inputVal && (
+          <button
+            onClick={handleClear}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0.5rem', color: '#aaa', fontSize: '1rem', lineHeight: 1 }}
+          >
+            ×
+          </button>
+        )}
+      </div>
+
+      {open && filtered.length > 0 && (
+        <div style={{
+          position: 'absolute',
+          top: 'calc(100% + 4px)',
+          left: 0,
+          right: 0,
+          background: '#fff',
+          border: '1px solid #ddd',
+          borderRadius: '8px',
+          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
+          maxHeight: '220px',
+          overflowY: 'auto',
+          zIndex: 100,
+        }}>
+          {filtered.slice(0, 60).map(genre => (
+            <div
+              key={genre}
+              onMouseDown={() => handleSelect(genre)}
+              style={{
+                padding: '0.4rem 0.75rem',
+                cursor: 'pointer',
+                fontSize: '0.85rem',
+                color: '#222',
+                borderBottom: '1px solid #f0f0f0',
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
+              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+            >
+              {genre}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ─── App ──────────────────────────────────────────────────────────────────────
 function App() {
   const [activeTab, setActiveTab] = useState('weekly')
@@ -479,7 +680,31 @@ function App() {
   const [feedLoading, setFeedLoading] = useState(false)
   const [feedOffset, setFeedOffset] = useState(0)
   const [feedHasMore, setFeedHasMore] = useState(true)
-
+  const [genreFilter, setGenreFilter] = useState('')
+  const [genreInput, setGenreInput] = useState('')
+    const loadMoreFeed = async (offset, reset = false, genreOverride) => {
+    const activeGenre = genreOverride !== undefined ? genreOverride : genreFilter
+    setFeedLoading(true)
+    try {
+      let url = `http://localhost:8000/discover/feed?limit=20&offset=${offset}`
+      if (activeGenre.trim()) {
+        url = `http://localhost:8000/discover/filter?genre=${encodeURIComponent(activeGenre)}&limit=20&offset=${offset}`
+      }
+      const res = await axios.get(url)
+      const newCards = res.data
+      if (reset) {
+        setFeedAlbums(newCards)
+      } else {
+        setFeedAlbums(prev => [...prev, ...newCards])
+      }
+      setFeedOffset(offset + 1)
+      setFeedHasMore(newCards.length === 20)
+    } catch (err) {
+      console.error('Failed to load feed', err)
+    } finally {
+      setFeedLoading(false)
+    }
+  }
   const sortedAlbums = useMemo(() => {
     return [...albums].sort((a, b) => {
       const aVal = a.gut_score ?? a.avg_score ?? 0
@@ -567,24 +792,13 @@ function App() {
     loadMoreFeed(0, true)
   }, [activeTab])
 
-  const loadMoreFeed = async (offset, reset = false) => {
-    setFeedLoading(true)
-    try {
-      const res = await axios.get(`http://localhost:8000/discover/feed?limit=20&offset=${offset}`)
-      const newCards = res.data
-      if (reset) {
-        setFeedAlbums(newCards)
-      } else {
-        setFeedAlbums(prev => [...prev, ...newCards])
-      }
-      setFeedOffset(offset + 1)
-      setFeedHasMore(newCards.length === 20)
-    } catch (err) {
-      console.error('Failed to load feed', err)
-    } finally {
-      setFeedLoading(false)
-    }
-  }
+  // Load initial feed when switching to discover tab
+  useEffect(() => {
+    if (activeTab !== 'discover') return
+    if (feedAlbums.length > 0) return  // already loaded
+    loadMoreFeed(0, true)
+  }, [activeTab])
+
 
   const handleStartEdit = (album) => {
     setEditingId(`${album.Artist}|${album.Album}`)
@@ -681,6 +895,20 @@ function App() {
     onCancelEdit: handleCancelEdit,
     onSaveCover: handleSaveCover,
     onToggleCoverFix: handleToggleCoverFix,
+    onSaveMetadata: (album, field, newValue) => {
+      // Update local state
+      const updater = a =>
+        a.Artist === album.Artist && a.Album === album.Album
+          ? { ...a, [field]: newValue }
+          : a
+      setAlbums(prev => prev.map(updater))
+      setTop100(prev => prev.map(updater))
+      setOrderedTop100(prev => prev.map(updater))
+      setFeedAlbums(prev => prev.map(updater))
+      setVaultAlbums(prev => prev.map(updater))
+      console.log(`Updated ${field} to "${newValue}" for ${album.Artist} - ${album.Album}`)
+      // TODO: call API to persist metadata changes
+    },
   }
 
   const handleDragEnd = async (result) => {
@@ -931,7 +1159,7 @@ function App() {
     )
   }
 
-  const DiscoverPage = () => {
+  const DiscoverPage = ({ feedAlbums, feedLoading, feedHasMore, loadMoreFeed, feedOffset, genreInput, setGenreInput }) => {
     return (
       <div className="discover-page">
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -941,12 +1169,232 @@ function App() {
               Albums the model scouted — rate to sign, ✕ to cut
             </p>
           </div>
-          <button
-            onClick={() => { setFeedAlbums([]); setFeedOffset(0); setFeedHasMore(true); loadMoreFeed(0, true) }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: '#888', padding: '0.4rem' }}
-          >
-            Reshuffle
-          </button>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <select
+              value={genreInput}
+              onChange={e => {
+                const val = e.target.value
+                setGenreInput(val)
+                setGenreFilter(val)
+                setFeedAlbums([])
+                setFeedOffset(0)
+                setFeedHasMore(true)
+                loadMoreFeed(0, true, val)
+              }}
+              style={{ padding: '0.3rem 0.7rem', borderRadius: '6px', border: '1px solid #ddd', fontSize: '0.85rem', width: '200px', background: '#fff' }}
+            >
+              <option value="">All Genres</option>
+              <option value="abstract hip hop">Abstract Hip Hop</option>
+              <option value="acid jazz">Acid Jazz</option>
+              <option value="acid rock">Acid Rock</option>
+              <option value="acoustic">Acoustic</option>
+              <option value="afrobeat">Afrobeat</option>
+              <option value="afropop">Afropop</option>
+              <option value="alt-country">Alt-Country</option>
+              <option value="alt-pop">Alt-Pop</option>
+              <option value="alt-rock">Alt-Rock</option>
+              <option value="alternative">Alternative</option>
+              <option value="alternative country">Alternative Country</option>
+              <option value="alternative folk">Alternative Folk</option>
+              <option value="alternative hip hop">Alternative Hip Hop</option>
+              <option value="alternative metal">Alternative Metal</option>
+              <option value="alternative r&b">Alternative R&B</option>
+              <option value="alternative rock">Alternative Rock</option>
+              <option value="ambient">Ambient</option>
+              <option value="americana">Americana</option>
+              <option value="art pop">Art Pop</option>
+              <option value="art punk">Art Punk</option>
+              <option value="art rock">Art Rock</option>
+              <option value="avant-garde">Avant-Garde</option>
+              <option value="avant-garde jazz">Avant-Garde Jazz</option>
+              <option value="baroque pop">Baroque Pop</option>
+              <option value="bedroom pop">Bedroom Pop</option>
+              <option value="black metal">Black Metal</option>
+              <option value="blackgaze">Blackgaze</option>
+              <option value="bluegrass">Bluegrass</option>
+              <option value="blues">Blues</option>
+              <option value="blues rock">Blues Rock</option>
+              <option value="boom bap">Boom Bap</option>
+              <option value="bossa nova">Bossa Nova</option>
+              <option value="britpop">Britpop</option>
+              <option value="chamber pop">Chamber Pop</option>
+              <option value="chillwave">Chillwave</option>
+              <option value="city pop">City Pop</option>
+              <option value="classic rock">Classic Rock</option>
+              <option value="classical">Classical</option>
+              <option value="cloud rap">Cloud Rap</option>
+              <option value="coldwave">Coldwave</option>
+              <option value="conscious hip hop">Conscious Hip Hop</option>
+              <option value="contemporary classical">Contemporary Classical</option>
+              <option value="contemporary jazz">Contemporary Jazz</option>
+              <option value="country">Country</option>
+              <option value="country folk">Country Folk</option>
+              <option value="country pop">Country Pop</option>
+              <option value="country rock">Country Rock</option>
+              <option value="dance pop">Dance Pop</option>
+              <option value="dance punk">Dance Punk</option>
+              <option value="dancehall">Dancehall</option>
+              <option value="dark ambient">Dark Ambient</option>
+              <option value="dark folk">Dark Folk</option>
+              <option value="dark wave">Dark Wave</option>
+              <option value="death metal">Death Metal</option>
+              <option value="deathcore">Deathcore</option>
+              <option value="deep house">Deep House</option>
+              <option value="desert rock">Desert Rock</option>
+              <option value="digicore">Digicore</option>
+              <option value="disco">Disco</option>
+              <option value="doom metal">Doom Metal</option>
+              <option value="downtempo">Downtempo</option>
+              <option value="dream pop">Dream Pop</option>
+              <option value="drill">Drill</option>
+              <option value="drone">Drone</option>
+              <option value="drum and bass">Drum and Bass</option>
+              <option value="dub">Dub</option>
+              <option value="dubstep">Dubstep</option>
+              <option value="dungeon synth">Dungeon Synth</option>
+              <option value="emo">Emo</option>
+              <option value="emo rap">Emo Rap</option>
+              <option value="emo revival">Emo Revival</option>
+              <option value="experimental">Experimental</option>
+              <option value="experimental folk">Experimental Folk</option>
+              <option value="experimental hip hop">Experimental Hip Hop</option>
+              <option value="experimental jazz">Experimental Jazz</option>
+              <option value="experimental rock">Experimental Rock</option>
+              <option value="folk">Folk</option>
+              <option value="folk pop">Folk Pop</option>
+              <option value="folk punk">Folk Punk</option>
+              <option value="folk rock">Folk Rock</option>
+              <option value="folktronica">Folktronica</option>
+              <option value="freak folk">Freak Folk</option>
+              <option value="free jazz">Free Jazz</option>
+              <option value="funk">Funk</option>
+              <option value="funk rock">Funk Rock</option>
+              <option value="future bass">Future Bass</option>
+              <option value="future garage">Future Garage</option>
+              <option value="g-funk">G-Funk</option>
+              <option value="gangsta rap">Gangsta Rap</option>
+              <option value="garage rock">Garage Rock</option>
+              <option value="glam rock">Glam Rock</option>
+              <option value="gospel">Gospel</option>
+              <option value="gothic metal">Gothic Metal</option>
+              <option value="gothic rock">Gothic Rock</option>
+              <option value="grime">Grime</option>
+              <option value="grindcore">Grindcore</option>
+              <option value="grunge">Grunge</option>
+              <option value="hard bop">Hard Bop</option>
+              <option value="hard rock">Hard Rock</option>
+              <option value="hardcore">Hardcore</option>
+              <option value="hardcore hip hop">Hardcore Hip Hop</option>
+              <option value="hardcore punk">Hardcore Punk</option>
+              <option value="heavy metal">Heavy Metal</option>
+              <option value="hip hop">Hip Hop</option>
+              <option value="hip-hop">Hip-Hop</option>
+              <option value="honky tonk">Honky Tonk</option>
+              <option value="house">House</option>
+              <option value="hyperpop">Hyperpop</option>
+              <option value="idm">IDM</option>
+              <option value="indie">Indie</option>
+              <option value="indie electronic">Indie Electronic</option>
+              <option value="indie folk">Indie Folk</option>
+              <option value="indie pop">Indie Pop</option>
+              <option value="indie rock">Indie Rock</option>
+              <option value="indietronica">Indietronica</option>
+              <option value="industrial">Industrial</option>
+              <option value="industrial metal">Industrial Metal</option>
+              <option value="instrumental hip hop">Instrumental Hip Hop</option>
+              <option value="j-pop">J-Pop</option>
+              <option value="j-rock">J-Rock</option>
+              <option value="jangle pop">Jangle Pop</option>
+              <option value="jazz">Jazz</option>
+              <option value="jazz fusion">Jazz Fusion</option>
+              <option value="jazz rap">Jazz Rap</option>
+              <option value="jazz rock">Jazz Rock</option>
+              <option value="k-pop">K-Pop</option>
+              <option value="krautrock">Krautrock</option>
+              <option value="latin">Latin</option>
+              <option value="latin jazz">Latin Jazz</option>
+              <option value="latin pop">Latin Pop</option>
+              <option value="lo-fi">Lo-Fi</option>
+              <option value="lo-fi hip hop">Lo-Fi Hip Hop</option>
+              <option value="math rock">Math Rock</option>
+              <option value="melodic hardcore">Melodic Hardcore</option>
+              <option value="melodic death metal">Melodic Death Metal</option>
+              <option value="metal">Metal</option>
+              <option value="metalcore">Metalcore</option>
+              <option value="midwest emo">Midwest Emo</option>
+              <option value="minimal techno">Minimal Techno</option>
+              <option value="modern classical">Modern Classical</option>
+              <option value="neo soul">Neo Soul</option>
+              <option value="neo-psychedelia">Neo-Psychedelia</option>
+              <option value="neo-soul">Neo-Soul</option>
+              <option value="neoclassical">Neoclassical</option>
+              <option value="new wave">New Wave</option>
+              <option value="noise">Noise</option>
+              <option value="noise pop">Noise Pop</option>
+              <option value="noise rock">Noise Rock</option>
+              <option value="outlaw country">Outlaw Country</option>
+              <option value="pop">Pop</option>
+              <option value="pop punk">Pop Punk</option>
+              <option value="pop rap">Pop Rap</option>
+              <option value="pop rock">Pop Rock</option>
+              <option value="post-black metal">Post-Black Metal</option>
+              <option value="post-hardcore">Post-Hardcore</option>
+              <option value="post-metal">Post-Metal</option>
+              <option value="post-punk">Post-Punk</option>
+              <option value="post-punk revival">Post-Punk Revival</option>
+              <option value="post-rock">Post-Rock</option>
+              <option value="power metal">Power Metal</option>
+              <option value="power pop">Power Pop</option>
+              <option value="punk">Punk</option>
+              <option value="punk rock">Punk Rock</option>
+              <option value="r&b">R&B</option>
+              <option value="rap">Rap</option>
+              <option value="reggae">Reggae</option>
+              <option value="reggaeton">Reggaeton</option>
+              <option value="riot grrrl">Riot Grrrl</option>
+              <option value="roots rock">Roots Rock</option>
+              <option value="screamo">Screamo</option>
+              <option value="shoegaze">Shoegaze</option>
+              <option value="singer-songwriter">Singer-Songwriter</option>
+              <option value="ska">Ska</option>
+              <option value="ska punk">Ska Punk</option>
+              <option value="sludge metal">Sludge Metal</option>
+              <option value="slowcore">Slowcore</option>
+              <option value="smooth jazz">Smooth Jazz</option>
+              <option value="soft rock">Soft Rock</option>
+              <option value="soul">Soul</option>
+              <option value="southern hip hop">Southern Hip Hop</option>
+              <option value="southern rock">Southern Rock</option>
+              <option value="space rock">Space Rock</option>
+              <option value="spiritual jazz">Spiritual Jazz</option>
+              <option value="stoner metal">Stoner Metal</option>
+              <option value="stoner rock">Stoner Rock</option>
+              <option value="surf rock">Surf Rock</option>
+              <option value="symphonic metal">Symphonic Metal</option>
+              <option value="synth-pop">Synth-Pop</option>
+              <option value="synthwave">Synthwave</option>
+              <option value="techno">Techno</option>
+              <option value="thrash metal">Thrash Metal</option>
+              <option value="traditional country">Traditional Country</option>
+              <option value="trance">Trance</option>
+              <option value="trap">Trap</option>
+              <option value="trip hop">Trip Hop</option>
+              <option value="trip-hop">Trip-Hop</option>
+              <option value="twee">Twee</option>
+              <option value="uk drill">UK Drill</option>
+              <option value="uk garage">UK Garage</option>
+              <option value="underground hip hop">Underground Hip Hop</option>
+              <option value="vaporwave">Vaporwave</option>
+              <option value="witch house">Witch House</option>
+              <option value="world music">World Music</option>
+            </select>
+            <button
+              onClick={() => { setFeedAlbums([]); setFeedOffset(0); setFeedHasMore(true); loadMoreFeed(0, true) }}
+              style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '0.9rem', color: '#888', padding: '0.4rem' }}
+            >
+              Reshuffle
+            </button>
+          </div>
         </div>
 
         {feedAlbums.length === 0 && feedLoading && <p>Loading your feed...</p>}
@@ -1017,7 +1465,17 @@ function App() {
       )}
 
       {activeTab === 'top100' && <Top100Table />}
-      {activeTab === 'discover' && <DiscoverPage />}
+      {activeTab === 'discover' && (
+        <DiscoverPage
+          feedAlbums={feedAlbums}
+          feedLoading={feedLoading}
+          feedHasMore={feedHasMore}
+          loadMoreFeed={loadMoreFeed}
+          feedOffset={feedOffset}
+          genreInput={genreInput}
+          setGenreInput={setGenreInput}
+        />
+      )}
       {activeTab === 'vault' && <VaultPage
         coverFixExpanded={coverFixExpanded}
         onToggleCoverFix={handleToggleCoverFix}
