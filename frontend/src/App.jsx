@@ -3,6 +3,8 @@ import axios from 'axios'
 import './App.css'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
+const API = import.meta.env.VITE_API_BASE || 'http://localhost:8000'
+
 // ─── ScoreInput ───────────────────────────────────────────────────────────────
 function ScoreInput({ album, initialValue, onSave, onCancel }) {
   const [val, setVal] = useState(initialValue ?? '')
@@ -125,6 +127,7 @@ function AlbumCard({
   editingId,
   coverErrors,
   coverFixExpanded,
+  blindRatingMode,
   getCoverUrl,
   onCoverError,
   onStartEdit,
@@ -409,7 +412,11 @@ function AlbumCard({
 
           <div className="card-scores">
             <div className="predicted-score">
-              Predicted: {album.avg_score?.toFixed(1) || '—'}
+              {blindRatingMode && (gut === undefined || gut === null) ? (
+                <span style={{ color: '#ccc', fontStyle: 'italic', fontSize: '0.8rem' }}>predicted: hidden</span>
+              ) : (
+                <>Predicted: {album.avg_score?.toFixed(1) || '—'}</>
+              )}
             </div>
             <div className="gut-score">
               Your Score:{' '}
@@ -537,123 +544,76 @@ function AlbumCard({
   )
 }
 
-// ─── GenreCombobox ────────────────────────────────────────────────────────────
-function GenreCombobox({ value, onChange, onSelect }) {
-  const [allGenres, setAllGenres] = useState([])
-  const [open, setOpen] = useState(false)
-  const [inputVal, setInputVal] = useState(value || '')
-  const containerRef = useRef(null)
+// ─── insertAlbumGroupOf3 ─────────────────────────────────────────────────────
+// Mutates `ordered` in-place, inserting `album` according to the group-of-3 rule:
+//   1. Divide ordered list into consecutive groups of 3.
+//   2. Find the group whose average score is closest to album.gut_score.
+//   3. Within that group, find the album most closely *above* the new score
+//      (ties go to the existing album — new one loses / goes after).
+//   4. Insert directly after that album. If no album in the group is above,
+//      insert at the end of the group.
+function insertAlbumGroupOf3(ordered, album) {
+  const getScore = a => a.gut_score ?? a.avg_score ?? 0
+  const newScore = getScore(album)
 
-  useEffect(() => {
-    axios.get('http://localhost:8000/genres')
-      .then(res => setAllGenres(res.data))
-      .catch(() => {})
-  }, [])
+  if (ordered.length === 0) {
+    ordered.push(album)
+    return
+  }
 
-  // Sync external clears (e.g. reshuffle)
-  useEffect(() => {
-    if (value === '') setInputVal('')
-  }, [value])
+  // Build groups of 3
+  const groups = []
+  for (let i = 0; i < ordered.length; i += 3) {
+    groups.push({ start: i, items: ordered.slice(i, i + 3) })
+  }
 
-  const filtered = inputVal.trim()
-    ? allGenres.filter(g => g.toLowerCase().includes(inputVal.toLowerCase()))
-    : allGenres
-
-  const handleInput = (e) => {
-    const val = e.target.value
-    setInputVal(val)
-    setOpen(true)
-    if (val === '') {
-      onSelect('')   // clear filter immediately
+  // Find group with average closest to newScore
+  let bestGroupIdx = 0
+  let bestDiff = Infinity
+  groups.forEach((g, gi) => {
+    const avg = g.items.reduce((sum, a) => sum + getScore(a), 0) / g.items.length
+    const diff = Math.abs(avg - newScore)
+    if (diff < bestDiff) {
+      bestDiff = diff
+      bestGroupIdx = gi
     }
-  }
+  })
 
-  const handleSelect = (genre) => {
-    setInputVal(genre)
-    setOpen(false)
-    onSelect(genre)
-  }
+  const group = groups[bestGroupIdx]
+  // Within the group, find the closest album strictly above newScore.
+  // "Ahead in number" = higher score. We want the one with the smallest
+  // score that is still > newScore (i.e. the closest ceiling).
+  // Ties (score === newScore) → existing album wins → insert after it.
+  let insertAfterLocalIdx = -1 // -1 means insert before the whole group
+  let closestAboveDiff = Infinity
 
-  const handleClear = () => {
-    setInputVal('')
-    setOpen(false)
-    onSelect('')
-  }
-
-  // Close on outside click
-  useEffect(() => {
-    const handler = (e) => {
-      if (containerRef.current && !containerRef.current.contains(e.target)) {
-        setOpen(false)
+  group.items.forEach((a, li) => {
+    const s = getScore(a)
+    if (s > newScore) {
+      const diff = s - newScore
+      if (diff < closestAboveDiff) {
+        closestAboveDiff = diff
+        insertAfterLocalIdx = li
+      }
+    } else if (s === newScore) {
+      // Tie → existing wins → new goes after existing
+      if (insertAfterLocalIdx === -1 || li > insertAfterLocalIdx) {
+        insertAfterLocalIdx = li
       }
     }
-    document.addEventListener('mousedown', handler)
-    return () => document.removeEventListener('mousedown', handler)
-  }, [])
+  })
 
-  return (
-    <div ref={containerRef} style={{ position: 'relative', width: '220px' }}>
-      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', background: '#fff', overflow: 'hidden' }}>
-        <input
-          type="text"
-          value={inputVal}
-          onChange={handleInput}
-          onFocus={() => setOpen(true)}
-          placeholder="Filter by genre…"
-          style={{
-            flex: 1,
-            padding: '0.35rem 0.7rem',
-            border: 'none',
-            outline: 'none',
-            fontSize: '0.85rem',
-            background: 'transparent',
-          }}
-        />
-        {inputVal && (
-          <button
-            onClick={handleClear}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 0.5rem', color: '#aaa', fontSize: '1rem', lineHeight: 1 }}
-          >
-            ×
-          </button>
-        )}
-      </div>
+  // Compute absolute insert index
+  let absoluteInsertAt
+  if (insertAfterLocalIdx === -1) {
+    // No album in group is >= newScore; insert at start of group
+    absoluteInsertAt = group.start
+  } else {
+    // Insert after the identified album within the group
+    absoluteInsertAt = group.start + insertAfterLocalIdx + 1
+  }
 
-      {open && filtered.length > 0 && (
-        <div style={{
-          position: 'absolute',
-          top: 'calc(100% + 4px)',
-          left: 0,
-          right: 0,
-          background: '#fff',
-          border: '1px solid #ddd',
-          borderRadius: '8px',
-          boxShadow: '0 4px 16px rgba(0,0,0,0.12)',
-          maxHeight: '220px',
-          overflowY: 'auto',
-          zIndex: 100,
-        }}>
-          {filtered.slice(0, 60).map(genre => (
-            <div
-              key={genre}
-              onMouseDown={() => handleSelect(genre)}
-              style={{
-                padding: '0.4rem 0.75rem',
-                cursor: 'pointer',
-                fontSize: '0.85rem',
-                color: '#222',
-                borderBottom: '1px solid #f0f0f0',
-              }}
-              onMouseEnter={e => e.currentTarget.style.background = '#f5f5f5'}
-              onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-            >
-              {genre}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
-  )
+  ordered.splice(absoluteInsertAt, 0, album)
 }
 
 // ─── App ──────────────────────────────────────────────────────────────────────
@@ -669,6 +629,20 @@ function App() {
   const [orderedTop100, setOrderedTop100] = useState([])
   const [top100Loading, setTop100Loading] = useState(false)
   const [coverFixExpanded, setCoverFixExpanded] = useState({})
+
+  // ── Settings (persisted to localStorage) ──
+  const [blindRatingMode, setBlindRatingMode] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('setting_blindRating') ?? 'false') } catch { return false }
+  })
+  const [showTop100Scores, setShowTop100Scores] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('setting_showTop100Scores') ?? 'false') } catch { return false }
+  })
+  const toggleBlindRating = () => setBlindRatingMode(v => {
+    const next = !v; localStorage.setItem('setting_blindRating', JSON.stringify(next)); return next
+  })
+  const toggleTop100Scores = () => setShowTop100Scores(v => {
+    const next = !v; localStorage.setItem('setting_showTop100Scores', JSON.stringify(next)); return next
+  })
 
   // Vault state
   const [vaultAlbums, setVaultAlbums] = useState([])
@@ -686,9 +660,9 @@ function App() {
     const activeGenre = genreOverride !== undefined ? genreOverride : genreFilter
     setFeedLoading(true)
     try {
-      let url = `http://localhost:8000/discover/feed?limit=20&offset=${offset}`
+      let url = `${API}/discover/feed?limit=20&offset=${offset}`
       if (activeGenre.trim()) {
-        url = `http://localhost:8000/discover/filter?genre=${encodeURIComponent(activeGenre)}&limit=20&offset=${offset}`
+        url = `${API}/discover/filter?genre=${encodeURIComponent(activeGenre)}&limit=20&offset=${offset}`
       }
       const res = await axios.get(url)
       const newCards = res.data
@@ -718,7 +692,7 @@ function App() {
     let url = album['Album Art'].replace(/\\/g, '/')
     if (url.startsWith('/covers/')) url = url.substring(1)
     else if (url.startsWith('./covers/')) url = url.substring(2)
-    if (url.startsWith('covers/')) return `http://localhost:8000/${url}`
+    if (url.startsWith('covers/')) return `${API}/${url}`
     return url
   }
 
@@ -727,7 +701,7 @@ function App() {
   }
 
   useEffect(() => {
-    axios.get('http://localhost:8000/weeks')
+    axios.get(`${API}/weeks`)
       .then(res => {
         setWeeks(res.data)
         if (res.data.length > 0) setSelectedWeek(res.data[0].formatted)
@@ -738,7 +712,7 @@ function App() {
   useEffect(() => {
     if (!selectedWeek) return
     setLoading(true)
-    axios.get(`http://localhost:8000/albums/${encodeURIComponent(selectedWeek)}`)
+    axios.get(`${API}/albums/${encodeURIComponent(selectedWeek)}`)
       .then(res => setAlbums(res.data.albums))
       .catch(err => console.error('Failed to fetch albums', err))
       .finally(() => setLoading(false))
@@ -748,26 +722,25 @@ function App() {
     if (activeTab !== 'top100') return
     setTop100Loading(true)
     Promise.all([
-      axios.get('http://localhost:8000/top100'),
-      axios.get('http://localhost:8000/top100/order'),
+      axios.get(`${API}/top100`),
+      axios.get(`${API}/top100/order`),
     ]).then(async ([res, orderRes]) => {
-      const newList = res.data
+      // ── Feature: only 2026 prediction albums allowed in Top 100 ──
+      const newList = res.data.filter(a => a.prediction_year === '2026')
       const savedOrder = orderRes.data
       const albumMap = new Map(newList.map(a => [`${a.Artist}|${a.Album}`, a]))
       const savedSet = new Set(savedOrder)
+      // Only keep saved-order entries that still exist in the 2026 list
       const ordered = savedOrder.map(k => albumMap.get(k)).filter(Boolean)
 
       for (const album of newList) {
         const key = `${album.Artist}|${album.Album}`
         if (!savedSet.has(key)) {
-          const score = album.gut_score ?? album.avg_score ?? 0
-          let i = 0
-          while (i < ordered.length && (ordered[i].gut_score ?? ordered[i].avg_score ?? 0) >= score) i++
-          ordered.splice(i, 0, album)
+          insertAlbumGroupOf3(ordered, album)
         }
       }
 
-      await axios.post('http://localhost:8000/top100/order', ordered.map(a => `${a.Artist}|${a.Album}`))
+      await axios.post(`${API}/top100/order`, ordered.map(a => `${a.Artist}|${a.Album}`))
       setOrderedTop100(ordered)
       setTop100(newList)
     }).catch(err => console.error('Failed to fetch top 100', err))
@@ -779,7 +752,7 @@ function App() {
     if (activeTab !== 'vault') return
     if (vaultAlbums.length > 0) return
     setVaultLoading(true)
-    axios.get('http://localhost:8000/vault')
+    axios.get(`${API}/vault`)
       .then(res => setVaultAlbums(res.data))
       .catch(err => console.error('Failed to load vault', err))
       .finally(() => setVaultLoading(false))
@@ -808,7 +781,7 @@ function App() {
     const scoreToSave = newScore !== null && newScore !== undefined ? newScore : (album.gut_score ?? 0)
     const notesToSave = newNotes !== null && newNotes !== undefined ? newNotes : (album.notes || '')
     try {
-      await axios.post('http://localhost:8000/rate', {
+      await axios.post(`${API}/rate`, {
         artist: album.Artist,
         album: album.Album,
         score: scoreToSave,
@@ -819,7 +792,25 @@ function App() {
           ? { ...a, gut_score: scoreToSave, notes: notesToSave }
           : a
       setAlbums(prev => prev.map(updater))
-      setOrderedTop100(prev => prev.map(updater))
+
+      // If score changed on a top 100 album, reposition it
+      if (newScore !== null && newScore !== undefined) {
+        setOrderedTop100(prev => {
+          const updated = prev.map(updater)
+          const idx = updated.findIndex(a => a.Artist === album.Artist && a.Album === album.Album)
+          if (idx === -1) return updated
+          // Remove from current position, then re-insert using group-of-3 logic
+          const [item] = updated.splice(idx, 1)
+          insertAlbumGroupOf3(updated, item)
+          // Persist new order
+          axios.post(`${API}/top100/order`, updated.map(a => `${a.Artist}|${a.Album}`))
+            .catch(err => console.error('Failed to save order after rescore', err))
+          return updated
+        })
+      } else {
+        setOrderedTop100(prev => prev.map(updater))
+      }
+
       // When rated in feed, remove card from feed (it's now rated)
       if (newScore !== null && newScore !== undefined) {
         setFeedAlbums(prev => prev.filter(a =>
@@ -836,7 +827,7 @@ function App() {
 
   const handleNuke = async (album) => {
     try {
-      await axios.post('http://localhost:8000/nuke', {
+      await axios.post(`${API}/nuke`, {
         artist: album.Artist,
         album: album.Album,
       })
@@ -859,7 +850,7 @@ function App() {
 
   const handleSaveCover = async (album, imageUrl) => {
     try {
-      await axios.post('http://localhost:8000/save_cover', {
+      await axios.post(`${API}/save_cover`, {
         artist: album.Artist,
         album: album.Album,
         image_url: imageUrl,
@@ -887,6 +878,7 @@ function App() {
     editingId,
     coverErrors,
     coverFixExpanded,
+    blindRatingMode,
     getCoverUrl,
     onCoverError: handleCoverError,
     onStartEdit: handleStartEdit,
@@ -918,19 +910,19 @@ function App() {
     items.splice(result.destination.index, 0, moved)
     setOrderedTop100(items)
     try {
-      await axios.post('http://localhost:8000/top100/order', items.map(i => `${i.Artist}|${i.Album}`))
+      await axios.post(`${API}/top100/order`, items.map(i => `${i.Artist}|${i.Album}`))
     } catch (err) {
       console.error('Failed to save order', err)
     }
   }
 
-  const Top100Table = () => {
+  const Top100Table = ({ showScores, onToggleScores }) => {
     const [editingReviewId, setEditingReviewId] = useState(null)
     const [editReviewValue, setEditReviewValue] = useState('')
 
     const handleSaveReview = async (album, newNotes) => {
       try {
-        await axios.post('http://localhost:8000/rate', {
+        await axios.post(`${API}/rate`, {
           artist: album.Artist,
           album: album.Album,
           score: album.gut_score,
@@ -949,6 +941,25 @@ function App() {
     if (!orderedTop100.length) return <p>No albums in top 100 yet.</p>
 
     return (
+      <div>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '0.75rem' }}>
+          <button
+            onClick={onToggleScores}
+            style={{
+              background: showScores ? '#2d3748' : '#f5f5f5',
+              color: showScores ? '#e2e8f0' : '#555',
+              border: '1px solid #ddd',
+              borderRadius: '6px',
+              padding: '0.3rem 0.9rem',
+              cursor: 'pointer',
+              fontSize: '0.85rem',
+              fontWeight: showScores ? 600 : 400,
+              transition: 'all 0.15s',
+            }}
+          >
+            {showScores ? '🙈 Hide Scores' : '👁 Reveal Scores'}
+          </button>
+        </div>
       <DragDropContext onDragEnd={handleDragEnd}>
         <Droppable droppableId="top100">
           {(provided) => (
@@ -959,6 +970,7 @@ function App() {
                 <div className="artist-col">Artist</div>
                 <div className="album-col">Album</div>
                 <div className="review-col">Review</div>
+                {showScores && <div className="score-col">Score</div>}
               </div>
               {orderedTop100.map((item, idx) => {
                 const albumKey = `${item.Artist}|${item.Album}`
@@ -1024,6 +1036,11 @@ function App() {
                             </span>
                           )}
                         </div>
+                        {showScores && (
+                          <div className="score-col" style={{ color: '#1DB954', fontWeight: 700 }}>
+                            {item.gut_score ?? '—'}
+                          </div>
+                        )}
                       </div>
                     )}
                   </Draggable>
@@ -1034,6 +1051,7 @@ function App() {
           )}
         </Droppable>
       </DragDropContext>
+      </div>
     )
   }
 
@@ -1441,6 +1459,9 @@ function App() {
         <button className={`tab-button ${activeTab === 'vault' ? 'active' : ''}`} onClick={() => setActiveTab('vault')}>
           Vault
         </button>
+        <button className={`tab-button ${activeTab === 'settings' ? 'active' : ''}`} onClick={() => setActiveTab('settings')}>
+          ⚙️ Settings
+        </button>
       </div>
 
       {activeTab === 'weekly' && (
@@ -1464,7 +1485,7 @@ function App() {
         </>
       )}
 
-      {activeTab === 'top100' && <Top100Table />}
+      {activeTab === 'top100' && <Top100Table showScores={showTop100Scores} onToggleScores={toggleTop100Scores} />}
       {activeTab === 'discover' && (
         <DiscoverPage
           feedAlbums={feedAlbums}
@@ -1482,6 +1503,86 @@ function App() {
         onSaveCover={handleSaveCover}
         getCoverUrl={getCoverUrl}
       />}
+
+      {activeTab === 'settings' && (
+        <div style={{ maxWidth: 480, paddingTop: '0.5rem' }}>
+          <h2 style={{ fontSize: '1.2rem', fontWeight: 600, marginBottom: '1.5rem' }}>Settings</h2>
+
+          {/* Blind Rating Mode */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '1.25rem 0', borderBottom: '1px solid #eee' }}>
+            <div style={{ flex: 1, paddingRight: '2rem' }}>
+              <div style={{ fontWeight: 500, marginBottom: '0.25rem' }}>Blind Rating Mode</div>
+              <div style={{ fontSize: '0.85rem', color: '#777', lineHeight: 1.4 }}>
+                Hide predicted scores on album cards until after you give your gut score. Keeps your rating unbiased — the prediction reveals itself once you've committed.
+              </div>
+            </div>
+            <button
+              onClick={toggleBlindRating}
+              style={{
+                flexShrink: 0,
+                width: 48,
+                height: 26,
+                borderRadius: 13,
+                border: 'none',
+                background: blindRatingMode ? '#1DB954' : '#ccc',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'background 0.2s',
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: 3,
+                left: blindRatingMode ? 25 : 3,
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                background: '#fff',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                transition: 'left 0.2s',
+                display: 'block',
+              }} />
+            </button>
+          </div>
+
+          {/* Top 100 Scores */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', padding: '1.25rem 0', borderBottom: '1px solid #eee' }}>
+            <div style={{ flex: 1, paddingRight: '2rem' }}>
+              <div style={{ fontWeight: 500, marginBottom: '0.25rem' }}>Show Scores on Top 100</div>
+              <div style={{ fontSize: '0.85rem', color: '#777', lineHeight: 1.4 }}>
+                Display gut scores on the Top 100 table. Off by default so the ranking feels like its own thing — toggle when you want to check the numbers.
+              </div>
+            </div>
+            <button
+              onClick={toggleTop100Scores}
+              style={{
+                flexShrink: 0,
+                width: 48,
+                height: 26,
+                borderRadius: 13,
+                border: 'none',
+                background: showTop100Scores ? '#1DB954' : '#ccc',
+                cursor: 'pointer',
+                position: 'relative',
+                transition: 'background 0.2s',
+              }}
+            >
+              <span style={{
+                position: 'absolute',
+                top: 3,
+                left: showTop100Scores ? 25 : 3,
+                width: 20,
+                height: 20,
+                borderRadius: '50%',
+                background: '#fff',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)',
+                transition: 'left 0.2s',
+                display: 'block',
+              }} />
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

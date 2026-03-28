@@ -18,7 +18,7 @@ app = FastAPI(title="Mike's Album Rankings API")
 # Allow requests from your React frontend (will be http://localhost:5173 during development)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],   # React dev server
+    allow_origins=["*"],   # allow LAN access for phone testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -306,21 +306,54 @@ def get_albums(week: str):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail=str(e))
 
+def _year_from_prediction_file(source_file: str) -> Optional[int]:
+    """
+    Extract the year from a prediction filename like 'predictions/03-14-26_Album_Recommendations.csv'.
+    Returns e.g. 2026, or None if unparseable.
+    """
+    if not source_file:
+        return None
+    try:
+        basename = os.path.basename(str(source_file))
+        date_part = basename.split('_')[0]          # '03-14-26'
+        date_obj = datetime.strptime(date_part, '%m-%d-%y')
+        return date_obj.year
+    except Exception:
+        return None
+
 @app.get("/top100")
 def top100():
-    """Return current Top 100 albums from master gut scores (2026 only) with covers"""
+    """Return Top 100 albums that came from 2026 prediction files, regardless of when they were rated."""
     master = load_master_gut_scores()
     if not master:
         return []
-    # Filter valid gut scores and current year
+
     df = pd.DataFrame(master)
     df = df[df['gut_score'].notna()]
     df['gut_score'] = pd.to_numeric(df['gut_score'], errors='coerce')
     df = df.dropna(subset=['gut_score'])
-    if 'gut_score_date' in df.columns:
-        df['gut_score_date'] = pd.to_datetime(df['gut_score_date'], errors='coerce')
-        current_year = datetime.now().year
-        df = df[df['gut_score_date'].dt.year == current_year]
+
+    # ── Core filter: album must originate from a 2026 prediction file ──
+    # source_file is stored when the score is saved (e.g. 'predictions/03-14-26_Album_Recommendations.csv')
+    # This is the right signal — not gut_score_date, which changes when you re-rate old albums.
+    current_year = datetime.now().year
+    if 'source_file' in df.columns:
+        df['prediction_year'] = df['source_file'].apply(
+            lambda f: str(_year_from_prediction_file(f)) if _year_from_prediction_file(f) else None
+        )
+        df = df[df['prediction_year'] == str(current_year)]
+    else:
+        # Fallback: no source_file column means old data — exclude everything
+        # (safer than letting non-2026 albums sneak in)
+        return []
+
+    # Exclude nuked albums
+    nuke_file = 'data/nuked_albums.csv'
+    if os.path.exists(nuke_file):
+        nuked_df = pd.read_csv(nuke_file)
+        nuked_set = set(zip(nuked_df['Artist'], nuked_df['Album Name']))
+        df = df[~df.apply(lambda r: (r['Artist'], r['Album']) in nuked_set, axis=1)]
+
     df = df.sort_values('gut_score', ascending=False).head(100)
 
     # Load covers to attach
@@ -372,9 +405,7 @@ def top100():
     if not links_df.empty:
         df = df.merge(links_df[['Artist', 'Album', 'Spotify URL']], on=['Artist', 'Album'], how='left')
 
-    # Stamp prediction year from gut_score_date
-    if 'gut_score_date' in df.columns:
-        df['prediction_year'] = pd.to_datetime(df['gut_score_date'], errors='coerce').dt.year.astype('Int64').astype(str).replace('<NA>', None)
+    # prediction_year is already stamped from source_file above — no need to re-derive from gut_score_date
 
     records = df.to_dict(orient='records')
     return clean_nan(records)
@@ -967,10 +998,20 @@ ORDER_FILE = 'data/top100_order.json'
 
 @app.get("/top100/order")
 def get_top100_order():
-    if os.path.exists(ORDER_FILE):
-        with open(ORDER_FILE, 'r') as f:
-            return json.load(f)
-    return []
+    if not os.path.exists(ORDER_FILE):
+        return []
+    with open(ORDER_FILE, 'r') as f:
+        order = json.load(f)
+    # Strip out any nuked albums so they can never resurface
+    nuke_file = 'data/nuked_albums.csv'
+    if os.path.exists(nuke_file):
+        nuked_df = pd.read_csv(nuke_file)
+        nuked_set = set(zip(nuked_df['Artist'], nuked_df['Album Name']))
+        order = [
+            key for key in order
+            if tuple(key.split('|', 1)) not in nuked_set
+        ]
+    return order
 
 @app.post("/top100/order")
 def save_top100_order(order: List[str]):  # order is list of "Artist|Album" strings
@@ -1099,32 +1140,57 @@ class CoverRequest(BaseModel):
 
 @app.post("/save_cover")
 def save_cover(request: CoverRequest):
-    """Save a cover image URL for an album"""
+    """Download cover image and save locally, then store local path in CSV"""
+    import requests as req
+    import re
+
     covers_file = 'data/nmf_album_covers.csv'
     os.makedirs('data', exist_ok=True)
-    
+    os.makedirs('covers', exist_ok=True)
+
+    # Try to download the image
+    local_path = None
+    try:
+        headers = {'User-Agent': 'Mozilla/5.0'}
+        response = req.get(request.image_url, timeout=10, headers=headers)
+        response.raise_for_status()
+        # Build a safe filename from artist + album
+        safe_name = re.sub(r'[^\w\-]', '_', f"{request.artist}_{request.album}")[:80]
+        ext = 'jpg'
+        content_type = response.headers.get('content-type', '')
+        if 'png' in content_type:
+            ext = 'png'
+        elif 'webp' in content_type:
+            ext = 'webp'
+        filename = f"{safe_name}.{ext}"
+        filepath = os.path.join('covers', filename)
+        with open(filepath, 'wb') as f:
+            f.write(response.content)
+        local_path = f"covers/{filename}"
+    except Exception as e:
+        print(f"Failed to download cover image: {e}")
+        local_path = request.image_url  # fall back to storing the URL
+
     # Load existing covers
     if os.path.exists(covers_file):
         covers_df = pd.read_csv(covers_file)
     else:
         covers_df = pd.DataFrame(columns=['Artist', 'Album Name', 'Album Art', 'status'])
-    
+
     # Remove existing entry for this album
     covers_df = covers_df[~((covers_df['Artist'] == request.artist) & (covers_df['Album Name'] == request.album))]
-    
+
     # Add new entry
     new_row = pd.DataFrame([{
         'Artist': request.artist,
         'Album Name': request.album,
-        'Album Art': request.image_url,
+        'Album Art': local_path,
         'status': None
     }])
     covers_df = pd.concat([covers_df, new_row], ignore_index=True)
-    
-    # Save back
     covers_df.to_csv(covers_file, index=False)
-    
-    return {"status": "ok", "message": f"Cover saved for {request.artist} - {request.album}"}
+
+    return {"status": "ok", "message": f"Cover saved for {request.artist} - {request.album}", "path": local_path}
 
 class NukeRequest(BaseModel):
     artist: str
@@ -1151,6 +1217,15 @@ def nuke_album(request: NukeRequest):
     }])
     nuked_df = pd.concat([nuked_df, new_row], ignore_index=True)
     nuked_df.to_csv(nuke_file, index=False)
+
+    # Also remove from saved top100 order so it never resurfaces
+    if os.path.exists(ORDER_FILE):
+        with open(ORDER_FILE, 'r') as f:
+            order = json.load(f)
+        key = f"{request.artist}|{request.album}"
+        order = [k for k in order if k != key]
+        with open(ORDER_FILE, 'w') as f:
+            json.dump(order, f)
 
     return {"status": "ok", "message": f"Nuked {request.artist} - {request.album}"}
 
